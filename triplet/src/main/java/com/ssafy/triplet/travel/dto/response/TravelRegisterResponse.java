@@ -1,19 +1,21 @@
-package com.ssafy.triplet.travel.dto.request;
+package com.ssafy.triplet.travel.dto.response;
 
-import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Getter
 @Setter
-public class TravelRegisterRequest {
-    private int country;
+public class TravelRegisterResponse {
+    private String walletAccountNumber;
+    private String inviteCode;
+    private String country;
     private LocalDate startDate;
     private LocalDate endDate;
     private String title;
-    private MultipartFile image;
+    private String image;
     private int memberCount;
     private double totalBudget;
     private double airportCost;
@@ -26,5 +28,11 @@ public class TravelRegisterRequest {
         private int categoryId;
         private double budget;
         private double budgetWon;
+
+        public BudgetDTO(int categoryId, double budget, double budgetWon) {
+            this.categoryId = categoryId;
+            this.budget = budget;
+            this.budgetWon = budgetWon;
+        }
     }
 }
