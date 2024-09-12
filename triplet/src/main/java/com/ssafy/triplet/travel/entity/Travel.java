@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Getter
@@ -19,16 +19,16 @@ public class Travel {
     private Long id;
 
     @Column(name = "start_date", nullable = false)
-    private Date staratDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
-    private Date endDate;
+    private LocalDate endDate;
 
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "image")
-    private String image;
+    @Column(name = "image", nullable = true)
+    private String image = "https://github.com/user-attachments/assets/5124d789-1953-4437-a0a5-ca0c2e636dba";
 
     @Column(name = "invite_code")
     private String inviteCode;
@@ -50,6 +50,12 @@ public class Travel {
 
     @Column(name = "total_budget", nullable = false)
     private double totalBudget;
+
+    @Column(name = "airport_cost", nullable = false)
+    private double airportCost;
+
+    @Column(name = "total_budget_won", nullable = false)
+    private double totalBudgetWon;
 
     @ManyToOne
     @JoinColumn(name = "country_id", referencedColumnName = "id", nullable = false)
