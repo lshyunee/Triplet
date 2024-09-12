@@ -1,0 +1,74 @@
+package com.ssafy.triplet.config;
+
+import com.ssafy.triplet.auth.jwt.CustomLogoutFilter;
+import com.ssafy.triplet.auth.jwt.JwtFilter;
+import com.ssafy.triplet.auth.jwt.JwtUtil;
+import com.ssafy.triplet.auth.jwt.LoginFilter;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private final CorsConfigurationSource corsConfigurationSource;
+    private final JwtUtil jwtUtil;
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
+
+    @Bean
+    public BCryptPasswordEncoder bCryptPasswordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http // cors 설정
+                .cors(cors -> cors.configurationSource(corsConfigurationSource));
+        http // form 로그인 disable
+                .formLogin(form -> form.disable());
+        http // 기존 logout disable
+                .logout(logout -> logout.disable());
+        http // csrf disable
+                .csrf(csrf -> csrf.disable());
+        http // http Basic 인증방식 disable
+                .httpBasic(httpBasic -> httpBasic.disable());
+
+        http // 경로별 인가 작업
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/login", "/signup", "/reissue").permitAll()
+                        .anyRequest().hasRole("USER")
+                );
+
+        http // JwtFilter 를 커스텀한 LoginFilter 앞에 등록
+                .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
+        http // 커스텀한 LoginFilter 를 기존의 UsernamePasswordAuthFilter 자리에 등록
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
+                        UsernamePasswordAuthenticationFilter.class);
+        http // 커스텀한 CustomLogoutFilter 를 기존의 LogoutFilter 앞에 등록
+                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
+        http // 세션 stateless 로 설정 -> jwt
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
+        return http.build();
+    }
+
+}

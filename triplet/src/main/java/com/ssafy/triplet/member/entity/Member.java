@@ -1,9 +1,6 @@
 package com.ssafy.triplet.member.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,12 +13,14 @@ public class Member {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String memberId;
+    @Column(unique = true)
+    private String memberId; // 식별자
     private String password;
     private String name;
     private LocalDate birth;
     private Boolean gender;
     private String simplePassword;
     private String phoneNumber;
+    private String role;
 
 }
