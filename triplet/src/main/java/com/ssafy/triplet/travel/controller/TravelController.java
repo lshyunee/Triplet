@@ -3,6 +3,7 @@ package com.ssafy.triplet.travel.controller;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.response.ApiResponse;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
+import com.ssafy.triplet.travel.dto.response.TravelListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import com.ssafy.triplet.travel.service.TravelService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -13,9 +14,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/travel")
+@RequestMapping("/api/v1/travels")
 @RequiredArgsConstructor
 public class TravelController {
 
@@ -68,11 +70,34 @@ public class TravelController {
         }
     }
 
+    @GetMapping("/ongoing")
+    public ResponseEntity<ApiResponse<List<TravelListResponse>>> ongoingTravel(@RequestHeader(name = "Authorization", required = false) String token) {
+        try {
+            Long userId = extractAndValidateUser(token);
+            List<TravelListResponse> responseList = travelService.getTravelOngoingList(userId);
+            if (responseList.isEmpty()) {
+                return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "진행중인 여행이 없습니다."));
+            }
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "진행중인 여행이 조회되었습니다.", responseList));
+        } catch (Exception e) {
+            return handleExceptionList(e);
+        }
+    }
+
 
 
 
     // 예외처리 메서드
     private ResponseEntity<ApiResponse<TravelResponse>> handleException(Exception e) {
+        if (e instanceof CustomException customException) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(customException.getErrorCode(), customException.getMessage()));
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>("E0000", "서버 에러가 발생했습니다."));
+        }
+    }
+
+    private ResponseEntity<ApiResponse<List<TravelListResponse>>> handleExceptionList(Exception e) {
         if (e instanceof CustomException customException) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(customException.getErrorCode(), customException.getMessage()));
         } else {
@@ -91,7 +116,7 @@ public class TravelController {
 //        if (member == null) {
 //            throw new CustomException("M0010", "존재하지 않는 회원입니다.");
 //        }
-        Long userId = 1L;
+        Long userId = 4L;
         return userId;
     }
 }
