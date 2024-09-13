@@ -1,8 +1,8 @@
 package com.ssafy.triplet.travel.service;
 
 import com.ssafy.triplet.exception.CustomException;
-import com.ssafy.triplet.travel.dto.request.TravelRegisterRequest;
-import com.ssafy.triplet.travel.dto.response.TravelRegisterResponse;
+import com.ssafy.triplet.travel.dto.request.TravelRequest;
+import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import com.ssafy.triplet.travel.entity.Country;
 import com.ssafy.triplet.travel.entity.Travel;
 import com.ssafy.triplet.travel.entity.TravelBudget;
@@ -32,16 +32,48 @@ public class TravelServiceImpl implements TravelService {
     private final S3Service s3Service;
 
     @Override
-    public TravelRegisterResponse createTravel(TravelRegisterRequest request, MultipartFile image) throws IOException {
+    public TravelResponse createTravel(TravelRequest request, MultipartFile image) throws IOException {
         validateTravelRequest(request);
         Travel travel = buildTravel(request, image);
         Travel savedTravel = travelRepository.save(travel);
         saveTravelBudgets(request, savedTravel);
-        return buildTravelRegisterResponse(savedTravel, request.getMemberCount());
+        return buildTravelResponse(savedTravel, request.getMemberCount());
     }
 
-    // 필수 값 및 날짜 검증 메서드 (여행 생성)
-    private void validateTravelRequest(TravelRegisterRequest request) {
+//    여행 생성 시 계좌번호 생성
+//    String walletNumber = "124-" + (1000 + new Random().nextInt(9000)) + "-1247";
+
+    @Override
+    public TravelResponse updateTravel(Long travelId, TravelRequest request, MultipartFile image) throws IOException {
+        validateTravelRequest(request);
+
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(() -> new CustomException("T0005", "해당 여행을 찾을 수 없습니다."));
+
+        travel.setStartDate(request.getStartDate());
+        travel.setEndDate(request.getEndDate());
+        travel.setTitle(request.getTitle());
+        travel.setMemberCount(request.getMemberCount());
+        travel.setTotalBudget(request.getTotalBudget());
+
+        if (image != null && !image.isEmpty()) {
+            String fileUrl = s3Service.uploadFile(image);
+            travel.setImage(fileUrl);
+        }
+
+        Country country = countryRepository.findById(request.getCountry())
+                .orElseThrow(() -> new CustomException("T0006", "국가를 찾을 수 없습니다."));
+        travel.setCountry(country);
+
+        Travel updatedTravel = travelRepository.save(travel);
+
+        updateTravelBudgets(request, updatedTravel);
+
+        return buildTravelResponse(updatedTravel, request.getMemberCount());
+    }
+
+    // 필수 값 및 날짜 검증 메서드 (여행 생성, 여행 수정)
+    private void validateTravelRequest(TravelRequest request) {
         if (request.getTitle() == null || request.getTitle().isEmpty() ||
                 request.getStartDate() == null || request.getEndDate() == null ||
                 request.getMemberCount() <= 0 || request.getTotalBudget() <= 0 ||
@@ -54,12 +86,12 @@ public class TravelServiceImpl implements TravelService {
             throw new CustomException("T0003", "시작일은 현재 날짜보다 이후여야 합니다.");
         }
         if (request.getEndDate().isBefore(request.getStartDate())) {
-            throw new CustomException("T0004", "종료일은 시작일보다 이후여야 합니다.");
+            throw new CustomException("T0009", "종료일은 시작일보다 이후여야 합니다.");
         }
     }
 
     // Travel 객체 생성 메서드 (여행 생성)
-    private Travel buildTravel(TravelRegisterRequest request, MultipartFile image) throws IOException {
+    private Travel buildTravel(TravelRequest request, MultipartFile image) throws IOException {
         Travel travel = new Travel();
         travel.setStartDate(request.getStartDate());
         travel.setEndDate(request.getEndDate());
@@ -73,7 +105,7 @@ public class TravelServiceImpl implements TravelService {
         }
 
         Country country = countryRepository.findById(request.getCountry())
-                .orElseThrow(() -> new IllegalArgumentException("국가를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException("T0006", "국가를 찾을 수 없습니다."));
         travel.setCountry(country);
 
         travel.setCreatorId(1L);
@@ -81,11 +113,11 @@ public class TravelServiceImpl implements TravelService {
     }
 
     // TravelBudget 저장 메서드 (여행 생성)
-    private void saveTravelBudgets(TravelRegisterRequest request, Travel travel) {
-        for (TravelRegisterRequest.BudgetDTO budgetDTO : request.getBudgets()) {
+    private void saveTravelBudgets(TravelRequest request, Travel travel) {
+        for (TravelRequest.BudgetDTO budgetDTO : request.getBudgets()) {
             TravelBudget travelBudget = new TravelBudget();
             travelBudget.setCategory(categoryRepository.findById(budgetDTO.getCategoryId())
-                    .orElseThrow(() -> new IllegalArgumentException("Category not found")));
+                    .orElseThrow(() -> new CustomException("T0008", "카테고리를 찾을 수 없습니다.")));
             travelBudget.setCategoryBudget(budgetDTO.getBudget());
             travelBudget.setBudgetWon(budgetDTO.getBudgetWon());
             travelBudget.setTravel(travel);
@@ -93,18 +125,18 @@ public class TravelServiceImpl implements TravelService {
         }
     }
 
-    // 응답 생성 메서드 (여행 생성)
-    private TravelRegisterResponse buildTravelRegisterResponse(Travel travel, int memberCount) {
-        TravelRegisterResponse response = new TravelRegisterResponse();
+    // 응답 생성 메서드 (여행 생성, 여행 수정)
+    private TravelResponse buildTravelResponse(Travel travel, int memberCount) {
+        TravelResponse response = new TravelResponse();
 
         if (memberCount >= 2) {
             String inviteCode = InviteCodeGenerator.generateInviteCode();
             response.setInviteCode(inviteCode);
         }
 
-        String walletNumber = "312-" + (1000 + new Random().nextInt(9000)) + "-0093";
-        response.setWalletAccountNumber(walletNumber);
+        response.setTravelId(travel.getId());
         response.setCountry(travel.getCountry().getName());
+        response.setCountryId(travel.getCountry().getId());
         response.setStartDate(travel.getStartDate());
         response.setEndDate(travel.getEndDate());
         response.setTitle(travel.getTitle());
@@ -115,8 +147,9 @@ public class TravelServiceImpl implements TravelService {
         List<TravelBudget> savedBudgets = travelBudgetRepository.findByTravel(travel);
         response.setBudgets(
                 savedBudgets.stream()
-                        .map(travelBudget -> new TravelRegisterResponse.BudgetDTO(
+                        .map(travelBudget -> new TravelResponse.BudgetDTO(
                                 travelBudget.getCategory().getCategoryId(),
+                                travelBudget.getCategory().getCategoryName(),
                                 travelBudget.getCategoryBudget(),
                                 travelBudget.getBudgetWon()))
                         .collect(Collectors.toList())
@@ -124,5 +157,24 @@ public class TravelServiceImpl implements TravelService {
 
         return response;
     }
+
+    private void updateTravelBudgets(TravelRequest request, Travel travel) {
+        List<TravelBudget> existingBudgets = travelBudgetRepository.findByTravel(travel);
+
+        for (TravelRequest.BudgetDTO budgetDTO : request.getBudgets()) {
+            TravelBudget existingBudget = existingBudgets.stream()
+                    .filter(budget -> budget.getCategory() != null &&
+                            budget.getCategory().getCategoryId() == budgetDTO.getCategoryId())
+                    .findFirst()
+                    .orElseThrow(() -> new CustomException("T0010", "해당 카테고리 예산을 찾을 수 없습니다."));
+
+            existingBudget.setCategoryBudget(budgetDTO.getBudget());
+            existingBudget.setBudgetWon(budgetDTO.getBudgetWon());
+
+            travelBudgetRepository.save(existingBudget);
+        }
+    }
+
+
 }
 

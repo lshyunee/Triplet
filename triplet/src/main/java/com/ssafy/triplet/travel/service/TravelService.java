@@ -1,11 +1,12 @@
 package com.ssafy.triplet.travel.service;
 
-import com.ssafy.triplet.travel.dto.request.TravelRegisterRequest;
-import com.ssafy.triplet.travel.dto.response.TravelRegisterResponse;
+import com.ssafy.triplet.travel.dto.request.TravelRequest;
+import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
 public interface TravelService {
-  TravelRegisterResponse createTravel(TravelRegisterRequest requestDTO, MultipartFile image) throws IOException;
+  TravelResponse createTravel(TravelRequest requestDTO, MultipartFile image) throws IOException;
+  TravelResponse updateTravel(Long travelId, TravelRequest requestDTO, MultipartFile image) throws IOException;
 }

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class TravelRegisterRequest {
+public class TravelRequest {
     private int country;
     private LocalDate startDate;
     private LocalDate endDate;
