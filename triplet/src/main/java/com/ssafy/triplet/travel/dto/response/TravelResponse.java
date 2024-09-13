@@ -17,6 +17,7 @@ public class TravelResponse {
     private LocalDate endDate;
     private String title;
     private String image;
+    private Long creatorId;
     private int memberCount;
     private double totalBudget;
     private double airportCost;

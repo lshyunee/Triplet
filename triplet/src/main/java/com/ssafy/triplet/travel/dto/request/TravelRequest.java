@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 public class TravelRequest {
+    private Long creatorId;
     private int country;
     private LocalDate startDate;
     private LocalDate endDate;
