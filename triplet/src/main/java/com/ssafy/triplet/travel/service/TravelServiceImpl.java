@@ -1,15 +1,16 @@
 package com.ssafy.triplet.travel.service;
 
 import com.ssafy.triplet.exception.CustomException;
+import com.ssafy.triplet.member.entity.Member;
+import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
+import com.ssafy.triplet.travel.dto.response.TravelListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import com.ssafy.triplet.travel.entity.Country;
 import com.ssafy.triplet.travel.entity.Travel;
 import com.ssafy.triplet.travel.entity.TravelBudget;
-import com.ssafy.triplet.travel.repository.CategoryRepository;
-import com.ssafy.triplet.travel.repository.CountryRepository;
-import com.ssafy.triplet.travel.repository.TravelBudgetRepository;
-import com.ssafy.triplet.travel.repository.TravelRepository;
+import com.ssafy.triplet.travel.entity.TravelMember;
+import com.ssafy.triplet.travel.repository.*;
 import com.ssafy.triplet.travel.util.InviteCodeGenerator;
 import com.ssafy.triplet.travel.util.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -18,14 +19,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class TravelServiceImpl implements TravelService {
     private final TravelRepository travelRepository;
+    private final MemberRepository memberRepository;
+    private final TravelMemberRepository travelMemberRepository;
     private final TravelBudgetRepository travelBudgetRepository;
     private final CategoryRepository categoryRepository;
     private final CountryRepository countryRepository;
@@ -36,6 +39,7 @@ public class TravelServiceImpl implements TravelService {
         validateTravelRequest(request);
         Travel travel = buildTravel(userId, request, image);
         Travel savedTravel = travelRepository.save(travel);
+        insertTravelMembers(userId, travel.getId());
         saveTravelBudgets(request, savedTravel);
         return buildTravelResponse(savedTravel, request.getMemberCount());
     }
@@ -79,6 +83,27 @@ public class TravelServiceImpl implements TravelService {
         } else {
             throw new CustomException("T0004", "여행이 존재하지 않습니다.");
         }
+    }
+
+    @Override
+    public List<TravelListResponse> getTravelOngoingList(Long userId) {
+        LocalDate today = LocalDate.now();
+        List<Travel> travelList = travelRepository.findByUserIdInTravelMembers(userId, today);
+        List<TravelListResponse> responseList = new ArrayList<>();
+        for (Travel travel : travelList) {
+            TravelListResponse response = new TravelListResponse();
+            response.setTitle(travel.getTitle());
+            response.setStartDate(travel.getStartDate());
+            response.setEndDate(travel.getEndDate());
+            response.setImage(travel.getImage());
+            response.setCountryId(travel.getCountry().getId());
+            response.setCountryName(travel.getCountry().getName());
+            response.setMemberCount(travel.getMemberCount());
+            response.setTotalBudget(travel.getTotalBudget());
+
+            responseList.add(response);
+        }
+        return responseList;
     }
 
     // 필수 값 및 날짜 검증 메서드 (여행 생성, 여행 수정)
@@ -168,6 +193,7 @@ public class TravelServiceImpl implements TravelService {
         return response;
     }
 
+    // 여행 예산 테이블 수정
     private void updateTravelBudgets(TravelRequest request, Travel travel) {
         List<TravelBudget> existingBudgets = travelBudgetRepository.findByTravel(travel);
 
@@ -185,6 +211,16 @@ public class TravelServiceImpl implements TravelService {
         }
     }
 
+    // 여행 멤버 테이블에 추가
+    private void insertTravelMembers(Long userId, Long travelId) {
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("M0010", "존재하지 않는 회원입니다."));
+        TravelMember travelMember = new TravelMember();
+        travelMember.setTravel(travel);
+        travelMember.setMember(member);
+        travelMemberRepository.save(travelMember);
+    }
 
 }
-

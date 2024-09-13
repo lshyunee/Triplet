@@ -62,6 +62,8 @@ public class Travel {
     Country country;
 
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
-    private List<TravelBudget> travelBudgets;
+    private List<TravelMember> travelMembers;
 
+    @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
+    private List<TravelBudget> travelBudgets;
 }

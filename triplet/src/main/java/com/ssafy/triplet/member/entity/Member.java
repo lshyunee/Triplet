@@ -19,7 +19,7 @@ public class Member {
     private String memberId;
     private String password;
     private String name;
-    private LocalDate birth;
+    private String birth;
     private Boolean gender;
     private String simplePassword;
     private String phoneNumber;
