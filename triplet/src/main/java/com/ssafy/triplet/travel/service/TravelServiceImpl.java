@@ -32,9 +32,9 @@ public class TravelServiceImpl implements TravelService {
     private final S3Service s3Service;
 
     @Override
-    public TravelResponse createTravel(TravelRequest request, MultipartFile image) throws IOException {
+    public TravelResponse createTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
         validateTravelRequest(request);
-        Travel travel = buildTravel(request, image);
+        Travel travel = buildTravel(userId, request, image);
         Travel savedTravel = travelRepository.save(travel);
         saveTravelBudgets(request, savedTravel);
         return buildTravelResponse(savedTravel, request.getMemberCount());
@@ -72,6 +72,15 @@ public class TravelServiceImpl implements TravelService {
         return buildTravelResponse(updatedTravel, request.getMemberCount());
     }
 
+    @Override
+    public void deleteTravel(Long travelId) {
+        if (travelRepository.existsById(travelId)) {
+            travelRepository.deleteById(travelId);
+        } else {
+            throw new CustomException("T0004", "여행이 존재하지 않습니다.");
+        }
+    }
+
     // 필수 값 및 날짜 검증 메서드 (여행 생성, 여행 수정)
     private void validateTravelRequest(TravelRequest request) {
         if (request.getTitle() == null || request.getTitle().isEmpty() ||
@@ -91,13 +100,14 @@ public class TravelServiceImpl implements TravelService {
     }
 
     // Travel 객체 생성 메서드 (여행 생성)
-    private Travel buildTravel(TravelRequest request, MultipartFile image) throws IOException {
+    private Travel buildTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
         Travel travel = new Travel();
         travel.setStartDate(request.getStartDate());
         travel.setEndDate(request.getEndDate());
         travel.setTitle(request.getTitle());
         travel.setMemberCount(request.getMemberCount());
         travel.setTotalBudget(request.getTotalBudget());
+        travel.setCreatorId(userId);
 
         if (image != null && !image.isEmpty()) {
             String fileUrl = s3Service.uploadFile(image);
@@ -108,7 +118,6 @@ public class TravelServiceImpl implements TravelService {
                 .orElseThrow(() -> new CustomException("T0006", "국가를 찾을 수 없습니다."));
         travel.setCountry(country);
 
-        travel.setCreatorId(1L);
         return travel;
     }
 
@@ -143,6 +152,7 @@ public class TravelServiceImpl implements TravelService {
         response.setImage(travel.getImage());
         response.setMemberCount(travel.getMemberCount());
         response.setTotalBudget(travel.getTotalBudget());
+        response.setCreatorId(travel.getCreatorId());
 
         List<TravelBudget> savedBudgets = travelBudgetRepository.findByTravel(travel);
         response.setBudgets(

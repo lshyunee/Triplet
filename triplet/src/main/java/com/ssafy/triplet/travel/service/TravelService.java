@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 public interface TravelService {
-  TravelResponse createTravel(TravelRequest requestDTO, MultipartFile image) throws IOException;
+  TravelResponse createTravel(Long userId, TravelRequest requestDTO, MultipartFile image) throws IOException;
   TravelResponse updateTravel(Long travelId, TravelRequest requestDTO, MultipartFile image) throws IOException;
+  void deleteTravel(Long travelId);
 }
