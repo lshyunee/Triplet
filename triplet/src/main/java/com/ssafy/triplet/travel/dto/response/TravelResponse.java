@@ -8,10 +8,11 @@ import java.util.List;
 
 @Getter
 @Setter
-public class TravelRegisterResponse {
-    private String walletAccountNumber;
+public class TravelResponse {
+    private Long travelId;
     private String inviteCode;
     private String country;
+    private int countryId;
     private LocalDate startDate;
     private LocalDate endDate;
     private String title;
@@ -26,11 +27,13 @@ public class TravelRegisterResponse {
     @Setter
     public static class BudgetDTO {
         private int categoryId;
+        private String categoryName;
         private double budget;
         private double budgetWon;
 
-        public BudgetDTO(int categoryId, double budget, double budgetWon) {
+        public BudgetDTO(int categoryId, String categoryName, double budget, double budgetWon) {
             this.categoryId = categoryId;
+            this.categoryName = categoryName;
             this.budget = budget;
             this.budgetWon = budgetWon;
         }

@@ -10,4 +10,6 @@ import java.util.List;
 @Repository
 public interface TravelBudgetRepository extends JpaRepository<TravelBudget, Long> {
     List<TravelBudget> findByTravel(Travel travel);
+
+    void deleteByTravel(Travel travel);
 }
