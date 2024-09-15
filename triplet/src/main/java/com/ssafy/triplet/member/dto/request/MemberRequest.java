@@ -17,9 +17,9 @@ public class MemberRequest {
     @Size(min = 8, max = 15, message = "길이는 8자에서 15자 사이여야 합니다.")
     private String password;
 
+    private String passwordConfirm;
     private String name;
-    private LocalDate birth;
-    private Boolean gender;
+    private String identificationNumber; // 주민번호: 생일 + 성별
 
     @Pattern(regexp = "^[0-9]{6}$", message = "6자리 숫자여야 합니다.")
     private String simplePassword;
