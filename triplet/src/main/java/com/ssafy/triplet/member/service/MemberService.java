@@ -6,7 +6,7 @@ import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.response.ApiResponse;
 import com.ssafy.triplet.response.CustomErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class MemberService {
 
     private final MemberRepository memberRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public ApiResponse<?> singUp(SignupRequest request) {
 
@@ -32,7 +32,9 @@ public class MemberService {
         // 주민번호에서 생일, 성별 꺼내기
         String identificationNumber = request.getIdentificationNumber();
         String birth = identificationNumber.substring(0, 6);
-        boolean gender = Boolean.parseBoolean(identificationNumber.substring(6));
+
+        String lastNum = identificationNumber.substring(6);
+        boolean gender = "1".equals(lastNum) || "3".equals(lastNum); // 1: 남, 0: 여
 
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(request.getPassword());

@@ -2,8 +2,6 @@ package com.ssafy.triplet.response;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 
 @AllArgsConstructor
 @NoArgsConstructor

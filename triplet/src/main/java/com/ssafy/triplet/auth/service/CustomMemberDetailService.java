@@ -19,10 +19,10 @@ public class CustomMemberDetailService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String memberId) throws UsernameNotFoundException {
         Member member = memberRepository.findByMemberId(memberId);
-        if (member != null) {
-            MemberAuthDto memberAuthDto = new MemberAuthDto(member.getMemberId(), member.getRole());
-            return new CustomMemberDetails(memberAuthDto);
+        if (member == null) {
+            throw new UsernameNotFoundException("user not found");
         }
-        return null;
+        MemberAuthDto memberAuthDto = new MemberAuthDto(member.getMemberId(), member.getPassword(), member.getRole());
+        return new CustomMemberDetails(memberAuthDto);
     }
 }

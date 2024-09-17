@@ -1,9 +1,6 @@
 package com.ssafy.triplet.config;
 
-import com.ssafy.triplet.auth.jwt.CustomLogoutFilter;
-import com.ssafy.triplet.auth.jwt.JwtFilter;
-import com.ssafy.triplet.auth.jwt.JwtUtil;
-import com.ssafy.triplet.auth.jwt.LoginFilter;
+import com.ssafy.triplet.auth.jwt.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,7 +9,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
@@ -24,6 +20,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final CustomAuthenticationProvider customAuthenticationProvider;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final CorsConfigurationSource corsConfigurationSource;
     private final JwtUtil jwtUtil;
@@ -31,11 +28,6 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
-    }
-
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -53,9 +45,12 @@ public class SecurityConfig {
 
         http // 경로별 인가 작업
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/signup", "/reissue").permitAll()
+                        .requestMatchers("/login", "/api/v1/signup", "/api/v1/reissue", "/api/v1/sms/**").permitAll()
                         .anyRequest().hasRole("USER")
                 );
+
+        http // user not found, invalid password 를 구분하도록 커스텀한 provider 등록
+                .authenticationProvider(customAuthenticationProvider);
 
         http // JwtFilter 를 커스텀한 LoginFilter 앞에 등록
                 .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
