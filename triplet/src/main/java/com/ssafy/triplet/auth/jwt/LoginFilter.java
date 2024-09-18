@@ -19,6 +19,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -53,8 +55,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String refresh = jwtUtil.createJwt("refresh", username, role, 86400000L);
 
         // 응답에 토큰 정보 담기
-        response.setHeader("Authorization", "Bearer/" + access);
-        response.addCookie(createCookie("refresh", "Bearer/" + refresh));
+        response.setHeader("Authorization", "Bearer " + access);
+        String encodedRefreshToken = URLEncoder.encode("Bearer " + refresh, StandardCharsets.UTF_8);
+        response.addCookie(createCookie("Authorization-Refresh", encodedRefreshToken));
 
         // JSON 응답 만들기
         response.setContentType("application/json");

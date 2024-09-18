@@ -28,13 +28,13 @@ public class JwtFilter extends OncePerRequestFilter {
         String authorization = request.getHeader("Authorization");
 
         // access 헤더 검증
-        if (authorization == null || !authorization.startsWith("Bearer/")) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) {
             log.info("token null");
             filterChain.doFilter(request, response);
             return; // 조건에 해당되면 메서드 종료
         }
 
-        String accessToken = authorization.split("/")[1]; // 토큰값만 가져오기
+        String accessToken = authorization.split(" ")[1]; // 토큰값만 가져오기
 
         // 토큰 소멸 시간 검증
         try {

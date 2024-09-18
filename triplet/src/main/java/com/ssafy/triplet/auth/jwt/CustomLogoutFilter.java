@@ -42,7 +42,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         Cookie[] cookies = request.getCookies();
         for (Cookie cookie : cookies) {
             if ("refresh".equals(cookie.getName())) {
-                refresh = cookie.getValue().split("/")[1];
+                refresh = cookie.getValue().split(" ")[1];
             }
         }
         // refresh 가 null 인지 확인

@@ -22,7 +22,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry
                 .addMapping("/**")
                 .allowedOrigins("http://localhost:3000") // 허용할 출처 : 특정 도메인만 받을 수 있음
-                .exposedHeaders("Set-Cookie", "Authorization")
+                .exposedHeaders("Set-Cookie", "Authorization", "Authorization-Refresh")
                 .allowedMethods("*")
                 .allowedHeaders("*")
                 .allowCredentials(true)
@@ -36,7 +36,7 @@ public class WebConfig implements WebMvcConfigurer {
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Collections.singletonList("*"));
-        configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization"));
+        configuration.setExposedHeaders(Arrays.asList("Set-Cookie", "Authorization", "Authorization-Refresh"));
         configuration.setMaxAge(1800L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
