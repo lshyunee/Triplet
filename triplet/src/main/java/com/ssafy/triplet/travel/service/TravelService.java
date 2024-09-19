@@ -13,4 +13,5 @@ public interface TravelService {
   TravelResponse updateTravel(Long travelId, TravelRequest requestDTO, MultipartFile image) throws IOException;
   void deleteTravel(Long travelId);
   List<TravelListResponse> getTravelOngoingList(Long userId);
+  List<TravelListResponse> getTravelCompleteList(Long userId);
 }

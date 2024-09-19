@@ -24,7 +24,8 @@ public class TravelMember {
     @JoinColumn(name = "travel_id", referencedColumnName = "id", nullable = false)
     private Travel travel;
 
-    @Column(name = "folder_id")
-    private Long folderId;
+    @ManyToOne
+    @JoinColumn(name = "folder_id", referencedColumnName = "id")
+    private TravelFolder folderId;
 }
 

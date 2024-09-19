@@ -13,5 +13,8 @@ import java.util.List;
 public interface TravelRepository extends JpaRepository<Travel, Long> {
 
     @Query("SELECT t FROM Travel t JOIN t.travelMembers tm WHERE tm.member.id = :userId AND (t.startDate <= :today AND t.endDate >= :today)")
-    List<Travel> findByUserIdInTravelMembers(@Param("userId") Long userId, @Param("today") LocalDate today);
+    List<Travel> findOngoingTravelsByUserId(@Param("userId") Long userId, @Param("today") LocalDate today);
+
+    @Query("SELECT t FROM Travel t JOIN t.travelMembers tm WHERE tm.member.id = :userId AND (t.endDate < :today)")
+    List<Travel> findCompletedTravelsByUserId(@Param("userId") Long userId, @Param("today") LocalDate today);
 }

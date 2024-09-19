@@ -84,6 +84,20 @@ public class TravelController {
         }
     }
 
+    @GetMapping("/completed")
+    public ResponseEntity<ApiResponse<List<TravelListResponse>>> completedTravel(@RequestHeader(name = "Authorization", required = false) String token) {
+        try {
+            Long userId = extractAndValidateUser(token);
+            List<TravelListResponse> responseList = travelService.getTravelCompleteList(userId);
+            if (responseList.isEmpty()) {
+                return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "완료된 여행이 없습니다."));
+            }
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "완료된 여행이 조회되었습니다.", responseList));
+        } catch (Exception e) {
+            return handleExceptionList(e);
+        }
+    }
+
 
 
 
@@ -93,7 +107,7 @@ public class TravelController {
             return ResponseEntity.badRequest().body(new ApiResponse<>(customException.getErrorCode(), customException.getMessage()));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>("E0000", "서버 에러가 발생했습니다."));
+                    .body(new ApiResponse<>("E0000", "서버 에러가 발생했습니다." + e.getMessage()));
         }
     }
 
@@ -102,7 +116,7 @@ public class TravelController {
             return ResponseEntity.badRequest().body(new ApiResponse<>(customException.getErrorCode(), customException.getMessage()));
         } else {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>("E0000", "서버 에러가 발생했습니다."));
+                    .body(new ApiResponse<>("E0000", "서버 에러가 발생했습니다." + e.getMessage()));
         }
     }
 
