@@ -1,9 +1,11 @@
 import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
 import styled, { createGlobalStyle } from 'styled-components';
 import './App.css';
 
 // router import
 import AppRoutes from './routes/AppRoutes';
+import Navbar from './components/navigation/Navbar';
 
 // 글로벌 css
 const GlobalStyle = createGlobalStyle`
@@ -21,10 +23,11 @@ const GlobalStyle = createGlobalStyle`
 
 const App: React.FC = () => {
   return (
-    <>
-    <GlobalStyle />
-    <AppRoutes/>
-    </>
+    <Router>
+      <GlobalStyle />
+      <Navbar/>
+      <AppRoutes/>
+    </Router>
   );
 };
 
