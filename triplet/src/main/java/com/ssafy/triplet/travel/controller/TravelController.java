@@ -8,6 +8,7 @@ import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import com.ssafy.triplet.travel.service.TravelService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -97,6 +98,26 @@ public class TravelController {
             return handleExceptionList(e);
         }
     }
+
+    @GetMapping("/upcoming")
+    public ResponseEntity<ApiResponse<List<TravelListResponse>>> upcomingTravel(@RequestHeader(name = "Authorization", required = false) String token) {
+        try {
+            Long userId = extractAndValidateUser(token);
+            List<TravelListResponse> responseList = travelService.getTravelUpcomingList(userId);
+            if (responseList.isEmpty()) {
+                return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "다가오는 여행이 없습니다."));
+            }
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "다가오는 여행이 조회되었습니다.", responseList));
+        } catch (Exception e) {
+            return handleExceptionList(e);
+        }
+    }
+
+
+
+
+
+
 
 
 

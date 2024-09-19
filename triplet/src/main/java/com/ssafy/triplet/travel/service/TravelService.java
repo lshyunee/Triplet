@@ -14,4 +14,5 @@ public interface TravelService {
   void deleteTravel(Long travelId);
   List<TravelListResponse> getTravelOngoingList(Long userId);
   List<TravelListResponse> getTravelCompleteList(Long userId);
+  List<TravelListResponse> getTravelUpcomingList(Long userId);
 }
