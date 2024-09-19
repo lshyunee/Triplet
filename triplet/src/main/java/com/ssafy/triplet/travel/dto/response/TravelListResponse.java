@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Setter
 @Getter
 public class TravelListResponse {
+    private Long travelId;
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;

@@ -107,6 +107,17 @@ public class TravelServiceImpl implements TravelService {
         return responseList;
     }
 
+    @Override
+    public List<TravelListResponse> getTravelUpcomingList(Long userId) {
+        LocalDate today = LocalDate.now();
+        List<Travel> travelList = travelRepository.findUpcomingTravelsByUserId(userId, today);
+        List<TravelListResponse> responseList = new ArrayList<>();
+        for (Travel travel : travelList) {
+            responseList.add(convertToTravelListResponse(travel));
+        }
+        return responseList;
+    }
+
     // 필수 값 및 날짜 검증 메서드 (여행 생성, 여행 수정)
     private void validateTravelRequest(TravelRequest request) {
         if (request.getTitle() == null || request.getTitle().isEmpty() ||
@@ -227,6 +238,7 @@ public class TravelServiceImpl implements TravelService {
     // 여행 리스트
     private TravelListResponse convertToTravelListResponse(Travel travel) {
         TravelListResponse response = new TravelListResponse();
+        response.setTravelId(travel.getId());
         response.setTitle(travel.getTitle());
         response.setStartDate(travel.getStartDate());
         response.setEndDate(travel.getEndDate());
