@@ -1,26 +1,31 @@
 import React from 'react';
-import logo from './logo.svg';
+import styled, { createGlobalStyle } from 'styled-components';
 import './App.css';
 
-function App() {
+// router import
+import AppRoutes from './routes/AppRoutes';
+
+// 글로벌 css
+const GlobalStyle = createGlobalStyle`
+  @font-face {
+    font-family: 'Pretendard';
+    src: url('/fonts/PretendardVariable.woff2') format('woff2');
+    font-weight: 1 1000;
+    font-style: normal;
+  }
+
+  body {
+    font-family : 'Pretendard', sans-serif;
+  }
+`;
+
+const App: React.FC = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+    <GlobalStyle />
+    <AppRoutes/>
+    </>
   );
-}
+};
 
 export default App;
