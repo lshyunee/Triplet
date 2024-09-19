@@ -22,25 +22,25 @@ const NavbarContainer = styled.nav`
   bottom: 0;
   width: 100%;
   height: 56px;
-  background-color: #00000;
   color: white;
   text-align: center;
   z-index: 1000;
 `;
 
-const StyledP = styled.p<{ isActive: boolean }>`
+const StyledP = styled.p.withConfig({
+    shouldForwardProp: (prop) => prop !== 'isActive',
+  })<{ isActive: boolean }>`
   color: ${({ isActive }) => (isActive ? '#008DE7' : '#888888')};  /* 활성화 상태에 따라 색상 변경 */
   display : flex;
   justify-content : center;
   align-items: center;
-  height : 12px;
   margin : 0;
+  font-size : 10px;
 `;
 
 const StyledUl = styled.ul`
   list-style-type: none; /* li 태그의 점 제거 */
-  padding-left : 30px;
-  padding-right : 30px;
+  padding: 0 30px; /* 양쪽 패딩 설정 */
   margin: 0;
   display: flex;
   align-items : center;
