@@ -130,6 +130,21 @@ public class TravelController {
         }
     }
 
+    @PostMapping("/share/{travelId}/{shareStatus}")
+    public ResponseEntity<ApiResponse<TravelResponse>> shareTravel(@RequestHeader(name = "Authorization", required = false) String token,
+                                                                    @PathVariable Long travelId, @PathVariable int shareStatus) {
+        try {
+            Long userId = extractAndValidateUser(token);
+            travelService.postTravel(userId, travelId, shareStatus);
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행이 공유되었습니다."));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
+
+
+
 
     // 예외처리 메서드
     private ResponseEntity<ApiResponse<TravelResponse>> handleException(Exception e) {
