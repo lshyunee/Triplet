@@ -12,6 +12,9 @@ import java.util.List;
 @Repository
 public interface TravelRepository extends JpaRepository<Travel, Long> {
 
+    @Query("SELECT t.creatorId FROM Travel t WHERE t.id = :travelId")
+    Long findCreatorIdByTravelId(@Param("travelId") Long travelId);
+
     @Query("SELECT t FROM Travel t JOIN t.travelMembers tm WHERE tm.member.id = :userId AND (t.startDate <= :today AND t.endDate >= :today) ORDER BY t.startDate ASC")
     List<Travel> findOngoingTravelsByUserId(@Param("userId") Long userId, @Param("today") LocalDate today);
 
@@ -20,4 +23,10 @@ public interface TravelRepository extends JpaRepository<Travel, Long> {
 
     @Query("SELECT t FROM Travel t JOIN t.travelMembers tm WHERE tm.member.id = :userId AND (t.startDate > :today) ORDER BY t.startDate ASC")
     List<Travel> findUpcomingTravelsByUserId(@Param("userId") Long userId, @Param("today") LocalDate today);
+
+    @Query("SELECT tm.folderId.id FROM TravelMember tm WHERE tm.member.id = :userId AND tm.travel.id = :travelId")
+    Long findFolderIdByUserId(@Param("userId") Long userId, @Param("travelId") Long travelId);
+
+    @Query("SELECT tf.folderTitle FROM TravelFolder tf WHERE tf.id = :folderId")
+    String findFolderNameByUserId(@Param("folderId") Long folderId);
 }

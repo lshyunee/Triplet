@@ -15,7 +15,12 @@ public class TravelListResponse {
     private String image;
     private String countryName;
     private int countryId;
+    private String currency;
     private int memberCount;
     private double totalBudget;
+    private boolean status;
+    private boolean isShared;
+    private boolean shareStatus;
     private Long folderId;
+    private String folderName;
 }
