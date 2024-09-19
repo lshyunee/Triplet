@@ -88,20 +88,21 @@ public class TravelServiceImpl implements TravelService {
     @Override
     public List<TravelListResponse> getTravelOngoingList(Long userId) {
         LocalDate today = LocalDate.now();
-        List<Travel> travelList = travelRepository.findByUserIdInTravelMembers(userId, today);
+        List<Travel> travelList = travelRepository.findOngoingTravelsByUserId(userId, today);
         List<TravelListResponse> responseList = new ArrayList<>();
         for (Travel travel : travelList) {
-            TravelListResponse response = new TravelListResponse();
-            response.setTitle(travel.getTitle());
-            response.setStartDate(travel.getStartDate());
-            response.setEndDate(travel.getEndDate());
-            response.setImage(travel.getImage());
-            response.setCountryId(travel.getCountry().getId());
-            response.setCountryName(travel.getCountry().getName());
-            response.setMemberCount(travel.getMemberCount());
-            response.setTotalBudget(travel.getTotalBudget());
+            responseList.add(convertToTravelListResponse(travel));
+        }
+        return responseList;
+    }
 
-            responseList.add(response);
+    @Override
+    public List<TravelListResponse> getTravelCompleteList(Long userId) {
+        LocalDate today = LocalDate.now();
+        List<Travel> travelList = travelRepository.findCompletedTravelsByUserId(userId, today);
+        List<TravelListResponse> responseList = new ArrayList<>();
+        for (Travel travel : travelList) {
+            responseList.add(convertToTravelListResponse(travel));
         }
         return responseList;
     }
@@ -223,4 +224,18 @@ public class TravelServiceImpl implements TravelService {
         travelMemberRepository.save(travelMember);
     }
 
+    // 여행 리스트
+    private TravelListResponse convertToTravelListResponse(Travel travel) {
+        TravelListResponse response = new TravelListResponse();
+        response.setTitle(travel.getTitle());
+        response.setStartDate(travel.getStartDate());
+        response.setEndDate(travel.getEndDate());
+        response.setImage(travel.getImage());
+        response.setCountryId(travel.getCountry().getId());
+        response.setCountryName(travel.getCountry().getName());
+        response.setMemberCount(travel.getMemberCount());
+        response.setTotalBudget(travel.getTotalBudget());
+
+        return response;
+    }
 }

@@ -16,4 +16,5 @@ public class TravelListResponse {
     private int countryId;
     private int memberCount;
     private double totalBudget;
+    private Long folderId;
 }
