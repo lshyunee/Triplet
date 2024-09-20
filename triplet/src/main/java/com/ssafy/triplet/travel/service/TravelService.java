@@ -179,8 +179,18 @@ public class TravelService {
         TravelFolder folder = travelFolderRepository.findById(folderId)
                 .orElseThrow(() -> new CustomException("T0013", "존재하지 않는 폴더ID입니다."));
         TravelMember travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId)
-                .orElseThrow(() -> new CustomException("T0004", "해당 여행에 속한 유저가 아닙니다."));
+                .orElseThrow(() -> new CustomException("T0005", "해당 여행에 속한 유저가 아니거나 여행 ID가 유효하지 않습니다."));
+        if (!travelRepository.existsById(travelId)) {
+            throw new CustomException("T0004", "여행이 존재하지 않습니다.");
+        }
         travelMember.setFolderId(folder);
+        travelMemberRepository.save(travelMember);
+    }
+
+    public void removeTravel(Long travelId, Long userId) {
+        TravelMember travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId)
+                .orElseThrow(() -> new CustomException("T0005", "해당 여행에 속한 유저가 아니거나 여행 ID가 유효하지 않습니다."));
+        travelMember.setFolderId(null);
         travelMemberRepository.save(travelMember);
     }
 
