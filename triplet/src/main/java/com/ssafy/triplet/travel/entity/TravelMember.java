@@ -26,5 +26,5 @@ public class TravelMember {
 
     @ManyToOne
     @JoinColumn(name = "folder_id", referencedColumnName = "id")
-    private TravelFolder folderId;
+    private TravelFolder travelFolder ;
 }

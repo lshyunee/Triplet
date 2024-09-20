@@ -138,9 +138,9 @@ public class TravelController {
         }
     }
 
-    @PostMapping("/create-folder")
+    @PostMapping("/folder/create")
     public ResponseEntity<ApiResponse<TravelFolder>> createFolder(@CookieValue(name = "accessToken", required = false) String token,
-                                                            @RequestBody TravelFolder travelFolder) {
+                                                                  @RequestBody TravelFolder travelFolder) {
         try {
 //            if (token == null) {
 //                throw new CustomException("M0011", "토큰이 비어있습니다.");
@@ -152,8 +152,8 @@ public class TravelController {
         }
     }
 
-    @PostMapping("/folder-travel/{folderId}/{travelId}")
-    public ResponseEntity<ApiResponse<TravelFolder>> createFolder(@CookieValue(name = "accessToken", required = false) String token,
+    @PostMapping("/folder/travel-add/{folderId}/{travelId}")
+    public ResponseEntity<ApiResponse<TravelFolder>> addTravelInFolder(@CookieValue(name = "accessToken", required = false) String token,
                                                                   @PathVariable Long folderId, @PathVariable Long travelId) {
         try {
             Long userId = extractAndValidateUser(token);
@@ -164,18 +164,31 @@ public class TravelController {
         }
     }
 
-    @DeleteMapping("/folder-travel/{travelId}")
-    public ResponseEntity<ApiResponse<TravelFolder>> deleteFolder(@CookieValue(name = "accessToken", required = false) String token,
-                                                                  @PathVariable Long travelId) {
+    @DeleteMapping("/folder/travel-delete/{travelId}")
+    public ResponseEntity<ApiResponse<TravelFolder>> deleteTravelInFolder(@CookieValue(name = "accessToken", required = false) String token,
+                                                                          @PathVariable Long travelId) {
         try {
             Long userId = extractAndValidateUser(token);
-            travelService.removeTravel(travelId, userId);
+            travelService.removeFolderInTravel(travelId, userId);
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "폴더에서 여행이 삭제되었습니다."));
         } catch (Exception e) {
             return handleException(e);
         }
     }
 
+    @DeleteMapping("/folder/delete/{folderId}")
+    public ResponseEntity<ApiResponse<Void>> deleteFolder(@CookieValue(name = "accessToken", required = false) String token,
+                                                          @PathVariable Long folderId) {
+        try {
+//            if (token == null) {
+//                throw new CustomException("M0011", "토큰이 비어있습니다.");
+//            }
+            travelService.removeFolder(folderId);
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "폴더가 삭제되었습니다."));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
 
 
     // 예외처리 메서드

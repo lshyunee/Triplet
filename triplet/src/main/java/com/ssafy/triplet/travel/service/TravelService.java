@@ -79,6 +79,8 @@ public class TravelService {
     }
 
     public void deleteTravel(Long travelId, Long userId) {
+        // 여행 지갑에 잔액 있는지 확인하는 로직 추가해야함
+
         if (travelRepository.existsById(travelId)) {
             Long creatorId = travelRepository.findCreatorIdByTravelId(travelId);
             if (!userId.equals(creatorId)) {
@@ -109,7 +111,7 @@ public class TravelService {
         List<TravelListResponse> withFolderList = new ArrayList<>();
         for (Travel travel : travelList) {
             TravelListResponse response = convertToTravelListResponse(travel, userId);
-            Long folderId = travelRepository.findFolderIdByUserId(userId, travel.getId());
+            Long folderId = travelRepository.findTravelFolderIdByUserId(userId, travel.getId());
             if (folderId == null) {
                 folderlessList.add(response);
             } else {
@@ -184,15 +186,24 @@ public class TravelService {
         if (!travelRepository.existsById(travelId)) {
             throw new CustomException("T0004", "여행이 존재하지 않습니다.");
         }
-        travelMember.setFolderId(folder);
+        travelMember.setTravelFolder(folder);
         travelMemberRepository.save(travelMember);
     }
 
-    public void removeTravel(Long travelId, Long userId) {
+    public void removeFolderInTravel(Long travelId, Long userId) {
         TravelMember travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId)
                 .orElseThrow(() -> new CustomException("T0005", "해당 여행에 속한 유저가 아니거나 여행 ID가 유효하지 않습니다."));
-        travelMember.setFolderId(null);
+        travelMember.setTravelFolder(null);
         travelMemberRepository.save(travelMember);
+    }
+
+    public void removeFolder(Long folderId) {
+        TravelFolder travelFolder = travelFolderRepository.findById(folderId)
+                .orElseThrow(() -> new CustomException("T0013", "존재하지 않는 폴더ID입니다."));
+        if (travelMemberRepository.countByTravelFolder_Id(folderId) != 0) {
+            throw new CustomException("T0014", "폴더 안에 여행이 존재합니다.");
+        }
+        travelFolderRepository.delete(travelFolder);
     }
 
 
@@ -329,7 +340,7 @@ public class TravelService {
         response.setMemberCount(travel.getMemberCount());
         response.setCurrency(travel.getCountry().getCurrency());
         response.setTotalBudget(travel.getTotalBudget());
-        Long folderId = travelRepository.findFolderIdByUserId(userId, travel.getId());
+        Long folderId = travelRepository.findTravelFolderIdByUserId(userId, travel.getId());
         response.setFolderId(folderId);
         response.setFolderName(travelRepository.findFolderNameByUserId(folderId));
         return response;

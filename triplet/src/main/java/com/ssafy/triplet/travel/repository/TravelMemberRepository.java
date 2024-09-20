@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface TravelMemberRepository extends JpaRepository<TravelMember, Long> {
     Optional<TravelMember> findByMemberIdAndTravelId(Long memberId, Long travelId);
+    int countByTravelFolder_Id(Long folderId);
 }
