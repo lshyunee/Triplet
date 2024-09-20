@@ -161,6 +161,21 @@ public class TravelController {
         }
     }
 
+    @PostMapping("/folder-travel/{folderId}/{travelId}")
+    public ResponseEntity<ApiResponse<TravelFolder>> createFolder(@RequestHeader(name = "Authorization", required = false) String token,
+                                                                  @PathVariable Long folderId, @PathVariable Long travelId) {
+        try {
+            Long userId = extractAndValidateUser(token);
+            travelService.addTravelFolder(folderId, travelId, userId);
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "폴더에 여행이 추가되었습니다."));
+        } catch (CustomException e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getErrorCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>("E0000", "서버 에러가 발생했습니다: " + e.getMessage()));
+        }
+    }
+
 
 
     // 예외처리 메서드

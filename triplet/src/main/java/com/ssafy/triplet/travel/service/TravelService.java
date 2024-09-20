@@ -175,8 +175,19 @@ public class TravelService {
         return travelFolderRepository.save(travelFolder);
     }
 
+    public void addTravelFolder(Long folderId, Long travelId, Long userId) {
+        TravelFolder folder = travelFolderRepository.findById(folderId)
+                .orElseThrow(() -> new CustomException("T0013", "존재하지 않는 폴더ID입니다."));
+        TravelMember travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId)
+                .orElseThrow(() -> new CustomException("T0004", "해당 여행에 속한 유저가 아닙니다."));
+        travelMember.setFolderId(folder);
+        travelMemberRepository.save(travelMember);
+    }
 
-    /* 여러번 사용되는 메서드 */
+
+
+
+    /* 중복 메서드 */
     // 필수 값 및 날짜 검증 메서드 (여행 생성, 여행 수정)
     private void validateTravelRequest(TravelRequest request) {
         if (request.getTitle() == null || request.getTitle().isEmpty() ||
