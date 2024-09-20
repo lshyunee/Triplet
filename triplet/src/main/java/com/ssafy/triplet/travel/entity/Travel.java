@@ -59,9 +59,9 @@ public class Travel {
 
     @ManyToOne
     @JoinColumn(name = "country_id", referencedColumnName = "id", nullable = false)
-    Country country;
+    private Country country;
 
-    @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TravelMember> travelMembers;
 
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)

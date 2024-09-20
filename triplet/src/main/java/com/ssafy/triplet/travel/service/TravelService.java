@@ -13,6 +13,7 @@ import com.ssafy.triplet.travel.util.InviteCodeGenerator;
 import com.ssafy.triplet.travel.util.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class TravelService {
     private final TravelRepository travelRepository;
     private final MemberRepository memberRepository;
@@ -32,6 +34,7 @@ public class TravelService {
     private final TravelFolderRepository travelFolderRepository;
     private final S3Service s3Service;
 
+    @Transactional
     public TravelResponse createTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
         validateTravelRequest(request);
         String inviteCode = InviteCodeGenerator.generateInviteCode();
@@ -45,6 +48,7 @@ public class TravelService {
 //    여행 생성 시 계좌번호 생성
 //    String walletNumber = "124-" + (1000 + new Random().nextInt(9000)) + "-1247";
 
+    @Transactional
     public TravelResponse updateTravel(Long travelId, TravelRequest request, MultipartFile image, Long userId) throws IOException {
         validateTravelRequest(request);
 
@@ -78,6 +82,7 @@ public class TravelService {
         return buildTravelResponse(updatedTravel, travel.getInviteCode());
     }
 
+    @Transactional
     public void deleteTravel(Long travelId, Long userId) {
         // 여행 지갑에 잔액 있는지 확인하는 로직 추가해야함
 
@@ -145,6 +150,7 @@ public class TravelService {
         return travelResponse;
     }
 
+    @Transactional
     public void postTravel(Long userId, TravelShareRequest request) {
         Travel travel = travelRepository.findById(request.getTravelId())
                 .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
@@ -172,12 +178,14 @@ public class TravelService {
         travelRepository.save(travel);
     }
 
+    @Transactional
     public TravelFolder addFolder(String title) {
         TravelFolder travelFolder = new TravelFolder();
         travelFolder.setFolderTitle(title);
         return travelFolderRepository.save(travelFolder);
     }
 
+    @Transactional
     public void addTravelFolder(Long folderId, Long travelId, Long userId) {
         TravelFolder folder = travelFolderRepository.findById(folderId)
                 .orElseThrow(() -> new CustomException("T0013", "존재하지 않는 폴더ID입니다."));
@@ -190,6 +198,7 @@ public class TravelService {
         travelMemberRepository.save(travelMember);
     }
 
+    @Transactional
     public void removeFolderInTravel(Long travelId, Long userId) {
         TravelMember travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId)
                 .orElseThrow(() -> new CustomException("T0005", "해당 여행에 속한 유저가 아니거나 여행 ID가 유효하지 않습니다."));
@@ -197,6 +206,7 @@ public class TravelService {
         travelMemberRepository.save(travelMember);
     }
 
+    @Transactional
     public void removeFolder(Long folderId) {
         TravelFolder travelFolder = travelFolderRepository.findById(folderId)
                 .orElseThrow(() -> new CustomException("T0013", "존재하지 않는 폴더ID입니다."));
@@ -205,6 +215,22 @@ public class TravelService {
         }
         travelFolderRepository.delete(travelFolder);
     }
+
+    @Transactional
+    public TravelResponse inviteTravel(String inviteCode, Long userId) {
+        Long travelId = travelRepository.findTravelIdByInviteCode(inviteCode);
+        if (travelId == null) {
+            throw new CustomException("T0001", "초대코드가 유효하지 않습니다.");
+        }
+        Optional<TravelMember> travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId);
+        if (travelMember.isPresent()) {
+            throw new CustomException("T0015", "해당 유저는 이미 이 여행에 속해 있습니다.");
+        }
+        insertTravelMembers(userId, travelId);
+        Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        return buildTravelResponse(travel, travel.getInviteCode());
+    }
+
 
 
 

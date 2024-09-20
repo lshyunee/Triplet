@@ -6,9 +6,11 @@ import com.ssafy.triplet.travel.dto.request.TravelRequest;
 import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.TravelListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelResponse;
+import com.ssafy.triplet.travel.entity.Travel;
 import com.ssafy.triplet.travel.entity.TravelFolder;
 import com.ssafy.triplet.travel.service.TravelService;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -190,6 +192,19 @@ public class TravelController {
         }
     }
 
+    @PostMapping("/invite/{inviteCode}")
+    public ResponseEntity<ApiResponse<TravelResponse>> inviteAddTravel(@CookieValue(name = "accessToken", required = false) String token,
+                                                               @PathVariable String inviteCode) {
+        try {
+            Long userId = extractAndValidateUser(token);
+            TravelResponse travel = travelService.inviteTravel(inviteCode, userId);
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행에 새로운 멤버가 추가되었습니다.", travel));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
+
 
     // 예외처리 메서드
     private <T> ResponseEntity<ApiResponse<T>> handleException(Exception e) {
@@ -212,7 +227,7 @@ public class TravelController {
 //        if (member == null) {
 //            throw new CustomException("M0010", "존재하지 않는 회원입니다.");
 //        }
-        Long userId = 1L;
+        Long userId = 2L;
         return userId;
     }
 }

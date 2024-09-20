@@ -29,4 +29,7 @@ public interface TravelRepository extends JpaRepository<Travel, Long> {
 
     @Query("SELECT tf.folderTitle FROM TravelFolder tf WHERE tf.id = :folderId")
     String findFolderNameByUserId(@Param("folderId") Long folderId);
+
+    @Query("SELECT t.id FROM Travel t WHERE t.inviteCode = :inviteCode")
+    Long findTravelIdByInviteCode(@Param("inviteCode") String inviteCode);
 }
