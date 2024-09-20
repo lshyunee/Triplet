@@ -231,6 +231,10 @@ public class TravelService {
         return buildTravelResponse(travel, travel.getInviteCode());
     }
 
+    public List<Country> countryList() {
+        return countryRepository.findAll();
+    }
+
 
 
 
