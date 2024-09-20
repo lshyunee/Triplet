@@ -1,9 +1,32 @@
+import axiosInstance from "../axios";
 
+interface signupData {
+    memberId: string;
+    password: string;
+    passwordConfirm: string;
+    name: string;
+    phoneNumber: string;
+    identificationNumber: string;
+}
 
-export const signup = async(memberId:String, password:String, passwordConfirm:String, name:String, 
-                phoneNumber:String, identificationNumber:String) => {
+// 회원가입
+export const signup = async(user:signupData) => {
+        try {
+            const response = await axiosInstance.post('/api/v1/signup', user);
+            return response.status;
+        }catch(error:any){
+            
+        }
+};
 
-                };
+// 휴대폰 인증 요청
+export const smsSend = async (phoneNumber: string) => {
+    try{
+        const response = await axiosInstance.post('/api/v1/sms/send', phoneNumber)
 
+    }catch(error:any){
+
+    }
+};
 
 export {};
