@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-    baseURL : 'http://localhost:8080',
+    baseURL : 'https://j11b202.p.ssafy.io',
     timeout : 10000,
     withCredentials : true,
 });
