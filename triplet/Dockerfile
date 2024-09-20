@@ -1,5 +1,5 @@
 # step 1 빌드를 하기 위한 과정
-FROM 20.16.0-alpine AS build
+FROM node:20.16.0-alpine AS build
 COPY    ./package* /usr/src/app/
 WORKDIR /usr/src/app
 RUN     npm install
