@@ -1,10 +1,12 @@
 package com.ssafy.triplet.config;
 
 import com.ssafy.triplet.auth.jwt.*;
+import com.ssafy.triplet.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,6 +22,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final CustomSuccessHandler customSuccessHandler;
     private final CustomAuthenticationProvider customAuthenticationProvider;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final CorsConfigurationSource corsConfigurationSource;
@@ -43,9 +47,16 @@ public class SecurityConfig {
         http // http Basic 인증방식 disable
                 .httpBasic(httpBasic -> httpBasic.disable());
 
+        http // 소셜 로그인
+                .oauth2Login(oauth2 -> oauth2
+                        .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
+                                .userService(customOAuth2UserService))
+                        .successHandler(customSuccessHandler));
+
         http // 경로별 인가 작업
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/api/v1/signup", "/api/v1/reissue", "/api/v1/sms/**").permitAll()
+                        .requestMatchers("/login", "/api/v1/signup",
+                                "/api/v1/reissue", "/api/v1/sms/**").permitAll()
                         .anyRequest().hasRole("USER")
                 );
 
