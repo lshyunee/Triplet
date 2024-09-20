@@ -17,10 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -136,10 +133,14 @@ public class TravelService {
         return responseList;
     }
 
-    public TravelResponse getTravel(Long travelId) {
+    public TravelResponse getTravel(Long travelId, Long userId) {
         Travel travel = travelRepository.findById(travelId)
                 .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
-        return buildTravelResponse(travel, travel.getInviteCode());
+        TravelResponse travelResponse = buildTravelResponse(travel, travel.getInviteCode());
+        if (Objects.equals(userId, travel.getCreatorId())) {
+            travelResponse.setMyTravel(true);
+        }
+        return travelResponse;
     }
 
     public void postTravel(Long userId, TravelShareRequest request) {
