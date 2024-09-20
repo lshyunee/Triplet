@@ -6,6 +6,7 @@ import com.ssafy.triplet.travel.dto.request.TravelRequest;
 import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.TravelListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelResponse;
+import com.ssafy.triplet.travel.entity.TravelFolder;
 import com.ssafy.triplet.travel.repository.TravelRepository;
 import com.ssafy.triplet.travel.service.TravelService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -143,6 +144,24 @@ public class TravelController {
         }
     }
 
+    @PostMapping("/create-folder")
+    public ResponseEntity<ApiResponse<TravelFolder>> createFolder(@RequestHeader(name = "Authorization", required = false) String token,
+                                                            @RequestBody TravelFolder travelFolder) {
+        try {
+//            if (token == null) {
+//                throw new CustomException("M0011", "토큰이 비어있습니다.");
+//            }
+            TravelFolder result = travelService.addFolder(travelFolder.getFolderTitle());
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "폴더가 생성되었습니다.", result));
+        } catch (CustomException e) {
+            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getErrorCode(), e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiResponse<>("E0000", "서버 에러가 발생했습니다: " + e.getMessage()));
+        }
+    }
+
+
 
     // 예외처리 메서드
     private ResponseEntity<ApiResponse<TravelResponse>> handleException(Exception e) {
@@ -173,7 +192,7 @@ public class TravelController {
 //        if (member == null) {
 //            throw new CustomException("M0010", "존재하지 않는 회원입니다.");
 //        }
-        Long userId = 4L;
+        Long userId = 1L;
         return userId;
     }
 }
