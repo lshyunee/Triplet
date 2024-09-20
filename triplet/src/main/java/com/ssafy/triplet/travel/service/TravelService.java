@@ -32,6 +32,7 @@ public class TravelService {
     private final TravelBudgetRepository travelBudgetRepository;
     private final CategoryRepository categoryRepository;
     private final CountryRepository countryRepository;
+    private final TravelFolderRepository travelFolderRepository;
     private final S3Service s3Service;
 
     public TravelResponse createTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
@@ -151,7 +152,7 @@ public class TravelService {
             throw new CustomException("T0011", "여행 생성자가 아닙니다.");
         }
         if (request.getShareStatus() != 1 && request.getShareStatus() != 0 &&
-            request.getIsShared() != 1 && request.getShareStatus() != 0){
+                request.getIsShared() != 1 && request.getShareStatus() != 0) {
             throw new CustomException("T0007", "0이나 1의 상태만 보낼 수 있습니다.");
         }
         if (request.getIsShared() == 1) {
@@ -166,6 +167,12 @@ public class TravelService {
             travel.setShareStatus(false);
         }
         travelRepository.save(travel);
+    }
+
+    public TravelFolder addFolder(String title) {
+        TravelFolder travelFolder = new TravelFolder();
+        travelFolder.setFolderTitle(title);
+        return travelFolderRepository.save(travelFolder);
     }
 
 
