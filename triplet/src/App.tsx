@@ -1,11 +1,11 @@
-import React from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import React, {useEffect, useState} from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import './App.css';
 
 // router import
 import AppRoutes from './routes/AppRoutes';
-import Navbar from './components/navigation/Navbar';
+import SplashScreen from './components/loading/SplashScreen';
+import AppContent from './pages/AppContent';
 
 // 글로벌 css
 const GlobalStyle = createGlobalStyle`
@@ -22,12 +22,34 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const App: React.FC = () => {
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(()=>{
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', () =>{
+        navigator.serviceWorker
+          .register('/service-worker.js')
+          .then((registration) => {
+            console.log("Service Worker register", registration.scope);
+            setLoading(false);
+          })
+          .catch((error) => {
+            console.log("로딩 실패");
+            setLoading(false);
+          });
+      });
+    }else{
+      setLoading(false);
+    }
+  }, []);
+
   return (
-    <Router>
+    <>
       <GlobalStyle />
-      <Navbar/>
+      {loading ? <SplashScreen/> : <AppContent/>}
       <AppRoutes/>
-    </Router>
+    </>
   );
 };
 

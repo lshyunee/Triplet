@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 // router import
 import Home from '../pages/home/HomePage';
@@ -7,11 +7,12 @@ import Board from '../pages/board/BoardPage';
 import MyPage from '../pages/mypage/MyPage';
 import Pay from '../pages/pay/PayPage';
 import Travels from '../pages/travels/TravelsPage';
-
+import Login from '../pages/user/login/LoginPage';
 
 const AppRoutes: React.FC = () => (
     <Routes>
     <Route path="/" />
+    <Route path="/login" element={<Login/>}/>
     <Route path="/home" element={<Home/>}/>
     <Route path="/feed" element={<Board/>}/>
     <Route path="/myPage" element={<MyPage/>} />

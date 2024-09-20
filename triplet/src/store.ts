@@ -1,28 +1,13 @@
-import { createStore } from 'redux';
-
-// 리듀서 정의 (예시)
-const initialState = {
-  count: 0,
-};
-
-function counterReducer(state = initialState, action: any) {
-  switch (action.type) {
-    case 'INCREMENT':
-      return {
-        ...state,
-        count: state.count + 1,
-      };
-    case 'DECREMENT':
-      return {
-        ...state,
-        count: state.count - 1,
-      };
-    default:
-      return state;
-  }
-}
+import { configureStore } from '@reduxjs/toolkit';
+import authSlice from './features/auth/authSlice';
 
 // 스토어 생성
-const store = createStore(counterReducer);
+const store = configureStore({
+  reducer: {
+    auth: authSlice,
+  },
+});
+
+export type RootState = ReturnType<typeof store.getState>;
 
 export default store;
