@@ -1,6 +1,6 @@
-import react, { useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { loginSuccess } from '../../../features/auth/authSlice';
 import styled from 'styled-components';
 
@@ -11,6 +11,17 @@ const BigDiv = styled.div`
     justify-content : center;
     align-items : center;
     flex-direction: column;
+`;
+
+const StyledLink = styled(Link)`
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    color: black; /* 링크 텍스트 색상 */
+    &:hover {
+        color: darkblue;
+    }
+    font-size : 14px;
 `;
 
 const LoginInput = styled.input`
@@ -139,7 +150,9 @@ const LoginPage = () => {
             <NaverLoginBtn onClick={handleNaverLogin}>네이버 계정 로그인</NaverLoginBtn>
             <SignupDiv>
                 <SignupP>아직 회원이 아니신가요?</SignupP>
-                <SignupP>회원가입</SignupP>
+                <StyledLink to="/signup">
+                    회원가입
+                </StyledLink>
             </SignupDiv>
         </BigDiv>
         </>

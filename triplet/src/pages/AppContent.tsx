@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { useLocation, Navigate } from 'react-router-dom';
+import { useLocation, Navigate, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import styled, { createGlobalStyle } from 'styled-components';
 
@@ -11,6 +11,7 @@ import LoginPage from './user/login/LoginPage';
 const AppContent = () => {
 
     const location = useLocation();
+    const navigate = useNavigate();
     const [isActive, setIsActive] = useState(true);
 
     const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
@@ -24,10 +25,16 @@ const AppContent = () => {
       }
     }, [location.pathname]);  // location.pathname이 변경될 때마다 실행
 
+    useEffect(()=> {
+        if(!isAuthenticated){
+            navigate('/login');
+        }else{
+            navigate('/home');
+        }
+    }, [])
+
   return (
     <>
-        {!isAuthenticated && <Navigate to="/login"/>}
-        {isAuthenticated && <Navigate to="/home"/>}
         {isActive && <Navbar />}  {/* isActive가 true일 때만 Navbar 렌더링 */}
     </>
   );
