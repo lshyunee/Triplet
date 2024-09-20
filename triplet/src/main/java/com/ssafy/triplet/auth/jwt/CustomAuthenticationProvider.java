@@ -1,6 +1,6 @@
 package com.ssafy.triplet.auth.jwt;
 
-import com.ssafy.triplet.auth.dto.CustomMemberDetails;
+import com.ssafy.triplet.auth.dto.CustomUserPrincipal;
 import com.ssafy.triplet.auth.service.CustomMemberDetailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,9 +35,9 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
         String password = authentication.getCredentials().toString();
 
         // CustomUserDetailsService를 사용하여 사용자 조회
-        CustomMemberDetails user;
+        CustomUserPrincipal user;
         try {
-            user = (CustomMemberDetails) userDetailsService.loadUserByUsername(username);
+            user = (CustomUserPrincipal) userDetailsService.loadUserByUsername(username);
         } catch (UsernameNotFoundException ex) {
             throw new UsernameNotFoundException("User not found");
         }

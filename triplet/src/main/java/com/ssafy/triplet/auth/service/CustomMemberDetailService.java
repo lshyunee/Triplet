@@ -1,6 +1,6 @@
 package com.ssafy.triplet.auth.service;
 
-import com.ssafy.triplet.auth.dto.CustomMemberDetails;
+import com.ssafy.triplet.auth.dto.CustomUserPrincipal;
 import com.ssafy.triplet.auth.dto.MemberAuthDto;
 import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
@@ -23,6 +23,6 @@ public class CustomMemberDetailService implements UserDetailsService {
             throw new UsernameNotFoundException("user not found");
         }
         MemberAuthDto memberAuthDto = new MemberAuthDto(member.getMemberId(), member.getPassword(), member.getRole());
-        return new CustomMemberDetails(memberAuthDto);
+        return new CustomUserPrincipal(memberAuthDto);
     }
 }

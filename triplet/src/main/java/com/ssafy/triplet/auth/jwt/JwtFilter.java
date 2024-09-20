@@ -1,6 +1,6 @@
 package com.ssafy.triplet.auth.jwt;
 
-import com.ssafy.triplet.auth.dto.CustomMemberDetails;
+import com.ssafy.triplet.auth.dto.CustomUserPrincipal;
 import com.ssafy.triplet.auth.dto.MemberAuthDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -78,10 +79,10 @@ public class JwtFilter extends OncePerRequestFilter {
         String role = jwtUtil.getRole(accessToken);
 
         MemberAuthDto memberAuthDto = new MemberAuthDto(username, role);
-        CustomMemberDetails customMemberDetails = new CustomMemberDetails(memberAuthDto);
+        CustomUserPrincipal customUserPrincipal = new CustomUserPrincipal(memberAuthDto);
 
         // 인증 토큰 생성
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(customMemberDetails, null, customMemberDetails.getAuthorities());
+        Authentication authToken = new UsernamePasswordAuthenticationToken(customUserPrincipal, null, customUserPrincipal.getAuthorities());
         // 세션에 추가
         SecurityContextHolder.getContext().setAuthentication(authToken);
 

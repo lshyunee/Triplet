@@ -50,7 +50,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             memberRepository.save(member);
             MemberAuthDto memberAuthDto = new MemberAuthDto(username, "ROLE_USER");
 
-            return new CustomOAuth2User(memberAuthDto);
+            return new CustomUserPrincipal(memberAuthDto);
         } else {
             existData.setName(oAuth2Response.getName());
             existData.setBirth(birth);
@@ -60,7 +60,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             memberRepository.save(existData);
             MemberAuthDto memberAuthDto = new MemberAuthDto(username, existData.getRole());
 
-            return new CustomOAuth2User(memberAuthDto);
+            return new CustomUserPrincipal(memberAuthDto);
         }
 
     }
