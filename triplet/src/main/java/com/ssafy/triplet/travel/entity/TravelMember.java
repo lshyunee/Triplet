@@ -28,4 +28,3 @@ public class TravelMember {
     @JoinColumn(name = "folder_id", referencedColumnName = "id")
     private TravelFolder folderId;
 }
-
