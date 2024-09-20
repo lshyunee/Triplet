@@ -4,6 +4,7 @@ import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
+import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.TravelListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import com.ssafy.triplet.travel.entity.*;
@@ -140,8 +141,8 @@ public class TravelService {
         return buildTravelResponse(travel, travel.getInviteCode());
     }
 
-    public void postTravel(Long userId, Long travelId, int shareStatus) {
-        Travel travel = travelRepository.findById(travelId)
+    public void postTravel(Long userId, TravelShareRequest request) {
+        Travel travel = travelRepository.findById(request.getTravelId())
                 .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
         if (!travel.isStatus()) {
             throw new CustomException("T0012", "종료된 여행이 아닙니다.");
@@ -149,17 +150,23 @@ public class TravelService {
         if (!userId.equals(travel.getCreatorId())) {
             throw new CustomException("T0011", "여행 생성자가 아닙니다.");
         }
-        travel.setShared(true);
-        if (shareStatus == 1) {
-            travel.setShareStatus(true);
+        if (request.getShareStatus() != 1 && request.getShareStatus() != 0 &&
+            request.getIsShared() != 1 && request.getShareStatus() != 0){
+            throw new CustomException("T0007", "0이나 1의 상태만 보낼 수 있습니다.");
+        }
+        if (request.getIsShared() == 1) {
+            travel.setShared(true);
+            if (request.getShareStatus() == 1) {
+                travel.setShareStatus(true);
+            } else {
+                travel.setShareStatus(false);
+            }
+        } else {
+            travel.setShared(false);
+            travel.setShareStatus(false);
         }
         travelRepository.save(travel);
     }
-
-
-
-
-
 
 
     /* 여러번 사용되는 메서드 */

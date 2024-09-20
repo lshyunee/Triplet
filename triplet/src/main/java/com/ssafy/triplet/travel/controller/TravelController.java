@@ -3,6 +3,7 @@ package com.ssafy.triplet.travel.controller;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.response.ApiResponse;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
+import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.TravelListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import com.ssafy.triplet.travel.repository.TravelRepository;
@@ -130,20 +131,17 @@ public class TravelController {
         }
     }
 
-    @PostMapping("/share/{travelId}/{shareStatus}")
+    @PostMapping("/share")
     public ResponseEntity<ApiResponse<TravelResponse>> shareTravel(@RequestHeader(name = "Authorization", required = false) String token,
-                                                                    @PathVariable Long travelId, @PathVariable int shareStatus) {
+                                                                   @RequestBody TravelShareRequest requestDTO) {
         try {
             Long userId = extractAndValidateUser(token);
-            travelService.postTravel(userId, travelId, shareStatus);
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행이 공유되었습니다."));
+            travelService.postTravel(userId, requestDTO);
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행 공유 상태가 변경되었습니다."));
         } catch (Exception e) {
             return handleException(e);
         }
     }
-
-
-
 
 
     // 예외처리 메서드
