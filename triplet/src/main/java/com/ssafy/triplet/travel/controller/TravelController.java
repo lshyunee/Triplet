@@ -80,7 +80,7 @@ public class TravelController {
             }
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "진행중인 여행이 조회되었습니다.", responseList));
         } catch (Exception e) {
-            return handleExceptionList(e);
+            return handleException(e);
         }
     }
 
@@ -114,7 +114,7 @@ public class TravelController {
             }
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "다가오는 여행이 조회되었습니다.", responseList));
         } catch (Exception e) {
-            return handleExceptionList(e);
+            return handleException(e);
         }
     }
 
@@ -153,11 +153,8 @@ public class TravelController {
 //            }
             TravelFolder result = travelService.addFolder(travelFolder.getFolderTitle());
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "폴더가 생성되었습니다.", result));
-        } catch (CustomException e) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getErrorCode(), e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>("E0000", "서버 에러가 발생했습니다: " + e.getMessage()));
+            return handleException(e);
         }
     }
 
@@ -168,18 +165,27 @@ public class TravelController {
             Long userId = extractAndValidateUser(token);
             travelService.addTravelFolder(folderId, travelId, userId);
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "폴더에 여행이 추가되었습니다."));
-        } catch (CustomException e) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(e.getErrorCode(), e.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>("E0000", "서버 에러가 발생했습니다: " + e.getMessage()));
+            return handleException(e);
+        }
+    }
+
+    @DeleteMapping("/folder-travel/{travelId}")
+    public ResponseEntity<ApiResponse<TravelFolder>> deleteFolder(@RequestHeader(name = "Authorization", required = false) String token,
+                                                                  @PathVariable Long travelId) {
+        try {
+            Long userId = extractAndValidateUser(token);
+            travelService.removeTravel(travelId, userId);
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "폴더에서 여행이 삭제되었습니다."));
+        } catch (Exception e) {
+            return handleException(e);
         }
     }
 
 
 
     // 예외처리 메서드
-    private ResponseEntity<ApiResponse<TravelResponse>> handleException(Exception e) {
+    private <T> ResponseEntity<ApiResponse<T>> handleException(Exception e) {
         if (e instanceof CustomException customException) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(customException.getErrorCode(), customException.getMessage()));
         } else {
@@ -188,14 +194,6 @@ public class TravelController {
         }
     }
 
-    private ResponseEntity<ApiResponse<List<TravelListResponse>>> handleExceptionList(Exception e) {
-        if (e instanceof CustomException customException) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(customException.getErrorCode(), customException.getMessage()));
-        } else {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>("E0000", "서버 에러가 발생했습니다." + e.getMessage()));
-        }
-    }
 
     // 토큰 및 회원 확인 메서드
     private Long extractAndValidateUser(String token) throws CustomException {
