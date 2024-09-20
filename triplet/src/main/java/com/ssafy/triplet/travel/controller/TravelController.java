@@ -6,11 +6,10 @@ import com.ssafy.triplet.travel.dto.request.TravelRequest;
 import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.TravelListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelResponse;
-import com.ssafy.triplet.travel.entity.Travel;
+import com.ssafy.triplet.travel.entity.Country;
 import com.ssafy.triplet.travel.entity.TravelFolder;
 import com.ssafy.triplet.travel.service.TravelService;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -199,6 +198,16 @@ public class TravelController {
             Long userId = extractAndValidateUser(token);
             TravelResponse travel = travelService.inviteTravel(inviteCode, userId);
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행에 새로운 멤버가 추가되었습니다.", travel));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
+    @GetMapping("/countries")
+    public ResponseEntity<ApiResponse<List<Country>>> getCountries() {
+        try {
+            List<Country> list = travelService.countryList();
+            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "국가 리스트가 조회되었습니다.", list));
         } catch (Exception e) {
             return handleException(e);
         }
