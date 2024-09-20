@@ -4,6 +4,7 @@ import com.ssafy.triplet.member.dto.request.SignupRequest;
 import com.ssafy.triplet.member.service.MemberService;
 import com.ssafy.triplet.response.ApiResponse;
 import com.ssafy.triplet.response.CustomErrorCode;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,13 +26,13 @@ public class SignupController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signUp(@Valid @RequestBody SignupRequest request, BindingResult bindingResult) {
+    public ResponseEntity<?> signUp(@Valid @RequestBody SignupRequest request, BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             return handleFieldErrors(bindingResult);
         }
-        ApiResponse<?> response = memberService.singUp(request);
+        ApiResponse<?> apiResponse = memberService.singUp(request, response);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
     // 회원가입 필드별 유효성검사 실패응답
@@ -51,10 +52,8 @@ public class SignupController {
                         response = new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.INVALID_PHONE_NUMBER), HttpStatus.BAD_REQUEST);
                 case "name" ->
                         response = new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.EMPTY_NAME), HttpStatus.BAD_REQUEST);
-                case "identificationNumber" ->
-                        response = new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.INVALID_IDENTIFICATION_NUMBER), HttpStatus.BAD_REQUEST);
                 default ->
-                        response = new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.INVALID_SIMPLE_PASSWORD), HttpStatus.BAD_REQUEST);
+                        response = new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.INVALID_IDENTIFICATION_NUMBER), HttpStatus.BAD_REQUEST);
             };
         }
         return response;

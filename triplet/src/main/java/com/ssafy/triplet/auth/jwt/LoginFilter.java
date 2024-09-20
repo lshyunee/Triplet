@@ -54,10 +54,9 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String access = jwtUtil.createJwt("access", username, role, 600000L);
         String refresh = jwtUtil.createJwt("refresh", username, role, 86400000L);
 
-        // 응답에 토큰 정보 담기
-        response.setHeader("Authorization", "Bearer " + access);
-        String encodedRefreshToken = URLEncoder.encode("Bearer " + refresh, StandardCharsets.UTF_8);
-        response.addCookie(createCookie("Authorization-Refresh", encodedRefreshToken));
+        // 쿠키에 토큰 정보 담기
+        response.addCookie(createCookie("Authorization", access));
+        response.addCookie(createCookie("Authorization-Refresh", refresh));
 
         // JSON 응답 만들기
         response.setContentType("application/json");

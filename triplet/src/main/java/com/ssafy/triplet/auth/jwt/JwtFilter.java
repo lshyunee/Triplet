@@ -5,6 +5,7 @@ import com.ssafy.triplet.auth.dto.MemberAuthDto;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,17 +25,29 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // access 헤더 값 가져옴
-        String authorization = request.getHeader("Authorization");
+        // login or oauth2 면 jwt 검사안하고 넘기기
+        String requestURI = request.getRequestURI();
 
-        // access 헤더 검증
-        if (authorization == null || !authorization.startsWith("Bearer ")) {
+        if (requestURI.matches("^\\/login(?:\\/.*)?$") || requestURI.matches("^\\/oauth2(?:\\/.*)?$")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // 쿠키에서 access 토큰 가져옴
+        String accessToken = null;
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if ("Authorization".equals(cookie.getName())) {
+                accessToken = cookie.getValue();
+            }
+        }
+
+        // access 토큰 검증
+        if (accessToken == null) {
             log.info("token null");
             filterChain.doFilter(request, response);
             return; // 조건에 해당되면 메서드 종료
         }
-
-        String accessToken = authorization.split(" ")[1]; // 토큰값만 가져오기
 
         // 토큰 소멸 시간 검증
         try {

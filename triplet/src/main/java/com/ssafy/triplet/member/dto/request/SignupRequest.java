@@ -27,10 +27,6 @@ public class SignupRequest {
     private String identificationNumber; // 주민번호: 생일 + 성별 7자리 숫자
 
     @NotNull
-    @Pattern(regexp = "^[0-9]{6}$")
-    private String simplePassword;
-
-    @NotNull
     @Pattern(regexp = "^[0-9]{10,11}$")
     private String phoneNumber;
 
