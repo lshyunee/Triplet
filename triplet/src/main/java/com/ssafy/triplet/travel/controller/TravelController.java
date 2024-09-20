@@ -7,11 +7,8 @@ import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.TravelListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import com.ssafy.triplet.travel.entity.TravelFolder;
-import com.ssafy.triplet.travel.repository.TravelRepository;
 import com.ssafy.triplet.travel.service.TravelService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,11 +24,10 @@ import java.util.Map;
 public class TravelController {
 
     private final TravelService travelService;
-    private final TravelRepository travelRepository;
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<TravelResponse>> createTravel(
-            @RequestHeader(name = "Authorization", required = false) String token,
+            @CookieValue(name = "accessToken", required = false) String token,
             @RequestPart("data") TravelRequest requestDTO,
             @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
         try {
@@ -45,7 +41,7 @@ public class TravelController {
 
     @PutMapping("/update/{travelId}")
     public ResponseEntity<ApiResponse<TravelResponse>> updateTravel(
-            @RequestHeader(name = "Authorization", required = false) String token,
+            @CookieValue(name = "accessToken", required = false) String token,
             @PathVariable Long travelId,
             @RequestPart("data") TravelRequest requestDTO,
             @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
@@ -59,7 +55,7 @@ public class TravelController {
     }
 
     @DeleteMapping("/delete/{travelId}")
-    public ResponseEntity<ApiResponse<TravelResponse>> deleteTravel(@RequestHeader(name = "Authorization", required = false) String token,
+    public ResponseEntity<ApiResponse<TravelResponse>> deleteTravel(@CookieValue(name = "accessToken", required = false) String token,
                                                                     @PathVariable Long travelId) {
         try {
             Long userId = extractAndValidateUser(token);
@@ -71,7 +67,7 @@ public class TravelController {
     }
 
     @GetMapping("/ongoing")
-    public ResponseEntity<ApiResponse<List<TravelListResponse>>> ongoingTravel(@RequestHeader(name = "Authorization", required = false) String token) {
+    public ResponseEntity<ApiResponse<List<TravelListResponse>>> ongoingTravel(@CookieValue(name = "accessToken", required = false) String token) {
         try {
             Long userId = extractAndValidateUser(token);
             List<TravelListResponse> responseList = travelService.getTravelOngoingList(userId);
@@ -86,7 +82,7 @@ public class TravelController {
 
     @GetMapping("/completed")
     public ResponseEntity<ApiResponse<Map<String, List<TravelListResponse>>>> completedTravel(
-            @RequestHeader(name = "Authorization", required = false) String token) {
+            @CookieValue(name = "accessToken", required = false) String token) {
         try {
             Long userId = extractAndValidateUser(token);
             Map<String, List<TravelListResponse>> responseList = travelService.getTravelCompleteList(userId);
@@ -105,7 +101,7 @@ public class TravelController {
     }
 
     @GetMapping("/upcoming")
-    public ResponseEntity<ApiResponse<List<TravelListResponse>>> upcomingTravel(@RequestHeader(name = "Authorization", required = false) String token) {
+    public ResponseEntity<ApiResponse<List<TravelListResponse>>> upcomingTravel(@CookieValue(name = "accessToken", required = false) String token) {
         try {
             Long userId = extractAndValidateUser(token);
             List<TravelListResponse> responseList = travelService.getTravelUpcomingList(userId);
@@ -119,13 +115,11 @@ public class TravelController {
     }
 
     @GetMapping("/{travelId}")
-    public ResponseEntity<ApiResponse<TravelResponse>> getReadTravel(@RequestHeader(name = "Authorization", required = false) String token,
+    public ResponseEntity<ApiResponse<TravelResponse>> getReadTravel(@CookieValue(name = "accessToken", required = false) String token,
                                                                      @PathVariable Long travelId) {
         try {
-//            if (token == null) {
-//                throw new CustomException("M0011", "토큰이 비어있습니다.");
-//            }
-            TravelResponse responseDTO = travelService.getTravel(travelId);
+            Long userId = extractAndValidateUser(token);
+            TravelResponse responseDTO = travelService.getTravel(travelId, userId);
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행이 조회되었습니다.", responseDTO));
         } catch (Exception e) {
             return handleException(e);
@@ -133,7 +127,7 @@ public class TravelController {
     }
 
     @PostMapping("/share")
-    public ResponseEntity<ApiResponse<TravelResponse>> shareTravel(@RequestHeader(name = "Authorization", required = false) String token,
+    public ResponseEntity<ApiResponse<TravelResponse>> shareTravel(@CookieValue(name = "accessToken", required = false) String token,
                                                                    @RequestBody TravelShareRequest requestDTO) {
         try {
             Long userId = extractAndValidateUser(token);
@@ -145,7 +139,7 @@ public class TravelController {
     }
 
     @PostMapping("/create-folder")
-    public ResponseEntity<ApiResponse<TravelFolder>> createFolder(@RequestHeader(name = "Authorization", required = false) String token,
+    public ResponseEntity<ApiResponse<TravelFolder>> createFolder(@CookieValue(name = "accessToken", required = false) String token,
                                                             @RequestBody TravelFolder travelFolder) {
         try {
 //            if (token == null) {
@@ -159,7 +153,7 @@ public class TravelController {
     }
 
     @PostMapping("/folder-travel/{folderId}/{travelId}")
-    public ResponseEntity<ApiResponse<TravelFolder>> createFolder(@RequestHeader(name = "Authorization", required = false) String token,
+    public ResponseEntity<ApiResponse<TravelFolder>> createFolder(@CookieValue(name = "accessToken", required = false) String token,
                                                                   @PathVariable Long folderId, @PathVariable Long travelId) {
         try {
             Long userId = extractAndValidateUser(token);
@@ -171,7 +165,7 @@ public class TravelController {
     }
 
     @DeleteMapping("/folder-travel/{travelId}")
-    public ResponseEntity<ApiResponse<TravelFolder>> deleteFolder(@RequestHeader(name = "Authorization", required = false) String token,
+    public ResponseEntity<ApiResponse<TravelFolder>> deleteFolder(@CookieValue(name = "accessToken", required = false) String token,
                                                                   @PathVariable Long travelId) {
         try {
             Long userId = extractAndValidateUser(token);

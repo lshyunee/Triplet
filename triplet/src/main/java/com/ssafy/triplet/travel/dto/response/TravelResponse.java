@@ -19,6 +19,7 @@ public class TravelResponse {
     private String title;
     private String image;
     private Long creatorId;
+    private boolean myTravel;
     private int memberCount;
     private double totalBudget;
     private double airportCost;
