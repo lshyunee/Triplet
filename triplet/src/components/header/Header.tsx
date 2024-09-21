@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import styled from 'styled-components';
 import alarm from '../../assets/header/alarm.png';
 
@@ -28,7 +28,9 @@ const Header: React.FC = () => {
 
   return (
     <StyledDiv>
-        <StyledP>Triplet</StyledP>
+        <Link to="/home" style={{ textDecoration: 'none' }}>
+            <StyledP>Triplet</StyledP>
+        </Link>
         <img onClick={() => navigate("/alarm")} src={alarm} alt="alarm" />
     </StyledDiv>
   );
