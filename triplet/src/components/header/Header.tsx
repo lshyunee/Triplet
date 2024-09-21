@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components';
 import rightArrow from '../../assets/header/rightArrow.png';
 
@@ -22,9 +23,12 @@ const StyledP = styled.p`
 `;
 
 const Header: React.FC<HeaderProps> = ({ title }) => {
+
+  const navigate = useNavigate();
+
   return (
     <StyledDiv>
-      <img src={rightArrow} alt="arrow" />
+      <img onClick={() => navigate(-1)} src={rightArrow} alt="arrow" />
       <StyledP>{title}</StyledP>  {/* title을 출력 */}
     </StyledDiv>
   );
