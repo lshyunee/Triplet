@@ -10,6 +10,7 @@ import Travels from '../pages/travels/TravelsPage';
 import Login from '../pages/user/login/LoginPage';
 import Signup from '../pages/user/signup/SignupPage';
 import AppContent from '../pages/AppContent';
+import Alarm from '../pages/alarm/AlarmPage';
 
 const AppRoutes: React.FC = () => (
     <Routes>
@@ -20,7 +21,8 @@ const AppRoutes: React.FC = () => (
     <Route path="/feed" element={<Board/>}/>
     <Route path="/myPage" element={<MyPage/>} />
     <Route path="/pay" element={<Pay/>}/>
-    <Route path="/travels" element={<Travels/>} />
+    <Route path="/travels" element={<Travels/>}/>
+    <Route path="/alarm" element={<Alarm/>}/>
     </Routes>
 );
 

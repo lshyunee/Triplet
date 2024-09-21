@@ -1,8 +1,12 @@
 import React from 'react';
+import Header from '../../components/header/Header';
 
 const BoardPage = () => {
     return (
-        <div>피드</div>
+        <>
+            <Header/>
+            <div>피드</div>
+        </>
     );
 };
 

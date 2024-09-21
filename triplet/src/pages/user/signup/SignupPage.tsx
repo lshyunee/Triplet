@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Header from '../../../components/header/Header';
+import BackHeader from '../../../components/header/BackHeader';
 import styled from 'styled-components';
 
 const HowP = styled.p`
@@ -117,7 +117,7 @@ const SignupPage = () => {
 
     return(
         <div>
-            <Header title={title}/>
+            <BackHeader title={title}/>
             <InputDiv>
                 <HowP>아이디</HowP>
                 <CheckDiv>
