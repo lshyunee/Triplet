@@ -68,4 +68,8 @@ public class CustomUserPrincipal implements UserDetails, OAuth2User {
     public boolean isEnabled() {
         return true;
     }
+
+    public String getMemberId() {
+        return memberAuthDto.getMemberId();
+    }
 }

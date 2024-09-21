@@ -1,7 +1,10 @@
 package com.ssafy.triplet.member.service;
 
 import com.ssafy.triplet.auth.jwt.JwtUtil;
+import com.ssafy.triplet.member.dto.request.MemberIdRequest;
 import com.ssafy.triplet.member.dto.request.SignupRequest;
+import com.ssafy.triplet.member.dto.request.SimplePasswordConfirmRequest;
+import com.ssafy.triplet.member.dto.request.SimplePasswordRequest;
 import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.response.ApiResponse;
@@ -13,11 +16,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class MemberService {
 
@@ -63,6 +68,28 @@ public class MemberService {
         autoLogin(request.getMemberId(), response);
 
         return new ApiResponse<Void>("200", "회원가입 성공");
+    }
+
+    public boolean createSimplePassword(SimplePasswordRequest request, String memberId) {
+        Member member = memberRepository.findByMemberId(memberId);
+        // 간편비밀번호랑 간편비밀번호확인 검증
+        if (!request.getNewSimplePassword().equals(request.getNewSimplePasswordConfirm())) {
+            return false;
+        }
+        member.setSimplePassword(request.getNewSimplePassword());
+        return true;
+    }
+
+    public boolean confirmSimplePassword(SimplePasswordConfirmRequest request, String memberId) {
+        // 간편비밀번호 확인: true -> 확인 성공
+        Member member = memberRepository.findByMemberId(memberId);
+        return request.getSimplePassword().equals(member.getSimplePassword());
+    }
+
+    public boolean isDuplicated(MemberIdRequest request) {
+        // 아이디 중복검사: true -> 중복
+        Member existData = memberRepository.findByMemberId(request.getMemberId());
+        return existData != null;
     }
 
     private void autoLogin(String memberId, HttpServletResponse response) {
