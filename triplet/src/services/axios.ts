@@ -2,6 +2,7 @@ import axios from 'axios';
 
 const axiosInstance = axios.create({
     baseURL : 'https://j11b202.p.ssafy.io',
+    // baseURL : 'localhost:8080',
     timeout : 10000,
     withCredentials : true,
 });
