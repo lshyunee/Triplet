@@ -1,7 +1,7 @@
 package com.ssafy.triplet.sms.controller;
 
 import com.ssafy.triplet.response.ApiResponse;
-import com.ssafy.triplet.response.CustomErrorCode;
+import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.sms.dto.request.SmsConfirmRequest;
 import com.ssafy.triplet.sms.dto.request.SmsSendRequest;
 import com.ssafy.triplet.sms.service.SmsService;
