@@ -58,6 +58,7 @@ public class SecurityConfig {
         http // 경로별 인가 작업
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error", "/api/v1/login", "/api/v1/signup",
+                                "/api/v1/signup/is-duplicated",
                                 "/api/v1/reissue", "/api/v1/sms/**").permitAll()
                         .anyRequest().hasRole("USER")
                 );
