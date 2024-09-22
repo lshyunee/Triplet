@@ -49,14 +49,17 @@ public class SecurityConfig {
 
         http // 소셜 로그인
                 .oauth2Login(oauth2 -> oauth2
+                        // 소셜로그인 경로 설정
+                        .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig
+                                .baseUri("/api/v1/oauth2/authorization"))
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
                         .successHandler(customSuccessHandler));
 
         http // 경로별 인가 작업
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/api/v1/signup",
-                                "/api/v1/reissue", "/api/v1/sms/**").permitAll()
+                        .requestMatchers("/api/v1/login", "/api/v1/signup",
+                                "/api/v1/reissue", "/api/v1/sms/**", "/api/v1/oauth2/authorization/**").permitAll()
                         .anyRequest().hasRole("USER")
                 );
 
@@ -66,8 +69,8 @@ public class SecurityConfig {
         http // JwtFilter 를 커스텀한 LoginFilter 앞에 등록
                 .addFilterBefore(new JwtFilter(jwtUtil), LoginFilter.class);
         http // 커스텀한 LoginFilter 를 기존의 UsernamePasswordAuthFilter 자리에 등록
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil),
-                        UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil) {{
+                    setFilterProcessesUrl("/api/v1/login");}}, UsernamePasswordAuthenticationFilter.class);
         http // 커스텀한 CustomLogoutFilter 를 기존의 LogoutFilter 앞에 등록
                 .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class);
         http // 세션 stateless 로 설정 -> jwt
