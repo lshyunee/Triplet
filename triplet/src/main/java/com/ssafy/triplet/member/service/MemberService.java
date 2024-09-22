@@ -1,25 +1,19 @@
 package com.ssafy.triplet.member.service;
 
 import com.ssafy.triplet.auth.jwt.JwtUtil;
-import com.ssafy.triplet.member.dto.request.MemberIdRequest;
-import com.ssafy.triplet.member.dto.request.SignupRequest;
-import com.ssafy.triplet.member.dto.request.SimplePasswordConfirmRequest;
-import com.ssafy.triplet.member.dto.request.SimplePasswordRequest;
+import com.ssafy.triplet.exception.CustomException;
+import com.ssafy.triplet.member.dto.request.*;
+import com.ssafy.triplet.member.dto.response.MemberResponse;
 import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.response.ApiResponse;
-import com.ssafy.triplet.response.CustomErrorCode;
+import com.ssafy.triplet.exception.CustomErrorCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 
 @Service
 @Transactional
@@ -30,17 +24,17 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public ApiResponse<?> singUp(SignupRequest request, HttpServletResponse response) {
+    public void signUp(SignupRequest request, HttpServletResponse response) {
 
         // 아이디 중복확인
         Member existMember = memberRepository.findByMemberId(request.getMemberId());
         if (existMember != null) {
-            return ApiResponse.isError(CustomErrorCode.ID_ALREADY_REGISTERED);
+            throw new CustomException(CustomErrorCode.ID_ALREADY_REGISTERED);
         }
 
         // 비밀번호 확인
         if (request.getPasswordConfirm() == null || !request.getPassword().equals(request.getPasswordConfirm())) {
-            return ApiResponse.isError(CustomErrorCode.PASSWORD_MISMATCH);
+            throw new CustomException(CustomErrorCode.PASSWORD_MISMATCH);
         }
 
         // 주민번호에서 생일, 성별 꺼내기
@@ -66,8 +60,6 @@ public class MemberService {
         memberRepository.save(member);
         // 자동 로그인 처리 (토큰발급)
         autoLogin(request.getMemberId(), response);
-
-        return new ApiResponse<Void>("200", "회원가입 성공");
     }
 
     public boolean createSimplePassword(SimplePasswordRequest request, String memberId) {
@@ -90,6 +82,71 @@ public class MemberService {
         // 아이디 중복검사: true -> 중복
         Member existData = memberRepository.findByMemberId(request.getMemberId());
         return existData != null;
+    }
+
+    public MemberResponse findMyInfo(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId);
+        if (member == null) {
+            throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
+        }
+        return MemberResponse.builder()
+                .memberId(member.getMemberId())
+                .password(member.getPassword())
+                .name(member.getName())
+                .phoneNumber(member.getPhoneNumber())
+                .birth(member.getBirth())
+                .gender(member.getGender())
+                .simplePassword(member.getSimplePassword()).build();
+    }
+
+    public MemberResponse updateMyInfo(MemberUpdateRequest request, String memberId) {
+        Member member = memberRepository.findByMemberId(memberId);
+        if (member == null) {
+            throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
+        }
+        // 주민번호에서 생일, 성별 꺼내기
+        String identificationNumber = request.getIdentificationNumber();
+        String birth = identificationNumber.substring(0, 6);
+        String lastNum = identificationNumber.substring(6);
+        boolean gender = "1".equals(lastNum) || "3".equals(lastNum); // 1: 남, 0: 여
+        // 업데이트
+        member.setGender(gender);
+        member.setBirth(birth);
+        member.setName(request.getName());
+        member.setPhoneNumber(request.getPhoneNumber());
+        // 변경된 정보 반환
+        return MemberResponse.builder()
+                .memberId(member.getMemberId())
+                .password(member.getPassword())
+                .name(request.getName())
+                .phoneNumber(request.getPhoneNumber())
+                .birth(birth)
+                .gender(gender)
+                .simplePassword(member.getSimplePassword()).build();
+    }
+
+    public void updatePassword(PasswordUpdateRequest request, String memberId) {
+        Member member = memberRepository.findByMemberId(memberId);
+        if (member == null) {
+            throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
+        }
+        // 입력한 기존 비밀번호랑 실제 내 비밀번호 일치하는지 확인
+        if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
+            throw new CustomException(CustomErrorCode.INCORRECT_PASSWORD);
+        }
+        // 새 비밀번호랑 새 비밀번호 확인이 일치하는지 확인
+        if (!request.getNewPassword().equals(request.getNewPasswordConfirm())) {
+            throw new CustomException(CustomErrorCode.PASSWORD_MISMATCH);
+        }
+        member.setPassword(request.getNewPassword());
+    }
+
+    public void deleteMyInfo(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId);
+        if (member == null) {
+            throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
+        }
+        memberRepository.delete(member);
     }
 
     private void autoLogin(String memberId, HttpServletResponse response) {
