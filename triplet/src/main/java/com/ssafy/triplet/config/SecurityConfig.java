@@ -49,7 +49,6 @@ public class SecurityConfig {
 
         http // 소셜 로그인
                 .oauth2Login(oauth2 -> oauth2
-                        // 소셜로그인 경로 설정
                         .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig
                                 .baseUri("/api/v1/oauth2/authorization"))
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
@@ -58,8 +57,8 @@ public class SecurityConfig {
 
         http // 경로별 인가 작업
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/login", "/api/v1/signup",
-                                "/api/v1/reissue", "/api/v1/sms/**", "/api/v1/oauth2/authorization/**").permitAll()
+                        .requestMatchers("/error", "/api/v1/login", "/api/v1/signup",
+                                "/api/v1/reissue", "/api/v1/sms/**").permitAll()
                         .anyRequest().hasRole("USER")
                 );
 

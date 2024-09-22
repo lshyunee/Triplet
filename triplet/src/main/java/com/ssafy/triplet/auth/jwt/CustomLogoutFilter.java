@@ -40,11 +40,14 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // refresh 토큰 꺼내기
         String refresh = null;
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if ("refresh".equals(cookie.getName())) {
-                refresh = cookie.getValue().split(" ")[1];
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("refresh".equals(cookie.getName())) {
+                    refresh = cookie.getValue().split(" ")[1];
+                }
             }
         }
+
         // refresh 가 null 인지 확인
         if (refresh == null) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

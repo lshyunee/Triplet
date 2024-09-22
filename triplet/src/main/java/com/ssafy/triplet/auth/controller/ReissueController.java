@@ -29,9 +29,11 @@ public class ReissueController {
         // 쿠키에서 refresh 토큰 가져오기
         String refresh = null;
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if ("Authorization-Refresh".equals(cookie.getName())) {
-                refresh = cookie.getValue();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("Authorization-Refresh".equals(cookie.getName())) {
+                    refresh = cookie.getValue();
+                }
             }
         }
 

@@ -17,6 +17,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,10 +27,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // login or oauth2 면 jwt 검사안하고 넘기기
+        // 아래 경로에 포함되면 jwt검사 생략
+        List<String> whiteList = List.of(
+                "/api/v1/login",
+                "/api/v1/signup",
+                "/api/v1/reissue",
+                "/api/v1/sms",
+                "/api/v1/oauth2/authorization"
+        );
         String requestURI = request.getRequestURI();
 
-        if (requestURI.matches("^\\/login(?:\\/.*)?$") || requestURI.matches("^\\/oauth2(?:\\/.*)?$")) {
+        if (whiteList.stream().anyMatch(requestURI::startsWith)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -37,9 +45,11 @@ public class JwtFilter extends OncePerRequestFilter {
         // 쿠키에서 access 토큰 가져옴
         String accessToken = null;
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if ("Authorization".equals(cookie.getName())) {
-                accessToken = cookie.getValue();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("Authorization".equals(cookie.getName())) {
+                    accessToken = cookie.getValue();
+                }
             }
         }
 
