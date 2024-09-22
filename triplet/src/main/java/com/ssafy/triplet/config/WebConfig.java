@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry
                 .addMapping("/**")
-                .allowedOrigins("http://localhost:3000") // 허용할 출처 : 특정 도메인만 받을 수 있음
+                .allowedOriginPatterns("*") // 허용할 출처 : 특정 도메인만 받을 수 있음
                 .exposedHeaders("Set-Cookie", "Authorization", "Authorization-Refresh")
                 .allowedMethods("*")
                 .allowedHeaders("*")
@@ -32,7 +32,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+
+        configuration.addAllowedOriginPattern("*");
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Collections.singletonList("*"));
