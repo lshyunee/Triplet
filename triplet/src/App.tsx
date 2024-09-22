@@ -16,6 +16,13 @@ const GlobalStyle = createGlobalStyle`
     font-style: normal;
   }
 
+  button, input {
+    font-family: 'Pretendard';
+    src: url('/fonts/PretendardVariable.woff2') format('woff2');
+    font-weight: 1 1000;
+    font-style: normal;
+  }
+
   body {
     font-family : 'Pretendard', sans-serif;
   }
