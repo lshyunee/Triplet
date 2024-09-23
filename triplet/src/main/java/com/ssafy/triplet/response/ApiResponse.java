@@ -1,5 +1,6 @@
 package com.ssafy.triplet.response;
 
+import com.ssafy.triplet.exception.CustomErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

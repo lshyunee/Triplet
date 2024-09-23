@@ -8,7 +8,7 @@ import com.ssafy.triplet.member.dto.request.SimplePasswordRequest;
 import com.ssafy.triplet.member.dto.response.MemberIdResponse;
 import com.ssafy.triplet.member.service.MemberService;
 import com.ssafy.triplet.response.ApiResponse;
-import com.ssafy.triplet.response.CustomErrorCode;
+import com.ssafy.triplet.exception.CustomErrorCode;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +36,8 @@ public class SignupController {
         if (bindingResult.hasErrors()) {
             return handleFieldErrors(bindingResult);
         }
-        ApiResponse<?> apiResponse = memberService.singUp(request, response);
-
-        return new ResponseEntity<>(apiResponse, HttpStatus.OK);
+        memberService.signUp(request, response);
+        return ResponseEntity.ok().body(new ApiResponse<>("200", "회원가입 성공"));
     }
 
     @PostMapping("/simple-password")
@@ -48,9 +47,9 @@ public class SignupController {
             return handleFieldErrors(bindingResult);
         }
         if (!memberService.createSimplePassword(request, customUserPrincipal.getMemberId())) {
-            return new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.SIMPLE_PASSWORD_MISMATCH), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(ApiResponse.isError(CustomErrorCode.SIMPLE_PASSWORD_MISMATCH));
         }
-        return new ResponseEntity<>(new ApiResponse<Void>("200", "간편비밀번호 설정 성공"), HttpStatus.OK);
+        return ResponseEntity.ok().body(new ApiResponse<Void>("200", "간편비밀번호 설정 성공"));
     }
 
     @PostMapping("/simple-password-confirm")
@@ -60,9 +59,9 @@ public class SignupController {
             return handleFieldErrors(bindingResult);
         }
         if (!memberService.confirmSimplePassword(request, customUserPrincipal.getMemberId())) {
-            return new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.SIMPLE_PASSWORD_MISMATCH), HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(ApiResponse.isError(CustomErrorCode.SIMPLE_PASSWORD_MISMATCH));
         }
-        return new ResponseEntity<>(new ApiResponse<Void>("200", "간편비밀번호 인증 성공"), HttpStatus.OK);
+        return ResponseEntity.ok().body(new ApiResponse<Void>("200", "간편비밀번호 인증 성공"));
     }
 
     @PostMapping("/signup/is-duplicated")
@@ -72,7 +71,7 @@ public class SignupController {
         }
         boolean isDuplicated = memberService.isDuplicated(request);
         MemberIdResponse memberIdResponse = new MemberIdResponse(isDuplicated);
-        return new ResponseEntity<>(new ApiResponse<>("200", "아이디 중복확인 성공", memberIdResponse), HttpStatus.OK);
+        return ResponseEntity.ok().body(new ApiResponse<>("200", "아이디 중복확인 성공", memberIdResponse));
     }
 
     // 회원가입 필드별 유효성검사 실패응답
