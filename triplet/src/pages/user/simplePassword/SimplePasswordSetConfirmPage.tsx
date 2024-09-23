@@ -81,7 +81,7 @@ const IconButton = styled.button`
   padding: 20px;
 `;
 
-const SimplePasswordSetPage: React.FC = () => {
+const SimplePasswordSetConfirmPage: React.FC = () => {
     const [numbers, setNumbers] = useState<number[]>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     const [password, setPassword] = useState<number[]>([]);
 
@@ -147,4 +147,4 @@ const SimplePasswordSetPage: React.FC = () => {
     );
 };
 
-export default SimplePasswordSetPage;
+export default SimplePasswordSetConfirmPage;
