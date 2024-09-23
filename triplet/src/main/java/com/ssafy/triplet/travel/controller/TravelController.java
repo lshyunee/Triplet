@@ -7,6 +7,7 @@ import com.ssafy.triplet.member.service.MemberService;
 import com.ssafy.triplet.response.ApiResponse;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
 import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
+import com.ssafy.triplet.travel.dto.response.TransactionListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import com.ssafy.triplet.travel.entity.Country;
@@ -36,9 +37,9 @@ public class TravelController {
             @RequestPart("data") TravelRequest requestDTO,
             @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
         try {
-            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             TravelResponse responseDTO = travelService.createTravel(userId, requestDTO, image);
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행이 생성되었습니다.", responseDTO));
+            return ResponseEntity.ok(new ApiResponse<>("200", "여행이 생성되었습니다.", responseDTO));
         } catch (Exception e) {
             return handleException(e);
         }
@@ -51,9 +52,9 @@ public class TravelController {
             @RequestPart("data") TravelRequest requestDTO,
             @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
         try {
-            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             TravelResponse responseDTO = travelService.updateTravel(travelId, requestDTO, image, userId);
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행이 수정되었습니다.", responseDTO));
+            return ResponseEntity.ok(new ApiResponse<>("200", "여행이 수정되었습니다.", responseDTO));
         } catch (Exception e) {
             return handleException(e);
         }
@@ -63,9 +64,9 @@ public class TravelController {
     public ResponseEntity<ApiResponse<TravelResponse>> deleteTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
                                                                     @PathVariable Long travelId) {
         try {
-            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             travelService.deleteTravel(travelId, userId);
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행이 삭제되었습니다."));
+            return ResponseEntity.ok(new ApiResponse<>("200", "여행이 삭제되었습니다."));
         } catch (Exception e) {
             return handleException(e);
         }
@@ -74,12 +75,12 @@ public class TravelController {
     @GetMapping("/ongoing")
     public ResponseEntity<ApiResponse<List<TravelListResponse>>> ongoingTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         try {
-            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             List<TravelListResponse> responseList = travelService.getTravelOngoingList(userId);
             if (responseList.isEmpty()) {
-                return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "진행중인 여행이 없습니다."));
+                return ResponseEntity.ok(new ApiResponse<>("200", "진행중인 여행이 없습니다."));
             }
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "진행중인 여행이 조회되었습니다.", responseList));
+            return ResponseEntity.ok(new ApiResponse<>("200", "진행중인 여행이 조회되었습니다.", responseList));
         } catch (Exception e) {
             return handleException(e);
         }
@@ -89,14 +90,14 @@ public class TravelController {
     public ResponseEntity<ApiResponse<List<TravelListResponse>>> completedTravel(
             @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         try {
-            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             List<TravelListResponse> responseList = travelService.getTravelCompleteList(userId);
 
             if (responseList.isEmpty()) {
-                return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "완료된 여행이 없습니다."));
+                return ResponseEntity.ok(new ApiResponse<>("200", "완료된 여행이 없습니다."));
             }
 
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "완료된 여행이 조회되었습니다.", responseList));
+            return ResponseEntity.ok(new ApiResponse<>("200", "완료된 여행이 조회되었습니다.", responseList));
         } catch (CustomException customException) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(customException.getErrorCode(), customException.getMessage()));
         } catch (Exception e) {
@@ -108,12 +109,12 @@ public class TravelController {
     @GetMapping("/upcoming")
     public ResponseEntity<ApiResponse<List<TravelListResponse>>> upcomingTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         try {
-            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             List<TravelListResponse> responseList = travelService.getTravelUpcomingList(userId);
             if (responseList.isEmpty()) {
-                return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "다가오는 여행이 없습니다."));
+                return ResponseEntity.ok(new ApiResponse<>("200", "다가오는 여행이 없습니다."));
             }
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "다가오는 여행이 조회되었습니다.", responseList));
+            return ResponseEntity.ok(new ApiResponse<>("200", "다가오는 여행이 조회되었습니다.", responseList));
         } catch (Exception e) {
             return handleException(e);
         }
@@ -123,9 +124,9 @@ public class TravelController {
     public ResponseEntity<ApiResponse<TravelResponse>> getReadTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
                                                                      @PathVariable Long travelId) {
         try {
-            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             TravelResponse responseDTO = travelService.getTravel(travelId, userId);
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행이 조회되었습니다.", responseDTO));
+            return ResponseEntity.ok(new ApiResponse<>("200", "여행이 조회되었습니다.", responseDTO));
         } catch (Exception e) {
             return handleException(e);
         }
@@ -135,9 +136,9 @@ public class TravelController {
     public ResponseEntity<ApiResponse<TravelResponse>> shareTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
                                                                    @RequestBody TravelShareRequest requestDTO) {
         try {
-            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             travelService.postTravel(userId, requestDTO);
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행 공유 상태가 변경되었습니다."));
+            return ResponseEntity.ok(new ApiResponse<>("200", "여행 공유 상태가 변경되었습니다."));
         } catch (Exception e) {
             return handleException(e);
         }
@@ -147,9 +148,9 @@ public class TravelController {
     public ResponseEntity<ApiResponse<TravelResponse>> inviteAddTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
                                                                        @PathVariable String inviteCode) {
         try {
-            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             TravelResponse travel = travelService.inviteTravel(inviteCode, userId);
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행에 새로운 멤버가 추가되었습니다.", travel));
+            return ResponseEntity.ok(new ApiResponse<>("200", "여행에 새로운 멤버가 추가되었습니다.", travel));
         } catch (Exception e) {
             return handleException(e);
         }
@@ -159,7 +160,21 @@ public class TravelController {
     public ResponseEntity<ApiResponse<List<Country>>> getCountries() {
         try {
             List<Country> list = travelService.countryList();
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "국가 리스트가 조회되었습니다.", list));
+            return ResponseEntity.ok(new ApiResponse<>("200", "국가 리스트가 조회되었습니다.", list));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
+    @GetMapping("/transaction/{travelId}")
+    public ResponseEntity<ApiResponse<List<TransactionListResponse>>> getTransactions(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+                                                                                      @PathVariable Long travelId) {
+        try {
+            List<TransactionListResponse> list = travelService.getTransactionList(travelId);
+            if (list.isEmpty()) {
+                ResponseEntity.ok(new ApiResponse<>("200", "거래 내역이 없습니다."));
+            }
+            return ResponseEntity.ok(new ApiResponse<>("200", "거래 내역이 조회되었습니다.", list));
         } catch (Exception e) {
             return handleException(e);
         }
