@@ -9,12 +9,11 @@ import Pay from '../pages/pay/PayPage';
 import Travels from '../pages/travels/TravelsPage';
 import Login from '../pages/user/login/LoginPage';
 import Signup from '../pages/user/signup/SignupPage';
-import AppContent from '../pages/AppContent';
 import Alarm from '../pages/alarm/AlarmPage';
 
 const AppRoutes: React.FC = () => (
     <Routes>
-    <Route path="/" element={<AppContent/>}/>
+    <Route path="/" element={<Home/>}/>
     <Route path="/login" element={<Login/>}/>
     <Route path="/signup" element={<Signup/>}/>
     <Route path="/home" element={<Home/>}/>

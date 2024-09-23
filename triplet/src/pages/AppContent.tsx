@@ -36,13 +36,9 @@ const AppContent = () => {
       }
     }, [location.pathname]);  // location.pathname이 변경될 때마다 실행
 
-    // 이 코드는 한번만 동작하는데, /home 으로 이동해도 /login으로
-    // 자동으로 이동하는 이유를 모르겠어요 !!
     useEffect(()=> {
         if(isAuthenticated){
             navigate('/login');
-        }else{
-            navigate('/home');
         }
     }, [])
 

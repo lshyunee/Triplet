@@ -3,7 +3,6 @@ import TravelCard from '../../components/travel/TravelCard';
 
 const HomePage = () => {
 
-
     return (
         <>
             <TravelCard/>
