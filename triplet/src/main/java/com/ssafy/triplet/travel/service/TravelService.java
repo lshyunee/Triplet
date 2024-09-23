@@ -5,9 +5,7 @@ import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
 import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
-import com.ssafy.triplet.travel.dto.response.TransactionListResponse;
-import com.ssafy.triplet.travel.dto.response.TravelListResponse;
-import com.ssafy.triplet.travel.dto.response.TravelResponse;
+import com.ssafy.triplet.travel.dto.response.*;
 import com.ssafy.triplet.travel.entity.*;
 import com.ssafy.triplet.travel.repository.*;
 import com.ssafy.triplet.travel.util.InviteCodeGenerator;
@@ -186,8 +184,8 @@ public class TravelService {
         return buildTravelResponse(travel, travel.getInviteCode());
     }
 
-    public List<Country> countryList() {
-        return countryRepository.findAll();
+    public List<CountryResponse> countryList() {
+        return countryRepository.getAllCountries();
     }
 
     public List<TransactionListResponse> getTransactionList(Long travelId) {
@@ -214,6 +212,9 @@ public class TravelService {
         return convertToTransactionListResponse(updatedTransaction);
     }
 
+    public List<CategoryResponse> getCategoryList() {
+        return categoryRepository.getAllCategories();
+    }
 
 
 
