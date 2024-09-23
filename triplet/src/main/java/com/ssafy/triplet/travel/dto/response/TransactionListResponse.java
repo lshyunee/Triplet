@@ -13,6 +13,7 @@ public class TransactionListResponse {
     private LocalDateTime transactionDate;
     private double balance;
     private String categoryName;
+    private int categoryId;
     private String merchantName;
     private Long travelId;
 }

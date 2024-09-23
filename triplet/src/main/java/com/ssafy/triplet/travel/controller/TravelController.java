@@ -5,6 +5,7 @@ import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.member.service.MemberService;
 import com.ssafy.triplet.response.ApiResponse;
+import com.ssafy.triplet.travel.dto.request.TransactionRequest;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
 import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.TransactionListResponse;
@@ -13,6 +14,7 @@ import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import com.ssafy.triplet.travel.entity.Country;
 import com.ssafy.triplet.travel.service.TravelService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Transaction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -175,6 +177,16 @@ public class TravelController {
                 ResponseEntity.ok(new ApiResponse<>("200", "거래 내역이 없습니다."));
             }
             return ResponseEntity.ok(new ApiResponse<>("200", "거래 내역이 조회되었습니다.", list));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
+    @PutMapping("/transaction/{transactionId}/{categoryId}")
+    public ResponseEntity<ApiResponse<TransactionListResponse>> updateTransaction(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+                                                                                  @PathVariable Long transactionId, @PathVariable int categoryId) {
+        try {
+            return ResponseEntity.ok(new ApiResponse<>("200", "거래 내역이 수정되었습니다.", travelService.modifyTransaction(transactionId, categoryId)));
         } catch (Exception e) {
             return handleException(e);
         }

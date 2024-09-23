@@ -26,15 +26,17 @@ public class TravelTransactionList {
     @Column(name = "balance", nullable = false)
     private double balance;
 
+    @Column(name = "merchant_id")
+    private Long merchantId;
+
+    @Column(name = "transaction_type")
+    private String transactionType;
+
     @ManyToOne
-    @JoinColumn(name = "category_id", referencedColumnName = "category_id", nullable = false)
+    @JoinColumn(name = "category_id", referencedColumnName = "category_id")
     private Category category;
 
     @ManyToOne
     @JoinColumn(name = "travel_id", referencedColumnName = "id", nullable = false)
     private Travel travel;
-
-    @ManyToOne
-    @JoinColumn(name = "merchant_id", referencedColumnName = "id", nullable = false)
-    private Merchant merchant;
 }

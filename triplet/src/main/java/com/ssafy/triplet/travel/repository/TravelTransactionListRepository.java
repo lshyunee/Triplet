@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface TravelTransactionListRepository extends JpaRepository<TravelTransactionList, Long> {
     List<TravelTransactionList> findByTravelIdOrderByTransactionDateDesc(Long travelId);
-
+    TravelTransactionList getTransactionListById(Long id);
 }
