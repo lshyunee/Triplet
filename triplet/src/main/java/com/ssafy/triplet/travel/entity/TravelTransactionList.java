@@ -23,6 +23,9 @@ public class TravelTransactionList {
     @Column(name = "transaction_date", nullable = false)
     private Date transactionDate;
 
+    @Column(name = "balance", nullable = false)
+    private double balance;
+
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "category_id", nullable = false)
     private Category category;
