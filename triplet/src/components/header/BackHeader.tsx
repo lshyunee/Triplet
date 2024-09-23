@@ -31,7 +31,7 @@ const BackHeader: React.FC<HeaderProps> = ({title}) => {
 
   return (
     <StyledDiv>
-      <LeftArrow/>
+      <LeftArrow onClick={() => navigate(-1)}/>
       <StyledP>{title}</StyledP> {/* title을 출력 */}
     </StyledDiv>
   );
