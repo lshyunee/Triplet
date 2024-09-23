@@ -99,6 +99,16 @@ const ProgressBar = styled.div`
     background-color: white;
 `;
 
+const ProgressText = styled.div`
+    position: absolute;
+    bottom: 38px; /* 진행률 바 바로 위에 위치 */
+    left: 20px;
+    z-index: 2;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+`;
+
 const PriceInfo = styled.div`
     position: absolute;
     bottom: 25px; /* 하단에 딱 붙지 않도록 여백 추가 */
@@ -114,7 +124,7 @@ const PriceInfo = styled.div`
 
 const PriceInfoP = styled.p`
     font-weight : 400;
-`
+`;
 
 const TravelCard = () => {
     return (
@@ -126,6 +136,7 @@ const TravelCard = () => {
                 <Badge>맛집 투어</Badge> {/* 우측 상단 배지 */}
                 <TitleP>고래상어보러가자</TitleP>
                 <InfoP>2024년 9월 3일 ~ 9월 7일<br />일본 · 2명</InfoP>
+                <ProgressText>30%</ProgressText> {/* 진행률 텍스트 추가 */}
                 <ProgressContainer>
                     <ProgressBar />
                 </ProgressContainer>

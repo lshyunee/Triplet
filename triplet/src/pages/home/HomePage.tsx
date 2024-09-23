@@ -64,50 +64,6 @@ const DetailP = styled.p`
     font-size: 14px;
     font-weight : 400;
     color : #666666;
-    margin : 0px;
-`;
-
-const MoneyP = styled.p`
-    font-size:16px;
-    font-weight : 600;
-`
-
-const MiddleDiv = styled.div`
-    box-sizing: border-box;
-    width : 328px;
-    height : 133px;
-    display : flex;
-    flex-direction : column;
-    background-color : white;
-    border-radius : 20px;
-    padding : 14px;
-
-
-    ${MoneyP}{
-        margin-top : 12px;
-        margin-bottom : 0px;
-    }
-
-    ${DetailP} {
-        margin-top : 24px;
-    }
-
-    ${TitleDiv}{
-       text-align : center;
-        ${TitleP}{
-            margin-top : 0px;
-            margin-bottom : 0px;
-        }
-    }
-`;
-
-const SendBtn = styled.button`
-    width: 65px;
-    height: 36px;
-    border-radius : 50px;
-    border : none;
-    background-color : #E6F2FF;
-    color: #008DE7;
 `;
 
 const LargeDiv = styled.div`
@@ -126,8 +82,61 @@ const LargeDiv = styled.div`
         margin-bottom : 0px;
     }
 
-    ${DetailP} {
-    }
+`;
+
+const Card = styled.div`
+    width : 328px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    margin: 0 16px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+`;
+
+const CardTitle = styled.span`
+    font-size: 16px;
+    font-weight: 600;
+`;
+
+const CardTitleArea = styled.div`
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin: 0 20px;
+padding-top: 20px;
+`;
+
+const CardCaption = styled.span`
+font-size: 14px;
+font-weight: 400;
+color: #666666;
+margin: 0 20px;
+padding-top: 24px;
+`;
+
+const CardContent = styled.span`
+font-size: 16px;
+font-weight: 600;
+align-self: flex-end;
+`;
+
+const CardButton = styled.button`
+border: 0;
+background-color: #E6F2FF;
+color: #008DE7;
+font-size: 14px;
+font-weight: 600;
+width: 65px;
+height: 36px;
+border-radius: 50px;
+`;
+
+const ButtonArea = styled.div`
+display: flex;
+justify-content: space-between;
+margin: 0 20px;
+padding-bottom: 20px;
 `;
 
 const HomePage = () => {
@@ -156,19 +165,17 @@ const HomePage = () => {
                 </LittleTitleDiv>
                 <RightArrow/>
             </LittleDiv>
-            <MiddleDiv>
-                <TitleDiv>
-                    <TitleP>내 통장</TitleP>
+            <Card>
+                <CardTitleArea>
+                    <CardTitle>내 통장</CardTitle>
                     <RightArrow/>
-                </TitleDiv>
-                <DetailP>은행 312-9446-0093</DetailP>
-                <TitleDiv>
-                    <MoneyP>20,000,000원</MoneyP>
-                    <SendBtn>
-                        송금
-                    </SendBtn>
-                </TitleDiv>
-            </MiddleDiv>
+                </CardTitleArea>
+                <CardCaption>은행 312-9446-0093</CardCaption>
+                <ButtonArea>
+                    <CardContent>20,000,000원</CardContent>
+                    <CardButton>송금</CardButton>
+                </ButtonArea>
+            </Card>
             <LargeDiv>
                 <TitleDiv>
                     <TitleP>내 외화 지갑</TitleP>
