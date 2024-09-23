@@ -19,14 +19,14 @@ import MyPageImgActive from '../../assets/navigation/mypageActive.png';
 
 // CSS styled
 const NavbarContainer = styled.nav`
-  position: fixed;
-  bottom: 0;
+  position : fixed;
+  bottom : 0;
   width: 100%;
   height: 56px; 
   background-color: white;
   padding-top : 8px;
   text-align: center;
-  z-index: 1000;
+  Z-index : 1000;
 `;
 
 const StyledP = styled.p.withConfig({
