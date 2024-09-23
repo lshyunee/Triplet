@@ -98,14 +98,10 @@ public class TravelService {
         }
     }
 
-    public List<TravelListResponse> getTravelOngoingList(Long userId) {
+    public TravelListResponse getTravelOngoingList(Long userId) {
         LocalDate today = LocalDate.now();
-        List<Travel> travelList = travelRepository.findOngoingTravelsByUserId(userId, today);
-        List<TravelListResponse> responseList = new ArrayList<>();
-        for (Travel travel : travelList) {
-            responseList.add(convertToTravelListResponse(travel, userId));
-        }
-        return responseList;
+        Travel travel = travelRepository.findOngoingTravelByUserId(userId, today);
+        return convertToTravelListResponse(travel);
     }
 
     public List<TravelListResponse> getTravelCompleteList(Long userId) {
@@ -114,7 +110,7 @@ public class TravelService {
 
         List<TravelListResponse> responseList = new ArrayList<>();
         for (Travel travel : travelList) {
-            TravelListResponse response = convertToTravelListResponse(travel, userId);
+            TravelListResponse response = convertToTravelListResponse(travel);
             responseList.add(response);
         }
 
@@ -126,7 +122,7 @@ public class TravelService {
         List<Travel> travelList = travelRepository.findUpcomingTravelsByUserId(userId, today);
         List<TravelListResponse> responseList = new ArrayList<>();
         for (Travel travel : travelList) {
-            responseList.add(convertToTravelListResponse(travel, userId));
+            responseList.add(convertToTravelListResponse(travel));
         }
         return responseList;
     }
@@ -350,7 +346,7 @@ public class TravelService {
     }
 
     // 여행 리스트
-    private TravelListResponse convertToTravelListResponse(Travel travel, Long userId) {
+    private TravelListResponse convertToTravelListResponse(Travel travel) {
         TravelListResponse response = new TravelListResponse();
         response.setTravelId(travel.getId());
         response.setTitle(travel.getTitle());
