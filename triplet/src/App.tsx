@@ -1,11 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import './App.css';
 
 // router import
 import AppRoutes from './routes/AppRoutes';
 import SplashScreen from './components/loading/SplashScreen';
-import AppContent from './pages/AppContent';
+import Navbar from './components/navigation/Navbar';
+import type { RootState } from './store';
 
 // 글로벌 css
 const GlobalStyle = createGlobalStyle`
@@ -28,9 +31,36 @@ const GlobalStyle = createGlobalStyle`
   }
 `;
 
+const Div = styled.div`
+  display : flex;
+  flex-direction : column;
+  padding-bottom : 56px;
+`;
+
 const App: React.FC = () => {
 
   const [loading, setLoading] = useState(false);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isActive, setIsActive] = useState(true);
+
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+
+  useEffect(() => {
+    const offPages = ["/login", "/signup", "/simple-password/set", "/simple-password/confirm"];
+    if (offPages.includes(location.pathname)) {
+      setIsActive(false);
+    } else {
+      setIsActive(true);
+    }
+  }, [location.pathname]);  // location.pathname이 변경될 때마다 실행
+
+  useEffect(()=> {
+      if(isAuthenticated){
+          navigate('/login');
+      }
+  }, [])
 
   useEffect(()=>{
     if('serviceWorker' in navigator){
@@ -52,11 +82,11 @@ const App: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <Div>
       <GlobalStyle />
-      {loading ? <SplashScreen/> : <AppContent/>}
       <AppRoutes/>
-    </>
+      {isActive && <Navbar />}  {/* isActive가 true일 때만 Navbar 렌더링 */}
+    </Div>
   );
 };
 

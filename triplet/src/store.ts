@@ -1,12 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import authSlice from './features/auth/authSlice';
-import titleSlice from './features/header/titleSlice';
+import naviSlice from './features/navigation/naviSlice';
 
 // 스토어 생성
 const store = configureStore({
   reducer: {
     auth: authSlice,
-    title: titleSlice,
+    navi: naviSlice,
   },
 });
 

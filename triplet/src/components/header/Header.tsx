@@ -5,13 +5,17 @@ import alarm from '../../assets/header/alarm.png';
 
 // 스타일
 const StyledDiv = styled.div`
+    width: 100%;
+    height: 56px;
     display:flex;
     align-items: center;
     flex-direction:row;
     justify-content: space-between;  /* 양 끝에 배치 */
-    padding: 5px 15px;
     background-color : #F3F4F6;
+<<<<<<< HEAD
     height : 56px;
+=======
+>>>>>>> 56b037eb8c783fe12fd914b3e2e195d4352b4d0f
 `;
 
 const StyledP = styled.p`

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginSuccess } from '../../../features/auth/authSlice';
@@ -123,26 +123,25 @@ const LoginPage = () => {
             = useAxios('/oauth2/authorization/naver', 'POST');
 
 
+    // 로그인 버튼 핸들러
     const handleLogin = () => {
+        loginRefetch(); // 클릭 시 요청 재시도
+    };
 
-        if( loginStatus === 200){
-            dispatch(loginSuccess());
-            navigate('/home');
-        }else if( loginStatus === 400 ){
-            console.log("로그인 정보가 잘못되었습니다.");
-        }
-    }
-
+    // 네이버 로그인 버튼 핸들러
     const handleNaverLogin = () => {
-    
-        if( naverStatus === 200){
-            dispatch(loginSuccess());
-            navigate('/home');
-        }else if( naverStatus === 400 ){
-            console.log("로그인 정보가 잘못되었습니다.");
-        }
+        naverRefetch(); // 클릭 시 요청 재시도
+    };
 
-    }
+    // 로그인 상태 변경 시 처리
+    useEffect(() => {
+        if (loginStatus === 200) {
+        dispatch(loginSuccess());
+        navigate('/home');
+        } else if (loginStatus === 400) {
+        console.log("로그인 정보가 잘못되었습니다.");
+        }
+    }, [loginStatus, dispatch, navigate]);
 
     return (
         <>

@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import useAxios from '../../../hooks/useAxios';
-import { pageMove } from '../../../features/header/titleSlice';
+import BackHeader from '../../../components/header/BackHeader';
 
 const HowP = styled.p`
     font-size : 12px;
@@ -138,12 +138,8 @@ const ConfirmBox = styled.button`
 
 const SignupPage = () => {
 
-    const dispatch = useDispatch();
     const navigate = useNavigate();
-
-    useEffect(() => {
-        dispatch(pageMove("회원가입"))
-    })
+    const title = "회원가입";
 
     const useInput = (validator?: (value: string) => boolean) => {
         const [value, setValue] = useState('');
@@ -241,6 +237,7 @@ const SignupPage = () => {
 
     return(
         <div>
+            <BackHeader title={title}/>
             <InputDiv>
                 <ExplainDiv>
                     <HowP>아이디</HowP>

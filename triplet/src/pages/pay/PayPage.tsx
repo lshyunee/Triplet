@@ -1,8 +1,12 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import styled from 'styled-components';
 import { ReactComponent as RightArrow } from '../../assets/pay/rightArrow.svg';
 import GlobalAccount from '../../components/pay/GlobalAccount';
 import ExchangeRate from '../../components/pay/ExchangeRate';
+import Header from '../../components/header/Header';
+import { useDispatch } from 'react-redux';
+import { pageMove } from '../../features/navigation/naviSlice';
+
 
 const s = {
 	Container: styled.div`
@@ -64,8 +68,15 @@ const s = {
 
 
 const PayPage = () => {
+	const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(pageMove("pay"));
+    }, [])
+
 	return (
 		<>
+			<Header/>
 			<s.Container>
 				<s.Card>
 					<s.CardTitleArea>
