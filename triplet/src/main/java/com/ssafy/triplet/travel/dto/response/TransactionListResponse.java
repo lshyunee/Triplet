@@ -16,4 +16,5 @@ public class TransactionListResponse {
     private int categoryId;
     private String merchantName;
     private Long travelId;
+    private String transactionType;
 }
