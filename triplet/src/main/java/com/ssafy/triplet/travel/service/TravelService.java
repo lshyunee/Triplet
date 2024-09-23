@@ -31,7 +31,6 @@ public class TravelService {
     private final TravelBudgetRepository travelBudgetRepository;
     private final CategoryRepository categoryRepository;
     private final CountryRepository countryRepository;
-    private final TravelFolderRepository travelFolderRepository;
     private final S3Service s3Service;
 
     @Transactional
@@ -108,26 +107,17 @@ public class TravelService {
         return responseList;
     }
 
-    public Map<String, List<TravelListResponse>> getTravelCompleteList(Long userId) {
+    public List<TravelListResponse> getTravelCompleteList(Long userId) {
         LocalDate today = LocalDate.now();
         List<Travel> travelList = travelRepository.findCompletedTravelsByUserId(userId, today);
 
-        List<TravelListResponse> folderlessList = new ArrayList<>();
-        List<TravelListResponse> withFolderList = new ArrayList<>();
+        List<TravelListResponse> responseList = new ArrayList<>();
         for (Travel travel : travelList) {
             TravelListResponse response = convertToTravelListResponse(travel, userId);
-            Long folderId = travelRepository.findTravelFolderIdByUserId(userId, travel.getId());
-            if (folderId == null) {
-                folderlessList.add(response);
-            } else {
-                withFolderList.add(response);
-            }
+            responseList.add(response);
         }
-        Map<String, List<TravelListResponse>> result = new HashMap<>();
-        result.put("folderlessTravels", folderlessList);
-        result.put("withFolderTravels", withFolderList);
 
-        return result;
+        return responseList;
     }
 
     public List<TravelListResponse> getTravelUpcomingList(Long userId) {
@@ -176,44 +166,6 @@ public class TravelService {
             travel.setShareStatus(false);
         }
         travelRepository.save(travel);
-    }
-
-    @Transactional
-    public TravelFolder addFolder(String title) {
-        TravelFolder travelFolder = new TravelFolder();
-        travelFolder.setFolderTitle(title);
-        return travelFolderRepository.save(travelFolder);
-    }
-
-    @Transactional
-    public void addTravelFolder(Long folderId, Long travelId, Long userId) {
-        TravelFolder folder = travelFolderRepository.findById(folderId)
-                .orElseThrow(() -> new CustomException("T0013", "존재하지 않는 폴더ID입니다."));
-        TravelMember travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId)
-                .orElseThrow(() -> new CustomException("T0005", "해당 여행에 속한 유저가 아니거나 여행 ID가 유효하지 않습니다."));
-        if (!travelRepository.existsById(travelId)) {
-            throw new CustomException("T0004", "여행이 존재하지 않습니다.");
-        }
-        travelMember.setTravelFolder(folder);
-        travelMemberRepository.save(travelMember);
-    }
-
-    @Transactional
-    public void removeFolderInTravel(Long travelId, Long userId) {
-        TravelMember travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId)
-                .orElseThrow(() -> new CustomException("T0005", "해당 여행에 속한 유저가 아니거나 여행 ID가 유효하지 않습니다."));
-        travelMember.setTravelFolder(null);
-        travelMemberRepository.save(travelMember);
-    }
-
-    @Transactional
-    public void removeFolder(Long folderId) {
-        TravelFolder travelFolder = travelFolderRepository.findById(folderId)
-                .orElseThrow(() -> new CustomException("T0013", "존재하지 않는 폴더ID입니다."));
-        if (travelMemberRepository.countByTravelFolder_Id(folderId) != 0) {
-            throw new CustomException("T0014", "폴더 안에 여행이 존재합니다.");
-        }
-        travelFolderRepository.delete(travelFolder);
     }
 
     @Transactional
@@ -370,9 +322,6 @@ public class TravelService {
         response.setMemberCount(travel.getMemberCount());
         response.setCurrency(travel.getCountry().getCurrency());
         response.setTotalBudget(travel.getTotalBudget());
-        Long folderId = travelRepository.findTravelFolderIdByUserId(userId, travel.getId());
-        response.setFolderId(folderId);
-        response.setFolderName(travelRepository.findFolderNameByUserId(folderId));
         return response;
     }
 }

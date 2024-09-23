@@ -23,8 +23,4 @@ public class TravelMember {
     @ManyToOne
     @JoinColumn(name = "travel_id", referencedColumnName = "id", nullable = false)
     private Travel travel;
-
-    @ManyToOne
-    @JoinColumn(name = "folder_id", referencedColumnName = "id")
-    private TravelFolder travelFolder;
 }

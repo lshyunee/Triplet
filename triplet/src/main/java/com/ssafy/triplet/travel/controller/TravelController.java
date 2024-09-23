@@ -7,7 +7,6 @@ import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.TravelListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import com.ssafy.triplet.travel.entity.Country;
-import com.ssafy.triplet.travel.entity.TravelFolder;
 import com.ssafy.triplet.travel.service.TravelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -82,11 +81,11 @@ public class TravelController {
     }
 
     @GetMapping("/completed")
-    public ResponseEntity<ApiResponse<Map<String, List<TravelListResponse>>>> completedTravel(
+    public ResponseEntity<ApiResponse<List<TravelListResponse>>> completedTravel(
             @CookieValue(name = "accessToken", required = false) String token) {
         try {
             Long userId = extractAndValidateUser(token);
-            Map<String, List<TravelListResponse>> responseList = travelService.getTravelCompleteList(userId);
+            List<TravelListResponse> responseList = travelService.getTravelCompleteList(userId);
 
             if (responseList.isEmpty()) {
                 return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "완료된 여행이 없습니다."));
@@ -139,58 +138,6 @@ public class TravelController {
         }
     }
 
-    @PostMapping("/folder/create")
-    public ResponseEntity<ApiResponse<TravelFolder>> createFolder(@CookieValue(name = "accessToken", required = false) String token,
-                                                                  @RequestBody TravelFolder travelFolder) {
-        try {
-//            if (token == null) {
-//                throw new CustomException("M0011", "토큰이 비어있습니다.");
-//            }
-            TravelFolder result = travelService.addFolder(travelFolder.getFolderTitle());
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "폴더가 생성되었습니다.", result));
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
-
-    @PostMapping("/folder/travel-add/{folderId}/{travelId}")
-    public ResponseEntity<ApiResponse<TravelFolder>> addTravelInFolder(@CookieValue(name = "accessToken", required = false) String token,
-                                                                  @PathVariable Long folderId, @PathVariable Long travelId) {
-        try {
-            Long userId = extractAndValidateUser(token);
-            travelService.addTravelFolder(folderId, travelId, userId);
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "폴더에 여행이 추가되었습니다."));
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
-
-    @DeleteMapping("/folder/travel-delete/{travelId}")
-    public ResponseEntity<ApiResponse<TravelFolder>> deleteTravelInFolder(@CookieValue(name = "accessToken", required = false) String token,
-                                                                          @PathVariable Long travelId) {
-        try {
-            Long userId = extractAndValidateUser(token);
-            travelService.removeFolderInTravel(travelId, userId);
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "폴더에서 여행이 삭제되었습니다."));
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
-
-    @DeleteMapping("/folder/delete/{folderId}")
-    public ResponseEntity<ApiResponse<Void>> deleteFolder(@CookieValue(name = "accessToken", required = false) String token,
-                                                          @PathVariable Long folderId) {
-        try {
-//            if (token == null) {
-//                throw new CustomException("M0011", "토큰이 비어있습니다.");
-//            }
-            travelService.removeFolder(folderId);
-            return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "폴더가 삭제되었습니다."));
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
-
     @PostMapping("/invite/{inviteCode}")
     public ResponseEntity<ApiResponse<TravelResponse>> inviteAddTravel(@CookieValue(name = "accessToken", required = false) String token,
                                                                @PathVariable String inviteCode) {
@@ -236,7 +183,7 @@ public class TravelController {
 //        if (member == null) {
 //            throw new CustomException("M0010", "존재하지 않는 회원입니다.");
 //        }
-        Long userId = 2L;
+        Long userId = 1L;
         return userId;
     }
 }

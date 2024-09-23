@@ -21,6 +21,4 @@ public class TravelListResponse {
     private boolean status;
     private boolean isShared;
     private boolean shareStatus;
-    private Long folderId;
-    private String folderName;
 }
