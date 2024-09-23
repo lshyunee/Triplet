@@ -70,11 +70,11 @@ public class TravelController {
     }
 
     @GetMapping("/ongoing")
-    public ResponseEntity<ApiResponse<List<TravelListResponse>>> ongoingTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
+    public ResponseEntity<ApiResponse<TravelListResponse>> ongoingTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         try {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
-            List<TravelListResponse> responseList = travelService.getTravelOngoingList(userId);
-            if (responseList.isEmpty()) {
+            TravelListResponse responseList = travelService.getTravelOngoingList(userId);
+            if (responseList == null) {
                 return ResponseEntity.ok(new ApiResponse<>("200", "진행중인 여행이 없습니다."));
             }
             return ResponseEntity.ok(new ApiResponse<>("200", "진행중인 여행이 조회되었습니다.", responseList));
