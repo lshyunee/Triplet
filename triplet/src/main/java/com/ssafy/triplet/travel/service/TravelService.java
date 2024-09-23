@@ -376,6 +376,7 @@ public class TravelService {
         response.setMerchantName(merchantRepository.findMerchantNameById(travelTransactionList.getMerchantId()));
         response.setTravelId(travelTransactionList.getTravel().getId());
         response.setBalance(travelTransactionList.getBalance());
+        response.setTransactionType(travelTransactionList.getTransactionType());
         return response;
     }
 }
