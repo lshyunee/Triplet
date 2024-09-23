@@ -10,6 +10,7 @@ import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.*;
 import com.ssafy.triplet.travel.service.TravelService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -206,6 +207,31 @@ public class TravelController {
             return handleException(e);
         }
     }
+
+    @GetMapping("/shared/list")
+    public ResponseEntity<ApiResponse<TravelListPagedResponse>> getTravelList(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+                                                                              @RequestParam(required = false) String countryName,
+                                                                              @RequestParam(required = false) Integer memberCount,
+                                                                              @RequestParam(required = false) Double minBudget,
+                                                                              @RequestParam(required = false) Double maxBudget,
+                                                                              @RequestParam(required = false) Integer month,
+                                                                              @RequestParam(required = false) Integer minDays,
+                                                                              @RequestParam(required = false) Integer maxDays,
+                                                                              @RequestParam(defaultValue = "0") int page) {
+        try {
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
+            Page<TravelListResponse> travelList = travelService.getTravelSNSList(userId, countryName, memberCount, minBudget, maxBudget, month, minDays, maxDays, page, 10);
+            TravelListPagedResponse pagedResponse = travelService.toPagedResponse(travelList);
+            if (travelList.isEmpty()) {
+                return ResponseEntity.ok(new ApiResponse<>("200", "게시글이 없습니다."));
+            }
+            return ResponseEntity.ok(new ApiResponse<>("200", "게시글 리스트가 조회되었습니다.", pagedResponse));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
+
 
 
     // 예외처리 메서드

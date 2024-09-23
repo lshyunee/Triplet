@@ -8,13 +8,17 @@ import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.*;
 import com.ssafy.triplet.travel.entity.*;
 import com.ssafy.triplet.travel.repository.*;
+import com.ssafy.triplet.travel.specification.TravelSpecification;
 import com.ssafy.triplet.travel.util.InviteCodeGenerator;
 import com.ssafy.triplet.travel.util.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
@@ -218,6 +222,31 @@ public class TravelService {
         return travelBudgetRepository.findBudgetResponseByTravel(travel);
     }
 
+    public Page<TravelListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
+                                                     Integer month, Integer minDays, Integer maxDays, int page, int size) {
+
+        Specification<Travel> spec = Specification.where(TravelSpecification.excludeCreator(userId))
+                .and(countryName != null ? TravelSpecification.countryNameContains(countryName) : null)
+                .and(memberCount != null ? TravelSpecification.memberCountEquals(memberCount) : null)
+                .and(minBudget != null && maxBudget != null ? TravelSpecification.totalBudgetWonBetween(minBudget, maxBudget) : null)
+                .and(month != null ? TravelSpecification.travelMonth(month) : null)
+                .and(minDays != null && maxDays != null ? TravelSpecification.travelDurationBetween(minDays, maxDays) : null);
+
+        Pageable pageable = PageRequest.of(page, size);
+        return travelRepository.findAll(spec, pageable)
+                .map(this::convertToTravelListResponse);
+    }
+
+    public TravelListPagedResponse toPagedResponse(Page<TravelListResponse> page) {
+        TravelListPagedResponse response = new TravelListPagedResponse();
+        response.setContent(page.getContent());
+        response.setPageNumber(page.getNumber());
+        response.setLast(page.isLast());
+        response.setTotalPages(page.getTotalPages());
+        response.setTotalElements(page.getTotalElements());
+        response.setNumber(page.getNumber());
+        return response;
+    }
 
 
 

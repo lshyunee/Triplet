@@ -1,9 +1,8 @@
 package com.ssafy.triplet.travel.repository;
 
-import com.ssafy.triplet.travel.dto.response.TravelListResponse;
-import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import com.ssafy.triplet.travel.entity.Travel;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -12,7 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface TravelRepository extends JpaRepository<Travel, Long> {
+public interface TravelRepository extends JpaRepository<Travel, Long>, JpaSpecificationExecutor<Travel> {
 
     @Query("SELECT t.creatorId FROM Travel t WHERE t.id = :travelId")
     Long findCreatorIdByTravelId(@Param("travelId") Long travelId);
