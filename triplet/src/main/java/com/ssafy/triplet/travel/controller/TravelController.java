@@ -7,10 +7,7 @@ import com.ssafy.triplet.member.service.MemberService;
 import com.ssafy.triplet.response.ApiResponse;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
 import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
-import com.ssafy.triplet.travel.dto.response.TransactionListResponse;
-import com.ssafy.triplet.travel.dto.response.TravelListResponse;
-import com.ssafy.triplet.travel.dto.response.TravelResponse;
-import com.ssafy.triplet.travel.entity.Country;
+import com.ssafy.triplet.travel.dto.response.*;
 import com.ssafy.triplet.travel.service.TravelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -157,9 +154,9 @@ public class TravelController {
     }
 
     @GetMapping("/countries")
-    public ResponseEntity<ApiResponse<List<Country>>> getCountries() {
+    public ResponseEntity<ApiResponse<List<CountryResponse>>> getCountries() {
         try {
-            List<Country> list = travelService.countryList();
+            List<CountryResponse> list = travelService.countryList();
             return ResponseEntity.ok(new ApiResponse<>("200", "국가 리스트가 조회되었습니다.", list));
         } catch (Exception e) {
             return handleException(e);
@@ -185,6 +182,16 @@ public class TravelController {
                                                                                   @PathVariable Long transactionId, @PathVariable int categoryId) {
         try {
             return ResponseEntity.ok(new ApiResponse<>("200", "거래 내역이 수정되었습니다.", travelService.modifyTransaction(transactionId, categoryId)));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
+    @GetMapping("/categories")
+    public ResponseEntity<ApiResponse<List<CategoryResponse>>> getCategories() {
+        try {
+            List<CategoryResponse> list = travelService.getCategoryList();
+            return ResponseEntity.ok(new ApiResponse<>("200", "카테고리 리스트가 조회되었습니다.", list));
         } catch (Exception e) {
             return handleException(e);
         }
