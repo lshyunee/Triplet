@@ -216,6 +216,12 @@ public class TravelService {
         return categoryRepository.getAllCategories();
     }
 
+    public List<TravelBudgetResponse> getTravelBudgetList(Long travelId) {
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        return travelBudgetRepository.findBudgetResponseByTravel(travel);
+    }
+
 
 
 
@@ -272,6 +278,8 @@ public class TravelService {
             travelBudget.setCategoryBudget(budgetDTO.getBudget());
             travelBudget.setBudgetWon(budgetDTO.getBudgetWon());
             travelBudget.setTravel(travel);
+            travelBudget.setFiftyBudget((budgetDTO.getBudget()/2));
+            travelBudget.setEightyBudget((budgetDTO.getBudget()*0.8));
             travelBudgetRepository.save(travelBudget);
         }
     }
@@ -322,6 +330,8 @@ public class TravelService {
 
             existingBudget.setCategoryBudget(budgetDTO.getBudget());
             existingBudget.setBudgetWon(budgetDTO.getBudgetWon());
+            existingBudget.setFiftyBudget((budgetDTO.getBudget()/2));
+            existingBudget.setEightyBudget((budgetDTO.getBudget()*0.8));
 
             travelBudgetRepository.save(existingBudget);
         }

@@ -197,6 +197,16 @@ public class TravelController {
         }
     }
 
+    @GetMapping("/expenditure-expenses/{travelId}")
+    public ResponseEntity<ApiResponse<List<TravelBudgetResponse>>> getExpenditureExpenses(@PathVariable Long travelId) {
+        try {
+            List<TravelBudgetResponse> list = travelService.getTravelBudgetList(travelId);
+            return ResponseEntity.ok(new ApiResponse<>("200", "카테고리별 지출현황이 조회되었습니다.", list));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
 
     // 예외처리 메서드
     private <T> ResponseEntity<ApiResponse<T>> handleException(Exception e) {
