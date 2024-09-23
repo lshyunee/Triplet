@@ -5,6 +5,7 @@ import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
 import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
+import com.ssafy.triplet.travel.dto.response.TransactionListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelResponse;
 import com.ssafy.triplet.travel.entity.*;
@@ -12,6 +13,7 @@ import com.ssafy.triplet.travel.repository.*;
 import com.ssafy.triplet.travel.util.InviteCodeGenerator;
 import com.ssafy.triplet.travel.util.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Transaction;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,6 +33,7 @@ public class TravelService {
     private final TravelBudgetRepository travelBudgetRepository;
     private final CategoryRepository categoryRepository;
     private final CountryRepository countryRepository;
+    private final TravelTransactionListRepository transactionListRepository;
     private final S3Service s3Service;
 
     @Transactional
@@ -187,6 +190,24 @@ public class TravelService {
         return countryRepository.findAll();
     }
 
+    public List<TransactionListResponse> getTransactionList(Long travelId) {
+        if (!travelRepository.existsById(travelId)) {
+            throw new CustomException("T0004", "여행이 존재하지 않습니다.");
+        }
+        List<TravelTransactionList> trList = transactionListRepository.findByTravelId(travelId);
+        List<TransactionListResponse> transactionListResponseList = new ArrayList<>();
+        for (TravelTransactionList travelTransactionList : trList) {
+            TransactionListResponse response = new TransactionListResponse();
+            response.setTransactionId(travelTransactionList.getId());
+            response.setPrice(travelTransactionList.getPrice());
+            response.setTransactionDate(travelTransactionList.getTransactionDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
+            response.setCategoryId(travelTransactionList.getCategory().getCategoryId());
+            response.setMerchantId(travelTransactionList.getMerchant().getId());
+            response.setTravelId(travelTransactionList.getTravel().getId());
+            transactionListResponseList.add(response);
+        }
+        return transactionListResponseList;
+    }
 
 
 
