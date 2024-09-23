@@ -24,9 +24,11 @@ const NavbarContainer = styled.nav`
   width: 100%;
   height: 56px;
   background-color: white;
-  padding-top: 8px;
+  /* padding-top: 8px; */
   text-align: center;
   z-index: 1000;
+  display: flex;
+  align-items: center;
 `;
 
 const StyledP = styled.p.withConfig({
@@ -42,17 +44,19 @@ const StyledP = styled.p.withConfig({
 
 const StyledUl = styled.ul`
   list-style-type: none; /* li 태그의 점 제거 */
-  padding: 0 30px; /* 양쪽 패딩 설정 */
+  padding: 0 28px; /* 양쪽 패딩 설정 */
   margin: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
 `;
 
 const StyledLi = styled.li`
-  margin-bottom: 10px; /* 각 리스트 항목 간의 간격 설정 */
-  display: flex;
-  align-items: center;
+  /* margin-bottom: 8px;
+  margin-top: 8px; */
+  /* display: flex; */
+  /* align-items: center; */
 `;
 
 const Navbar = () => {
