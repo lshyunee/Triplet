@@ -22,4 +22,9 @@ public class ApiResponse<T> {
         this.message = message;
     }
 
+    // 실패 응답
+    public static ApiResponse<Void> isError(CustomErrorCode errorCode) {
+        return new ApiResponse<>(errorCode.getCode(), errorCode.getMessage());
+    }
+
 }

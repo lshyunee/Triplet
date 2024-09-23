@@ -13,15 +13,20 @@ public class TravelResponse {
     private String inviteCode;
     private String country;
     private int countryId;
+    private String currency;
     private LocalDate startDate;
     private LocalDate endDate;
     private String title;
     private String image;
     private Long creatorId;
+    private boolean myTravel;
     private int memberCount;
     private double totalBudget;
     private double airportCost;
     private double totalBudgetWon;
+    private boolean status;
+    private boolean isShared;
+    private boolean shareStatus;
     private List<BudgetDTO> budgets;
 
     @Getter
