@@ -124,7 +124,7 @@ const LoginPage = () => {
 
 
     const handleLogin = () => {
-
+        loginRefetch();
         if( loginStatus === 200){
             dispatch(loginSuccess());
             navigate('/home');
@@ -134,7 +134,7 @@ const LoginPage = () => {
     }
 
     const handleNaverLogin = () => {
-    
+        naverRefetch();
         if( naverStatus === 200){
             dispatch(loginSuccess());
             navigate('/home');
