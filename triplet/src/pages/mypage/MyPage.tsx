@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
-import { pageMove } from '../../features/header/titleSlice';
+import BackHeader from '../../components/header/BackHeader';
 
 
 const PageDiv = styled.div`
@@ -41,14 +41,11 @@ const InfoP = styled.p`
 
 const MyPage = () => {
 
-    const dispatch = useDispatch();
-
-    useEffect(() => {
-        dispatch(pageMove("마이페이지"))
-    })
+    const title = "마이페이지"
 
     return (
         <>
+            <BackHeader title={title}/>
             <PageDiv>
                 <MyInfoDiv>
                     <TitleP>내 정보</TitleP>

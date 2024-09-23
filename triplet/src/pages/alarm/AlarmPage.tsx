@@ -1,18 +1,12 @@
 import React, {useEffect} from 'react';
-import { useDispatch } from 'react-redux'
-import { Dispatch } from '@reduxjs/toolkit';
-import { pageMove } from '../../features/header/titleSlice'
+import BackHeader from '../../components/header/BackHeader';
 
-const PayPage = () => {
-
-    const dispatch = useDispatch<Dispatch>();
-
-    useEffect(() => {
-        dispatch(pageMove("회원가입"))
-    })
+const PayPage = () => {    
+    const title = "알람";
 
     return (
         <>
+            <BackHeader title={title}/>
             <div>알람</div>
         </>
     );
