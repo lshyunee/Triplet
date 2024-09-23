@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import BackHeader from '../../components/header/BackHeader';
 import { pageMove } from '../../features/navigation/naviSlice';
 import useAxios from '../../hooks/useAxios';
-import rightArrow from '../../assets/mypage/rightArrow.png';
+import { ReactComponent as RightArrow} from '../../assets/common/rightArrow.svg';
 
 const PageDiv = styled.div`
     background-color : #F3F4F6;
@@ -149,28 +149,28 @@ const MyPage = () => {
                     <StyledLink to="/mypage/info-edit">
                         <ConfigDiv>
                             <CategoryP>내 정보 수정</CategoryP>
-                            <img src={rightArrow} alt="arrow" />
+                            <RightArrow/>
                         </ConfigDiv>
                     </StyledLink>
                     <StyledLink to="/simple-password/set">
                         <ConfigDiv>
                             <CategoryP>간편 비밀번호 재설정</CategoryP>
-                            <img src={rightArrow} alt="arrow" />
+                            <RightArrow/>
                         </ConfigDiv>
                     </StyledLink>
                     <StyledLink to="/mypage/password-edit">
                         <ConfigDiv>
                             <CategoryP>비밀번호 변경</CategoryP>
-                            <img src={rightArrow} alt="arrow" />
+                            <RightArrow/>
                         </ConfigDiv>
                     </StyledLink>
                     <ConfigDiv>
                         <CategoryP>로그아웃</CategoryP>
-                        <img src={rightArrow} alt="arrow" />
+                        <RightArrow/>
                     </ConfigDiv>
                     <ConfigDiv>
                         <CategoryP>회원탈퇴</CategoryP>
-                        <img src={rightArrow} alt="arrow" />
+                        <RightArrow/>
                     </ConfigDiv>
                 </MyInfoConfigDiv>
             </PageDiv>
