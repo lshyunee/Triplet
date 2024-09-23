@@ -11,7 +11,8 @@ public class TransactionListResponse {
     private Long transactionId;
     private double price;
     private LocalDateTime transactionDate;
-    private int categoryId;
-    private Long merchantId;
+    private double balance;
+    private String categoryName;
+    private String merchantName;
     private Long travelId;
 }

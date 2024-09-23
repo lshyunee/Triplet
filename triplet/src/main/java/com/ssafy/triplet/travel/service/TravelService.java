@@ -34,6 +34,7 @@ public class TravelService {
     private final CategoryRepository categoryRepository;
     private final CountryRepository countryRepository;
     private final TravelTransactionListRepository transactionListRepository;
+    private final MerchantRepository merchantRepository;
     private final S3Service s3Service;
 
     @Transactional
@@ -194,16 +195,17 @@ public class TravelService {
         if (!travelRepository.existsById(travelId)) {
             throw new CustomException("T0004", "여행이 존재하지 않습니다.");
         }
-        List<TravelTransactionList> trList = transactionListRepository.findByTravelId(travelId);
+        List<TravelTransactionList> trList = transactionListRepository.findByTravelIdOrderByTransactionDateDesc(travelId);
         List<TransactionListResponse> transactionListResponseList = new ArrayList<>();
         for (TravelTransactionList travelTransactionList : trList) {
             TransactionListResponse response = new TransactionListResponse();
             response.setTransactionId(travelTransactionList.getId());
             response.setPrice(travelTransactionList.getPrice());
             response.setTransactionDate(travelTransactionList.getTransactionDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
-            response.setCategoryId(travelTransactionList.getCategory().getCategoryId());
-            response.setMerchantId(travelTransactionList.getMerchant().getId());
+            response.setCategoryName(categoryRepository.findCategoryNameByCategoryId(travelTransactionList.getCategory().getCategoryId()));
+            response.setMerchantName(merchantRepository.findMerchantNameById(travelTransactionList.getMerchant().getId()));
             response.setTravelId(travelTransactionList.getTravel().getId());
+            response.setBalance(travelTransactionList.getBalance());
             transactionListResponseList.add(response);
         }
         return transactionListResponseList;
