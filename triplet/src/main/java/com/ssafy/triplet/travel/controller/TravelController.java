@@ -1,6 +1,9 @@
 package com.ssafy.triplet.travel.controller;
 
+import com.ssafy.triplet.auth.dto.CustomUserPrincipal;
 import com.ssafy.triplet.exception.CustomException;
+import com.ssafy.triplet.member.repository.MemberRepository;
+import com.ssafy.triplet.member.service.MemberService;
 import com.ssafy.triplet.response.ApiResponse;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
 import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
@@ -11,12 +14,12 @@ import com.ssafy.triplet.travel.service.TravelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/travels")
@@ -24,14 +27,16 @@ import java.util.Map;
 public class TravelController {
 
     private final TravelService travelService;
+    private final MemberService memberService;
+    private final MemberRepository memberRepository;
 
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<TravelResponse>> createTravel(
-            @CookieValue(name = "accessToken", required = false) String token,
+            @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
             @RequestPart("data") TravelRequest requestDTO,
             @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
         try {
-            Long userId = extractAndValidateUser(token);  // 토큰과 회원 확인 로직 호출
+            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
             TravelResponse responseDTO = travelService.createTravel(userId, requestDTO, image);
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행이 생성되었습니다.", responseDTO));
         } catch (Exception e) {
@@ -41,12 +46,12 @@ public class TravelController {
 
     @PutMapping("/update/{travelId}")
     public ResponseEntity<ApiResponse<TravelResponse>> updateTravel(
-            @CookieValue(name = "accessToken", required = false) String token,
+            @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
             @PathVariable Long travelId,
             @RequestPart("data") TravelRequest requestDTO,
             @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
         try {
-            Long userId = extractAndValidateUser(token);
+            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
             TravelResponse responseDTO = travelService.updateTravel(travelId, requestDTO, image, userId);
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행이 수정되었습니다.", responseDTO));
         } catch (Exception e) {
@@ -55,10 +60,10 @@ public class TravelController {
     }
 
     @DeleteMapping("/delete/{travelId}")
-    public ResponseEntity<ApiResponse<TravelResponse>> deleteTravel(@CookieValue(name = "accessToken", required = false) String token,
+    public ResponseEntity<ApiResponse<TravelResponse>> deleteTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
                                                                     @PathVariable Long travelId) {
         try {
-            Long userId = extractAndValidateUser(token);
+            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
             travelService.deleteTravel(travelId, userId);
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행이 삭제되었습니다."));
         } catch (Exception e) {
@@ -67,9 +72,9 @@ public class TravelController {
     }
 
     @GetMapping("/ongoing")
-    public ResponseEntity<ApiResponse<List<TravelListResponse>>> ongoingTravel(@CookieValue(name = "accessToken", required = false) String token) {
+    public ResponseEntity<ApiResponse<List<TravelListResponse>>> ongoingTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         try {
-            Long userId = extractAndValidateUser(token);
+            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
             List<TravelListResponse> responseList = travelService.getTravelOngoingList(userId);
             if (responseList.isEmpty()) {
                 return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "진행중인 여행이 없습니다."));
@@ -82,9 +87,9 @@ public class TravelController {
 
     @GetMapping("/completed")
     public ResponseEntity<ApiResponse<List<TravelListResponse>>> completedTravel(
-            @CookieValue(name = "accessToken", required = false) String token) {
+            @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         try {
-            Long userId = extractAndValidateUser(token);
+            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
             List<TravelListResponse> responseList = travelService.getTravelCompleteList(userId);
 
             if (responseList.isEmpty()) {
@@ -101,9 +106,9 @@ public class TravelController {
     }
 
     @GetMapping("/upcoming")
-    public ResponseEntity<ApiResponse<List<TravelListResponse>>> upcomingTravel(@CookieValue(name = "accessToken", required = false) String token) {
+    public ResponseEntity<ApiResponse<List<TravelListResponse>>> upcomingTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         try {
-            Long userId = extractAndValidateUser(token);
+            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
             List<TravelListResponse> responseList = travelService.getTravelUpcomingList(userId);
             if (responseList.isEmpty()) {
                 return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "다가오는 여행이 없습니다."));
@@ -115,10 +120,10 @@ public class TravelController {
     }
 
     @GetMapping("/{travelId}")
-    public ResponseEntity<ApiResponse<TravelResponse>> getReadTravel(@CookieValue(name = "accessToken", required = false) String token,
+    public ResponseEntity<ApiResponse<TravelResponse>> getReadTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
                                                                      @PathVariable Long travelId) {
         try {
-            Long userId = extractAndValidateUser(token);
+            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
             TravelResponse responseDTO = travelService.getTravel(travelId, userId);
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행이 조회되었습니다.", responseDTO));
         } catch (Exception e) {
@@ -127,10 +132,10 @@ public class TravelController {
     }
 
     @PostMapping("/share")
-    public ResponseEntity<ApiResponse<TravelResponse>> shareTravel(@CookieValue(name = "accessToken", required = false) String token,
+    public ResponseEntity<ApiResponse<TravelResponse>> shareTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
                                                                    @RequestBody TravelShareRequest requestDTO) {
         try {
-            Long userId = extractAndValidateUser(token);
+            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
             travelService.postTravel(userId, requestDTO);
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행 공유 상태가 변경되었습니다."));
         } catch (Exception e) {
@@ -139,10 +144,10 @@ public class TravelController {
     }
 
     @PostMapping("/invite/{inviteCode}")
-    public ResponseEntity<ApiResponse<TravelResponse>> inviteAddTravel(@CookieValue(name = "accessToken", required = false) String token,
-                                                               @PathVariable String inviteCode) {
+    public ResponseEntity<ApiResponse<TravelResponse>> inviteAddTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+                                                                       @PathVariable String inviteCode) {
         try {
-            Long userId = extractAndValidateUser(token);
+            Long userId = memberRepository.findById(customUserPrincipal.getMemberId());
             TravelResponse travel = travelService.inviteTravel(inviteCode, userId);
             return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK.toString(), "여행에 새로운 멤버가 추가되었습니다.", travel));
         } catch (Exception e) {
@@ -161,7 +166,6 @@ public class TravelController {
     }
 
 
-
     // 예외처리 메서드
     private <T> ResponseEntity<ApiResponse<T>> handleException(Exception e) {
         if (e instanceof CustomException customException) {
@@ -172,18 +176,4 @@ public class TravelController {
         }
     }
 
-
-    // 토큰 및 회원 확인 메서드
-    private Long extractAndValidateUser(String token) throws CustomException {
-//        if (token == null) {
-//            throw new CustomException("M0011", "토큰이 비어있습니다.");
-//        }
-//        long userId = jwtUtil.extractUserId(token.substring(7));
-//        MemberResponse member = memberService.getMemberById(userId);
-//        if (member == null) {
-//            throw new CustomException("M0010", "존재하지 않는 회원입니다.");
-//        }
-        Long userId = 1L;
-        return userId;
-    }
 }
