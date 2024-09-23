@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import rightArrow from '../../assets/header/rightArrow.png';
+import leftArrow from '../../assets/header/leftArrow.png';
 
 // props 타입 정의
 interface HeaderProps {
@@ -31,7 +31,7 @@ const BackHeader: React.FC<HeaderProps> = ({title}) => {
 
   return (
     <StyledDiv>
-      <img onClick={() => navigate(-1)} src={rightArrow} alt="arrow" />
+      <img onClick={() => navigate(-1)} src={leftArrow} alt="arrow" />
       <StyledP>{title}</StyledP> {/* title을 출력 */}
     </StyledDiv>
   );
