@@ -11,8 +11,6 @@ interface HeaderProps {
 
 // 스타일
 const StyledDiv = styled.div`
-    position: fixed;
-    top: 0;
     display: flex;
     width: 100%;
     height: 56px;
@@ -20,7 +18,6 @@ const StyledDiv = styled.div`
     flex-direction: row;
     background-color: white;
     padding: 5px 15px;
-    z-index: 1000;
 `;
 
 const StyledP = styled.p`
