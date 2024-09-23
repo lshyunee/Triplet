@@ -12,7 +12,6 @@ const StyledDiv = styled.div`
     padding: 5px 15px;
     background-color : #F3F4F6;
     height : 56px;
-    margin-bottom : 12px;
 `;
 
 const StyledP = styled.p`

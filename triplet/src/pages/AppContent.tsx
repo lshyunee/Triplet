@@ -17,7 +17,7 @@ const AppContent = () => {
     const [backHeader, setBackHeader] = useState(false);
 
     const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
- 
+
     useEffect(() => {
       const onPages = ["/signup", "/mypage","/alarm"]
       if(onPages.includes(location.pathname)){
@@ -49,6 +49,7 @@ const AppContent = () => {
   return (
     <>
         {backHeader ? <BackHeader/> : <Header/>}
+
         {isActive && <Navbar />}  {/* isActive가 true일 때만 Navbar 렌더링 */}
     </>
   );
