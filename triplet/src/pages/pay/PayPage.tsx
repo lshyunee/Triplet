@@ -11,7 +11,9 @@ import { pageMove } from '../../features/navigation/naviSlice';
 const s = {
 	Container: styled.div`
 		background-color: #F3F4F6;
-		height: 100vh;
+		/* height: 100%; */
+		padding-top: 68px;
+		padding-bottom: 16px;
 	`,
 	Card: styled.div`
 		background-color: #ffffff;

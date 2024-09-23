@@ -14,10 +14,7 @@ const StyledDiv = styled.div`
     justify-content: space-between;  /* 양 끝에 배치 */
     padding-right : 17px;
     background-color : #F3F4F6;
-<<<<<<< HEAD
-    height : 56px;
-=======
->>>>>>> 56b037eb8c783fe12fd914b3e2e195d4352b4d0f
+    position: fixed;
 `;
 
 const StyledP = styled.p`
