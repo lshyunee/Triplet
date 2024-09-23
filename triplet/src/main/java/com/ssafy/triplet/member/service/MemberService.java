@@ -91,12 +91,10 @@ public class MemberService {
         }
         return MemberResponse.builder()
                 .memberId(member.getMemberId())
-                .password(member.getPassword())
                 .name(member.getName())
                 .phoneNumber(member.getPhoneNumber())
                 .birth(member.getBirth())
-                .gender(member.getGender())
-                .simplePassword(member.getSimplePassword()).build();
+                .gender(member.getGender()).build();
     }
 
     public MemberResponse updateMyInfo(MemberUpdateRequest request, String memberId) {
@@ -117,12 +115,10 @@ public class MemberService {
         // 변경된 정보 반환
         return MemberResponse.builder()
                 .memberId(member.getMemberId())
-                .password(member.getPassword())
                 .name(request.getName())
                 .phoneNumber(request.getPhoneNumber())
                 .birth(birth)
-                .gender(gender)
-                .simplePassword(member.getSimplePassword()).build();
+                .gender(gender).build();
     }
 
     public void updatePassword(PasswordUpdateRequest request, String memberId) {

@@ -9,11 +9,9 @@ import lombok.*;
 public class MemberResponse {
 
     private String memberId;
-    private String password;
     private String name;
     private String birth;
     private boolean gender;
     private String phoneNumber;
-    private String simplePassword;
 
 }
