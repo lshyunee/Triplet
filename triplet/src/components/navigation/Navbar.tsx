@@ -22,7 +22,8 @@ const NavbarContainer = styled.nav`
   bottom: 0;
   width: 100%;
   height: 56px;
-  color: white;
+  background-color: white;
+  padding-top : 8px;
   text-align: center;
   z-index: 1000;
 `;

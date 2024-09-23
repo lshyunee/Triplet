@@ -30,7 +30,7 @@ const GlobalStyle = createGlobalStyle`
 
 const App: React.FC = () => {
 
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   useEffect(()=>{
     if('serviceWorker' in navigator){
