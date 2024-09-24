@@ -28,7 +28,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
     private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         // path, method 검증
         String requestURI = request.getRequestURI();
-        if (!requestURI.matches("^/logout$")) { // logout 경로가 아니면 다음 필터로
+        if (!requestURI.matches("^/api/v1/logout$")) { // logout 경로가 아니면 다음 필터로
             filterChain.doFilter(request, response);
             return;
         }
@@ -42,8 +42,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("refresh".equals(cookie.getName())) {
-                    refresh = cookie.getValue().split(" ")[1];
+                if ("Authorization-Refresh".equals(cookie.getName())) {
+                    refresh = cookie.getValue();
                 }
             }
         }
@@ -67,14 +67,21 @@ public class CustomLogoutFilter extends GenericFilterBean {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        // refresh 토큰 Cookie 값 0
-        Cookie cookie = new Cookie("refresh", null);
-        cookie.setMaxAge(0);
-        cookie.setPath("/");
-        cookie.setSecure(true);
-        cookie.setHttpOnly(true);
+        // access, refresh 토큰 Cookie 삭제
+        Cookie refreshCookie = new Cookie("Authorization-Refresh", null);
+        refreshCookie.setMaxAge(0);
+        refreshCookie.setPath("/");
+        refreshCookie.setSecure(true);
+        refreshCookie.setHttpOnly(true);
 
-        response.addCookie(cookie);
+        Cookie accessCookie = new Cookie("Authorization", null);
+        accessCookie.setMaxAge(0);
+        accessCookie.setPath("/");
+        accessCookie.setSecure(true);
+        accessCookie.setHttpOnly(true);
+
+        response.addCookie(refreshCookie);
+        response.addCookie(accessCookie);
         response.setStatus(HttpServletResponse.SC_OK);
     }
 }

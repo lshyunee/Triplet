@@ -3,6 +3,7 @@ package com.ssafy.triplet.account.controller;
 import com.ssafy.triplet.account.dto.request.CreateTransactionRequest;
 import com.ssafy.triplet.account.dto.request.TransactionListRequest;
 import com.ssafy.triplet.account.dto.response.AccountDetailResponse;
+import com.ssafy.triplet.account.dto.response.CreateTransactionResponse;
 import com.ssafy.triplet.account.dto.response.TransactionListResponse;
 import com.ssafy.triplet.account.service.AccountService;
 import com.ssafy.triplet.auth.dto.CustomUserPrincipal;
@@ -26,9 +27,6 @@ public class AccountController {
     @GetMapping("/account")
     public ResponseEntity<?> findAccount(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         AccountDetailResponse krwAccount = accountService.getKrwAccount(customUserPrincipal.getMemberId());
-        if (krwAccount == null) {
-            return ResponseEntity.ok().body(new ApiResponse<Void>("200", "원화계좌가 존재하지 않습니다."));
-        }
         return ResponseEntity.ok().body(new ApiResponse<>("200", "원화계좌 조회 성공", krwAccount));
     }
 
@@ -50,9 +48,10 @@ public class AccountController {
         return ResponseEntity.ok().body(new ApiResponse<>("200", "거래내역 조회 성공", transactionList));
     }
 
-//    @PostMapping("/transaction/create")
-//    public ResponseEntity<?> createTransaction(@RequestBody CreateTransactionRequest request) {
-//
-//    }
+    @PostMapping("/transaction/create")
+    public ResponseEntity<?> createTransaction(@RequestBody CreateTransactionRequest request) {
+        List<CreateTransactionResponse> transaction = accountService.createTransaction(request);
+        return ResponseEntity.ok().body(new ApiResponse<>("200", "원화계좌 송금 성공", transaction));
+    }
 
 }

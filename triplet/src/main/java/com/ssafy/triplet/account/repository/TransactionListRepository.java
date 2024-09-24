@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface TransactionListRepository extends JpaRepository<TransactionList, Long> {
 
-    @Query("select tl from TransactionList tl join fetch tl.krwAccount ka " +
-            "where ka.accountId = :accountId")
-    List<TransactionList> findByKrwAccountId(Long accountId);
+    @Query("select tl from TransactionList tl join fetch tl.account a " +
+            "where a.accountId = :accountId")
+    List<TransactionList> findByAccountId(Long accountId);
 
 }

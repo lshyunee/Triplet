@@ -61,7 +61,6 @@ public class MemberService {
                 .role("ROLE_USER")
                 .build();
         Member savedMember = memberRepository.save(member);
-        log.info("savedMemberId = {}", savedMember.getId());
         // 계좌 자동생성
         accountService.createAccount(savedMember);
         accountService.generateForeignAccounts(savedMember);
