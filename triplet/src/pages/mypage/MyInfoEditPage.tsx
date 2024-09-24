@@ -16,6 +16,7 @@ const InputDiv = styled.div`
     display: flex;
     flex-direction: column;
     margin-top:40px;
+    padding-top : 56px;
 `;
 
 const NumP = styled.p`

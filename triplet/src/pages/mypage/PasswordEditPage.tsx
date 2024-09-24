@@ -41,6 +41,7 @@ const StyledInput = styled.input`
 
 const CurrentDiv = styled.div`
     margin-top : 120px;
+    padding-top : 56px;
 `
 
 const NewDiv = styled.div`
