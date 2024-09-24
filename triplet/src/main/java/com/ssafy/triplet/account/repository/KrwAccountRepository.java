@@ -9,4 +9,5 @@ public interface KrwAccountRepository extends JpaRepository<KrwAccount, Long> {
 
     boolean existsByAccountId(Long accountId);
 
+    KrwAccount findByAccountNumber(String accountNumber);
 }

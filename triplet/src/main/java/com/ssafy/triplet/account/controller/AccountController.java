@@ -1,5 +1,6 @@
 package com.ssafy.triplet.account.controller;
 
+import com.ssafy.triplet.account.dto.request.CreateTransactionRequest;
 import com.ssafy.triplet.account.dto.request.TransactionListRequest;
 import com.ssafy.triplet.account.dto.response.AccountDetailResponse;
 import com.ssafy.triplet.account.dto.response.TransactionListResponse;
@@ -48,5 +49,10 @@ public class AccountController {
         List<TransactionListResponse> transactionList = accountService.getTransactionList(request);
         return ResponseEntity.ok().body(new ApiResponse<>("200", "거래내역 조회 성공", transactionList));
     }
+
+//    @PostMapping("/transaction/create")
+//    public ResponseEntity<?> createTransaction(@RequestBody CreateTransactionRequest request) {
+//
+//    }
 
 }

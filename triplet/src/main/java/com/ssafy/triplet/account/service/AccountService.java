@@ -1,7 +1,9 @@
 package com.ssafy.triplet.account.service;
 
+import com.ssafy.triplet.account.dto.request.CreateTransactionRequest;
 import com.ssafy.triplet.account.dto.request.TransactionListRequest;
 import com.ssafy.triplet.account.dto.response.AccountDetailResponse;
+import com.ssafy.triplet.account.dto.response.CreateTransactionResponse;
 import com.ssafy.triplet.account.dto.response.TransactionListResponse;
 import com.ssafy.triplet.account.entity.ForeignAccount;
 import com.ssafy.triplet.account.entity.KrwAccount;
@@ -15,6 +17,7 @@ import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -24,6 +27,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class AccountService {
 
@@ -151,6 +155,16 @@ public class AccountService {
             throw new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND);
         }
     }
+
+//    public List<CreateTransactionResponse> createTransaction(CreateTransactionRequest request) {
+//        KrwAccount withdrawalAccount = krwAccountRepository.findByAccountNumber(request.getWithdrawalAccountNumber());
+//        if (withdrawalAccount == null) {
+//            throw new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND);
+//        }
+//        double currentBalance = withdrawalAccount.getAccountBalance();
+//        double newBalance = currentBalance - request.getTransactionBalance();
+//
+//    }
 
     public List<TransactionListResponse> getTransactionList(TransactionListRequest request) {
         Long accountId = request.getAccountId();
