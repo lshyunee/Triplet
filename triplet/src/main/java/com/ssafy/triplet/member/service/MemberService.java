@@ -1,5 +1,6 @@
 package com.ssafy.triplet.member.service;
 
+import com.ssafy.triplet.account.service.AccountService;
 import com.ssafy.triplet.auth.jwt.JwtUtil;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.dto.request.*;
@@ -11,10 +12,12 @@ import com.ssafy.triplet.exception.CustomErrorCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -24,8 +27,9 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public void signUp(SignupRequest request, HttpServletResponse response) {
+    private final AccountService accountService;
 
+    public void signUp(SignupRequest request, HttpServletResponse response) {
         // 아이디 중복확인
         Member existMember = memberRepository.findByMemberId(request.getMemberId());
         if (existMember != null) {
@@ -56,9 +60,12 @@ public class MemberService {
                 .phoneNumber(request.getPhoneNumber())
                 .role("ROLE_USER")
                 .build();
-        // 회원가입
-        memberRepository.save(member);
-        // 자동 로그인 처리 (토큰발급)
+        Member savedMember = memberRepository.save(member);
+        log.info("savedMemberId = {}", savedMember.getId());
+        // 계좌 자동생성
+        accountService.createAccount(savedMember);
+        accountService.generateForeignAccounts(savedMember);
+        // 자동으로 로그인
         autoLogin(request.getMemberId(), response);
     }
 
