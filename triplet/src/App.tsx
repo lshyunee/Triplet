@@ -62,25 +62,6 @@ const App: React.FC = () => {
       }
   }, [])
 
-  useEffect(()=>{
-    if('serviceWorker' in navigator){
-      window.addEventListener('load', () =>{
-        navigator.serviceWorker
-          .register('/service-worker.js')
-          .then((registration) => {
-            console.log("Service Worker register", registration.scope);
-            setLoading(false);
-          })
-          .catch((error) => {
-            console.log("로딩 실패");
-            setLoading(false);
-          });
-      });
-    }else{
-      setLoading(false);
-    }
-  }, []);
-
   return (
     <Div>
       <GlobalStyle />
