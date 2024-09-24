@@ -1,9 +1,12 @@
 package com.ssafy.triplet.member.entity;
 
+import com.ssafy.triplet.account.entity.ForeignAccount;
+import com.ssafy.triplet.account.entity.KrwAccount;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.util.List;
+
 
 @Entity
 @Builder
@@ -24,5 +27,16 @@ public class Member {
     private String simplePassword;
     private String phoneNumber;
     private String role;
+
+    @OneToOne(mappedBy = "member")
+    private KrwAccount krwAccount;
+
+    @OneToMany(mappedBy = "member")
+    private List<ForeignAccount> foreignAccounts;
+
+    public void createMyKrwAccount(KrwAccount krwAccount) {
+        this.krwAccount = krwAccount;
+        krwAccount.setMember(this);
+    }
 
 }
