@@ -21,7 +21,7 @@ const shuffleArray = (array: number[]) => {
 };
 
 const TitleDiv = styled.div`
-    margin-top : 70px;
+    margin-top : 126px;
     text-align : center;
 `
 
@@ -32,11 +32,16 @@ const Title = styled.p`
 `;
 
 const Description = styled.p`
+    display : flex;
+    align-items: center;
+    justify-content : center;
+    height : 34px;
   margin-bottom: 20px;
   font-size:14px;
   font-weight: 500;
   color: #333;
 `;
+
 
 const PasswordDots = styled.div`
   display: flex;
@@ -76,6 +81,7 @@ const BottomButtons = styled.div`
   gap: 15px;
   max-width: 300px;
   margin: 0 auto;
+    margin-top : 10px;
 `;
 
 const IconButton = styled.button`
@@ -113,7 +119,6 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
         if (password.length < 6) {
             const newPassword = [...password, num];
             setPassword(newPassword);
-            setNumbers(shuffleArray([...numbers]));
             setIsError(false);
 
             if (newPassword.length === 6) {
@@ -125,6 +130,7 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
                     }
                 } else {
                     setIsError(true); // 에러 상태로 설정
+                    setPassword([]);
                 }
             }
             
@@ -139,6 +145,7 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
     // 초기화 버튼 클릭 핸들러
     const handleReset = () => {
         setPassword([]);
+        setNumbers(shuffleArray([...numbers]));
     };
 
     return (

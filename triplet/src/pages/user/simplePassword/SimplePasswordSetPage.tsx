@@ -16,7 +16,7 @@ const shuffleArray = (array: number[]) => {
 };
 
 const TitleDiv = styled.div`
-    margin-top: 70px;
+    margin-top : 126px;
     text-align: center;
 `;
 
@@ -27,11 +27,16 @@ const Title = styled.p`
 `;
 
 const Description = styled.p`
+    display : flex;
+    align-items: center;
+    justify-content : center;
+    height : 34px;
     margin-bottom: 20px;
-    font-size: 14px;
+    font-size:14px;
     font-weight: 500;
     color: #333;
 `;
+
 
 const PasswordDots = styled.div`
     display: flex;
@@ -62,6 +67,7 @@ const NumberButton = styled.button`
     font-weight: 600;
     background-color: white;
     border: none;
+      margin-top : 10px;
 `;
 
 const BottomButtons = styled.div`
@@ -98,7 +104,6 @@ const SimplePasswordSetPage: React.FC = () => {
         if (password.length < 6) {
             const newPassword = [...password, num];
             setPassword(newPassword);
-            setNumbers(shuffleArray([...numbers]));
 
             if (newPassword.length === 6) {
                 // 6자리 비밀번호가 입력되면 이동
@@ -115,6 +120,7 @@ const SimplePasswordSetPage: React.FC = () => {
     // 초기화 버튼 클릭 핸들러
     const handleReset = () => {
         setPassword([]);
+        setNumbers(shuffleArray([...numbers]));
     };
 
     return (
