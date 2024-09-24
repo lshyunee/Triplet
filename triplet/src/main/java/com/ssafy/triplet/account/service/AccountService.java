@@ -7,6 +7,7 @@ import com.ssafy.triplet.account.dto.response.CreateTransactionResponse;
 import com.ssafy.triplet.account.dto.response.TransactionListResponse;
 import com.ssafy.triplet.account.entity.ForeignAccount;
 import com.ssafy.triplet.account.entity.KrwAccount;
+import com.ssafy.triplet.account.entity.TransactionList;
 import com.ssafy.triplet.account.repository.ForeignAccountRepository;
 import com.ssafy.triplet.account.repository.ForeignTransactionListRepository;
 import com.ssafy.triplet.account.repository.KrwAccountRepository;
@@ -20,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -85,7 +83,7 @@ public class AccountService {
         }
         KrwAccount krwAccount = member.getKrwAccount();
         if (krwAccount == null) {
-            return null;
+            throw new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND);
         }
 
         return AccountDetailResponse.builder()
@@ -156,15 +154,61 @@ public class AccountService {
         }
     }
 
-//    public List<CreateTransactionResponse> createTransaction(CreateTransactionRequest request) {
-//        KrwAccount withdrawalAccount = krwAccountRepository.findByAccountNumber(request.getWithdrawalAccountNumber());
-//        if (withdrawalAccount == null) {
-//            throw new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND);
-//        }
-//        double currentBalance = withdrawalAccount.getAccountBalance();
-//        double newBalance = currentBalance - request.getTransactionBalance();
-//
-//    }
+    public List<CreateTransactionResponse> createTransaction(CreateTransactionRequest request) {
+        KrwAccount withdrawalAccount = krwAccountRepository.findByAccountNumber(request.getWithdrawalAccountNumber());
+        KrwAccount depositAccount = krwAccountRepository.findByAccountNumber(request.getDepositAccountNumber());
+        if (withdrawalAccount == null || depositAccount == null) {
+            throw new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND);
+        }
+        // 출금계좌에 잔액 확인
+        if (withdrawalAccount.getAccountBalance() < request.getTransactionBalance()) {
+            throw new CustomException(CustomErrorCode.INSUFFICIENT_BALANCE);
+        }
+        double withdrawal = withdrawalAccount.getAccountBalance() - request.getTransactionBalance();
+        double deposit = depositAccount.getAccountBalance() + request.getTransactionBalance();
+        // 입금 출금
+        withdrawalAccount.setAccountBalance(withdrawal);
+        depositAccount.setAccountBalance(deposit);
+        // 거래내역 생성
+        TransactionList withdrawalTransaction = TransactionList.builder()
+                .transactionType(2)
+                .transactionTypeName("출금")
+                .transactionAccountNumber(depositAccount.getAccountNumber())
+                .price(request.getTransactionBalance())
+                .transactionAfterBalance(withdrawal)
+                .transactionName("출금").build();
+        TransactionList savedWithdrawal = transactionListRepository.save(withdrawalTransaction);
+        withdrawalAccount.createTransaction(savedWithdrawal);
+
+        TransactionList depositTransaction = TransactionList.builder()
+                .transactionType(1)
+                .transactionName("입금")
+                .transactionAccountNumber(withdrawalAccount.getAccountNumber())
+                .price(request.getTransactionBalance())
+                .transactionAfterBalance(deposit)
+                .transactionName("입금").build();
+        TransactionList savedDeposit = transactionListRepository.save(depositTransaction);
+        depositAccount.createTransaction(savedDeposit);
+        // 거래내역 반환 Dto
+        List<CreateTransactionResponse> responses = new ArrayList<>();
+        CreateTransactionResponse withdrawalResponse = CreateTransactionResponse.builder()
+                .transactionId(savedWithdrawal.getId())
+                .accountNumber(withdrawalAccount.getAccountNumber())
+                .transactionDate(withdrawalTransaction.getTransactionDate().toString())
+                .transactionType(2)
+                .transactionTypeName("출금")
+                .transactionAccountNumber(depositAccount.getAccountNumber()).build();
+        CreateTransactionResponse depositResponse = CreateTransactionResponse.builder()
+                .transactionId(savedDeposit.getId())
+                .accountNumber(depositAccount.getAccountNumber())
+                .transactionDate(depositTransaction.getTransactionDate().toString())
+                .transactionType(1)
+                .transactionTypeName("입금")
+                .transactionAccountNumber(withdrawalAccount.getAccountNumber()).build();
+        responses.add(withdrawalResponse);
+        responses.add(depositResponse);
+        return responses;
+    }
 
     public List<TransactionListResponse> getTransactionList(TransactionListRequest request) {
         Long accountId = request.getAccountId();

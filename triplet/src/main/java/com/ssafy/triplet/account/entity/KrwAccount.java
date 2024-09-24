@@ -38,4 +38,9 @@ public class KrwAccount {
         this.accountCreatedDate = accountCreatedDate;
         this.accountExpiryDate = accountExpiryDate;
     }
+
+    public void createTransaction(TransactionList transaction) {
+        transactionList.add(transaction);
+        transaction.setKrwAccount(this);
+    }
 }
