@@ -15,6 +15,7 @@ const StyledDiv = styled.div`
     padding-right : 17px;
     background-color : #F3F4F6;
     position: fixed;
+    z-index: 10;
 `;
 
 const StyledP = styled.p`

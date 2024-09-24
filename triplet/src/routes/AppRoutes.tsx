@@ -17,6 +17,7 @@ import SimplePasswordSetPage from '../pages/user/simplePassword/SimplePasswordSe
 import SimplePasswordConfirmPage from '../pages/user/simplePassword/SimplePasswordConfirmPage';
 import SimplePasswordSetConfirmPage from '../pages/user/simplePassword/SimplePasswordSetConfirmPage';
 
+
 const AppRoutes: React.FC = () => (
         <Routes>
             <Route path="/" element={<Home/>}/>

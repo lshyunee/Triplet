@@ -17,7 +17,9 @@ const StyledDiv = styled.div`
     align-items: center;
     flex-direction: row;
     background-color: white;
-    padding: 5px 15px;
+    padding: 0 16px;
+    position: fixed;
+    z-index: 2;
 `;
 
 const StyledP = styled.p`
