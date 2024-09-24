@@ -7,6 +7,18 @@ import styled from 'styled-components';
 import useAxios from '../../../hooks/useAxios';
 import useInput from '../../../hooks/useInput';
 
+const TitleP = styled.p`
+    font-size : 32px;
+    font-weight : 800;
+    color : #008DE7;
+    margin : 0px;
+`
+
+const TitleDiv = styled.div`
+    margin-top : 125px;
+    margin-bottom : 61px;
+`
+
 const BigDiv = styled.div`
     display:flex;
     justify-content : center;
@@ -18,7 +30,7 @@ const StyledLink = styled(Link)`
     display : flex;
     justify-content : center;
     align-items : center;
-    color: black; /* 링크 텍스트 색상 */
+    color: #888888; /* 링크 텍스트 색상 */
     &:hover {
         color: darkblue;
     }
@@ -29,10 +41,11 @@ const LoginInput = styled.input`
     width:328px;
     height:44px;
     border-radius : 10px;
+    background-color : #F9FAFC;
     border : 1px solid #F0F0F0;
     box-sizing: border-box;
-    margin : 10px;
-    padding : 10px;
+    margin-bottom : 20px;
+    padding : 14px;
 `;
 
 const LoginBtn = styled.button`
@@ -43,8 +56,8 @@ const LoginBtn = styled.button`
     border-radius : 10px;
     border : none;
     box-sizing: border-box;
-    margin : 10px;
-    padding : 10px;
+    margin-bottom : 20px;
+    padding : 14px;
 `;
 
 const NaverLoginBtn = styled.button`
@@ -55,8 +68,8 @@ const NaverLoginBtn = styled.button`
     border-radius : 10px;
     border : none;
     box-sizing: border-box;
-    margin : 10px;
-    padding : 10px;
+    margin-bottom : 20px;
+    padding : 14px;
 `;
 
 const SignupDiv = styled.div`
@@ -65,9 +78,8 @@ const SignupDiv = styled.div`
 `;
 
 const SignupP = styled.p`
-    margin-left: 4px;
-    margin-right: 4px;
     font-size : 14px;
+    margin : 0px 4px;
 `;
 
 const LoginPage = () => {
@@ -96,9 +108,9 @@ const LoginPage = () => {
         , status: loginStatus, refetch: loginRefetch } 
         = useAxios('/login', 'POST', formData);
 
-        const { data: naverData, error: naverError, loading: naverLoading,
-            status: naverStatus, refetch: naverRefetch }
-            = useAxios('/oauth2/authorization/naver', 'POST');
+    const { data: naverData, error: naverError, loading: naverLoading,
+        status: naverStatus, refetch: naverRefetch }
+        = useAxios('/oauth2/authorization/naver', 'POST');
 
 
     // 로그인 버튼 핸들러
@@ -124,9 +136,9 @@ const LoginPage = () => {
     return (
         <>
         <BigDiv>
-            <div>
-                <p>Triplet</p>
-            </div>
+            <TitleDiv>
+                <TitleP>Triplet</TitleP>
+            </TitleDiv>
             <LoginInput type="text" placeholder='아이디' {...id} />
             <LoginInput type="password" placeholder='비밀번호' {...pw} />
             <LoginBtn onClick={handleLogin}>로그인</LoginBtn>
@@ -134,7 +146,7 @@ const LoginPage = () => {
             <SignupDiv>
                 <SignupP>아직 회원이 아니신가요?</SignupP>
                 <StyledLink to="/signup">
-                    회원가입
+                    <SignupP>회원가입</SignupP>
                 </StyledLink>
             </SignupDiv>
         </BigDiv>
