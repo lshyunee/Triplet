@@ -82,7 +82,7 @@ const App: React.FC = () => {
   return (
     <Div>
       <GlobalStyle />
-      {isLoading && <SplashScreen />}
+      {/* {isLoading && <SplashScreen />} */}
       <AppRoutes/>
       {isActive && <Navbar />}  {/* isActive가 true일 때만 Navbar 렌더링 */}
     </Div>
