@@ -105,7 +105,7 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
 
     const { data: resData, loading: resLoading, error: resError, 
         status: resStatus, refetch: resRefetch } 
-        = useAxios('/api/v1/simple-password', 'POST', { 
+        = useAxios('/simple-password', 'POST', { 
             newSimplePassword : prePassword,
             newSimplePasswordConfirm : password 
         }); 

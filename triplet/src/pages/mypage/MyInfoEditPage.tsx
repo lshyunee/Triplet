@@ -193,7 +193,7 @@ const MyInfoEditPage = () => {
 
     const { data: editData, error: editError, loading: editLoading,
         status: editStatus, refetch: editRefetch }
-        = useAxios('/api/v1/user/my', 'PUT', {
+        = useAxios('/user/my', 'PUT', {
             name : name,
             phoneNumber : phoneNum,
             identificationNumber : identificationNum

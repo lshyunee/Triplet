@@ -115,7 +115,7 @@ const MyPage = () => {
 
     const { data: infoData, error: infoError, loading: infoLoading,
         status: infoStatus, refetch: infoRefetch }
-        = useAxios('/api/v1/user/my', 'GET');
+        = useAxios('/user/my', 'GET');
 
     useEffect(() => {
         infoRefetch();

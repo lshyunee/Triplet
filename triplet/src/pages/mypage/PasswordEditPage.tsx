@@ -81,7 +81,7 @@ const PasswordEditPage = () => {
 
     const { data: pwData, error: pwError, loading: pwLoading,
         status: pwStatus, refetch: pwRefetch
-    } = useAxios('/api/v1/user/password', 'PUT',{
+    } = useAxios('/user/password', 'PUT',{
         password : pw,
         newPassword : newPw,
         newPasswordConfirm : newPwCheck
