@@ -36,7 +36,7 @@ public class TravelService {
     private final CountryRepository countryRepository;
     private final TravelTransactionListRepository transactionListRepository;
     private final MerchantRepository merchantRepository;
-    private final TravelWalletRepository travelWalletRepository;
+    private final TravelWalletService travelWalletService;
     private final S3Service s3Service;
 
     @Transactional
@@ -47,50 +47,33 @@ public class TravelService {
         Travel savedTravel = travelRepository.save(travel);
         insertTravelMembers(userId, travel.getId());
         saveTravelBudgets(request, savedTravel);
-
-        TravelWallet travelWallet = new TravelWallet();
-        travelWallet.setTravelId(savedTravel);
-        String travelId = savedTravel.getId() + "";
-        String walletNumber = "124" + travelId;
-        travelWallet.setWalletNumber(walletNumber);
-        travelWallet.setCurrency(savedTravel.getCountry().getCurrency());
-        Member member = memberRepository.findById(userId).orElseThrow(() -> new CustomException("M0010", "존재하지 않는 회원입니다."));
-        travelWallet.setCreatorId(member);
-        travelWalletRepository.save(travelWallet);
+        travelWalletService.makeTravelWallet(savedTravel, userId);
         return buildTravelResponse(savedTravel, inviteCode);
     }
 
     @Transactional
     public TravelResponse updateTravel(Long travelId, TravelRequest request, MultipartFile image, Long userId) throws IOException {
         validateTravelRequest(request);
-
         Travel travel = travelRepository.findById(travelId)
                 .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
-
         Long creatorId = travelRepository.findCreatorIdByTravelId(travelId);
         if (!userId.equals(creatorId)) {
             throw new CustomException("T0011", "여행 생성자가 아닙니다.");
         }
-
         travel.setStartDate(request.getStartDate());
         travel.setEndDate(request.getEndDate());
         travel.setTitle(request.getTitle());
         travel.setMemberCount(request.getMemberCount());
         travel.setTotalBudget(request.getTotalBudget());
-
         if (image != null && !image.isEmpty()) {
             String fileUrl = s3Service.uploadFile(image);
             travel.setImage(fileUrl);
         }
-
         Country country = countryRepository.findById(request.getCountry())
                 .orElseThrow(() -> new CustomException("T0006", "국가를 찾을 수 없습니다."));
         travel.setCountry(country);
-
         Travel updatedTravel = travelRepository.save(travel);
-
         updateTravelBudgets(request, updatedTravel);
-
         return buildTravelResponse(updatedTravel, travel.getInviteCode());
     }
 
