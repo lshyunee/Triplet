@@ -5,12 +5,9 @@ import com.ssafy.triplet.account.dto.request.TransactionListRequest;
 import com.ssafy.triplet.account.dto.response.AccountDetailResponse;
 import com.ssafy.triplet.account.dto.response.CreateTransactionResponse;
 import com.ssafy.triplet.account.dto.response.TransactionListResponse;
-import com.ssafy.triplet.account.entity.ForeignAccount;
-import com.ssafy.triplet.account.entity.KrwAccount;
+import com.ssafy.triplet.account.entity.Account;
 import com.ssafy.triplet.account.entity.TransactionList;
-import com.ssafy.triplet.account.repository.ForeignAccountRepository;
-import com.ssafy.triplet.account.repository.ForeignTransactionListRepository;
-import com.ssafy.triplet.account.repository.KrwAccountRepository;
+import com.ssafy.triplet.account.repository.AccountRepository;
 import com.ssafy.triplet.account.repository.TransactionListRepository;
 import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.exception.CustomException;
@@ -29,11 +26,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AccountService {
 
-    private final ForeignAccountRepository foreignAccountRepository;
-    private final KrwAccountRepository krwAccountRepository;
+    private final AccountRepository accountRepository;
     private final MemberRepository memberRepository;
     private final TransactionListRepository transactionListRepository;
-    private final ForeignTransactionListRepository foreignTransactionListRepository;
 
     // 원화계좌 생성
     public void createAccount(Member member) {
@@ -42,9 +37,15 @@ public class AccountService {
         LocalDateTime created = LocalDateTime.now();
         LocalDateTime expiry = created.plusYears(5);
         // 원화계좌 생성
-        KrwAccount krwAccount = new KrwAccount(accountNumber, created, expiry);
-        member.createMyKrwAccount(krwAccount);
-        krwAccountRepository.save(krwAccount);
+        Account account = Account.builder()
+                .accountNumber(accountNumber)
+                .accountName("내 통장")
+                .accountType("DOMESTIC")
+                .currency("KRW")
+                .accountCreatedDate(created)
+                .accountExpiryDate(expiry).build();
+        member.createMyKrwAccount(account);
+        accountRepository.save(account);
     }
 
     // 국가별 외화지갑 자동생성
@@ -64,16 +65,30 @@ public class AccountService {
     }
 
     // 외화지갑 생성
-    public void createForeignAccount(Member member, String currency, String accountName) {
+    public void createForeignAccount(Member member, String currencyCode, String accountName) {
+        Map<String, String> currencyCodeMap = new HashMap<>();
+        currencyCodeMap.put("001", "USD");
+        currencyCodeMap.put("002", "EUR");
+        currencyCodeMap.put("003", "JPY");
+        currencyCodeMap.put("004", "CHY");
+        currencyCodeMap.put("005", "GBP");
+        currencyCodeMap.put("006", "CHF");
+        currencyCodeMap.put("007", "CAD");
         // 계좌번호 고유값 생성
-        String accountNumber = generateAccountNumber(currency);
+        String accountNumber = generateAccountNumber(currencyCode);
         // 계좌 개설일, 만료일은 개설일 + 5년
         LocalDateTime created = LocalDateTime.now();
         LocalDateTime expiry = created.plusYears(5);
         // 외화지갑 생성
-        ForeignAccount foreignAccount = new ForeignAccount(accountNumber, accountName, currency, created, expiry);
-        member.createMyForeignAccount(foreignAccount);
-        foreignAccountRepository.save(foreignAccount);
+        Account account = Account.builder()
+                .accountNumber(accountNumber)
+                .accountName(accountName)
+                .accountType("OVERSEAS")
+                .currency(currencyCodeMap.get(currencyCode))
+                .accountCreatedDate(created)
+                .accountExpiryDate(expiry).build();
+        member.createMyForeignAccount(account);
+        accountRepository.save(account);
     }
 
     public AccountDetailResponse getKrwAccount(String memberId) {
@@ -81,23 +96,20 @@ public class AccountService {
         if (member == null) {
             throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
         }
-        KrwAccount krwAccount = member.getKrwAccount();
-        if (krwAccount == null) {
-            throw new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND);
-        }
+        Account account = member.getKrwAccount();
 
         return AccountDetailResponse.builder()
-                .accountId(krwAccount.getAccountId())
-                .bankCode(krwAccount.getBankCode())
-                .bankName(krwAccount.getBankName())
-                .accountNumber(krwAccount.getAccountNumber())
-                .accountName(krwAccount.getAccountName())
-                .accountType(krwAccount.getAccountType())
-                .currency(krwAccount.getCurrency())
+                .accountId(account.getAccountId())
+                .bankCode(account.getBankCode())
+                .bankName(account.getBankName())
+                .accountNumber(account.getAccountNumber())
+                .accountName(account.getAccountName())
+                .accountType(account.getAccountType())
+                .currency(account.getCurrency())
                 .memberName(member.getName())
-                .accountCreatedDate(krwAccount.getAccountCreatedDate().toString())
-                .accountExpiryDate(krwAccount.getAccountExpiryDate().toString())
-                .accountBalance(krwAccount.getAccountBalance()).build();
+                .accountCreatedDate(account.getAccountCreatedDate().toString())
+                .accountExpiryDate(account.getAccountExpiryDate().toString())
+                .accountBalance(account.getAccountBalance()).build();
     }
 
     public List<AccountDetailResponse> getForeignAccounts(String memberId) {
@@ -105,7 +117,7 @@ public class AccountService {
         if (member == null) {
             throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
         }
-        return foreignAccountRepository.findMyForeignAccounts(memberId).stream()
+        return accountRepository.findMyForeignAccounts(memberId).stream()
                 .map(foreignAccount -> AccountDetailResponse.builder()
                         .accountId(foreignAccount.getAccountId())
                         .bankCode(foreignAccount.getBankCode())
@@ -121,54 +133,34 @@ public class AccountService {
     }
 
     public AccountDetailResponse getAccountById(Long accountId) {
-        KrwAccount krwAccount = krwAccountRepository.findById(accountId).orElse(null);
-        ForeignAccount foreignAccount = foreignAccountRepository.findById(accountId).orElse(null);
-        if (krwAccount != null) {
-            return AccountDetailResponse.builder()
-                    .accountId(krwAccount.getAccountId())
-                    .bankCode(krwAccount.getBankCode())
-                    .bankName(krwAccount.getBankName())
-                    .accountNumber(krwAccount.getAccountNumber())
-                    .accountName(krwAccount.getAccountName())
-                    .accountType(krwAccount.getAccountType())
-                    .currency(krwAccount.getCurrency())
-                    .memberName(krwAccount.getMember().getName())
-                    .accountCreatedDate(krwAccount.getAccountCreatedDate().toString())
-                    .accountExpiryDate(krwAccount.getAccountExpiryDate().toString())
-                    .accountBalance(krwAccount.getAccountBalance()).build();
-        } else if (foreignAccount != null) {
-            return AccountDetailResponse.builder()
-                    .accountId(foreignAccount.getAccountId())
-                    .bankCode(foreignAccount.getBankCode())
-                    .bankName(foreignAccount.getBankName())
-                    .accountNumber(foreignAccount.getAccountNumber())
-                    .accountName(foreignAccount.getAccountName())
-                    .accountType(foreignAccount.getAccountType())
-                    .currency(foreignAccount.getCurrency())
-                    .memberName(foreignAccount.getMember().getName())
-                    .accountCreatedDate(foreignAccount.getAccountCreatedDate().toString())
-                    .accountExpiryDate(foreignAccount.getAccountExpiryDate().toString())
-                    .accountBalance(foreignAccount.getAccountBalance()).build();
-        } else {
-            throw new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND);
-        }
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND));
+        return AccountDetailResponse.builder()
+                .accountId(account.getAccountId())
+                .bankCode(account.getBankCode())
+                .bankName(account.getBankName())
+                .accountNumber(account.getAccountNumber())
+                .accountName(account.getAccountName())
+                .accountType(account.getAccountType())
+                .currency(account.getCurrency())
+                .memberName(account.getMember().getName())
+                .accountCreatedDate(account.getAccountCreatedDate().toString())
+                .accountExpiryDate(account.getAccountExpiryDate().toString())
+                .accountBalance(account.getAccountBalance()).build();
     }
 
     public List<CreateTransactionResponse> createTransaction(CreateTransactionRequest request) {
-        KrwAccount withdrawalAccount = krwAccountRepository.findByAccountNumber(request.getWithdrawalAccountNumber());
-        KrwAccount depositAccount = krwAccountRepository.findByAccountNumber(request.getDepositAccountNumber());
-        if (withdrawalAccount == null || depositAccount == null) {
-            throw new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND);
-        }
-        // 출금계좌에 잔액 확인
-        if (withdrawalAccount.getAccountBalance() < request.getTransactionBalance()) {
-            throw new CustomException(CustomErrorCode.INSUFFICIENT_BALANCE);
-        }
+        Account withdrawalAccount = accountRepository.findByAccountNumber(request.getWithdrawalAccountNumber());
+        Account depositAccount = accountRepository.findByAccountNumber(request.getDepositAccountNumber());
+
+        // 거래 가능여부 확인
+        isTransactionAllowed(request, withdrawalAccount, depositAccount);
+
+        // 입금 출금
         double withdrawal = withdrawalAccount.getAccountBalance() - request.getTransactionBalance();
         double deposit = depositAccount.getAccountBalance() + request.getTransactionBalance();
-        // 입금 출금
         withdrawalAccount.setAccountBalance(withdrawal);
         depositAccount.setAccountBalance(deposit);
+
         // 거래내역 생성
         TransactionList withdrawalTransaction = TransactionList.builder()
                 .transactionType(2)
@@ -182,13 +174,14 @@ public class AccountService {
 
         TransactionList depositTransaction = TransactionList.builder()
                 .transactionType(1)
-                .transactionName("입금")
+                .transactionTypeName("입금")
                 .transactionAccountNumber(withdrawalAccount.getAccountNumber())
                 .price(request.getTransactionBalance())
                 .transactionAfterBalance(deposit)
                 .transactionName("입금").build();
         TransactionList savedDeposit = transactionListRepository.save(depositTransaction);
         depositAccount.createTransaction(savedDeposit);
+
         // 거래내역 반환 Dto
         List<CreateTransactionResponse> responses = new ArrayList<>();
         CreateTransactionResponse withdrawalResponse = CreateTransactionResponse.builder()
@@ -212,40 +205,49 @@ public class AccountService {
 
     public List<TransactionListResponse> getTransactionList(TransactionListRequest request) {
         Long accountId = request.getAccountId();
-        if (krwAccountRepository.existsByAccountId(accountId)) {
-            return transactionListRepository.findByKrwAccountId(accountId).stream()
-                    .map(tre -> TransactionListResponse.builder()
-                            .transactionId(tre.getId())
-                            .transactionDate(tre.getTransactionDate().toString())
-                            .transactionType(tre.getTransactionType())
-                            .transactionTypeName(tre.getTransactionTypeName())
-                            .transactionAccountNumber(tre.getTransactionAccountNumber())
-                            .price(tre.getPrice())
-                            .transactionAfterBalance(tre.getTransactionAfterBalance())
-                            .transactionName(tre.getTransactionName()).build()).collect(Collectors.toList());
-        } else if (foreignAccountRepository.existsByAccountId(accountId)) {
-            return foreignTransactionListRepository.findByForeignAccountId(accountId).stream()
-                    .map(ftre -> TransactionListResponse.builder()
-                            .transactionId(ftre.getId())
-                            .transactionDate(ftre.getTransactionDate().toString())
-                            .transactionType(ftre.getTransactionType())
-                            .transactionTypeName(ftre.getTransactionTypeName())
-                            .transactionAccountNumber(ftre.getTransactionAccountNumber())
-                            .price(ftre.getPrice())
-                            .transactionAfterBalance(ftre.getTransactionAfterBalance())
-                            .transactionName(ftre.getTransactionName()).build()).collect(Collectors.toList());
-        } else {
-            throw new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND);
+        accountRepository.findById(accountId).orElseThrow(() -> new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND));
+        return transactionListRepository.findByAccountId(accountId).stream()
+                .map(tre -> TransactionListResponse.builder()
+                        .transactionId(tre.getId())
+                        .transactionDate(tre.getTransactionDate().toString())
+                        .transactionType(tre.getTransactionType())
+                        .transactionTypeName(tre.getTransactionTypeName())
+                        .transactionAccountNumber(tre.getTransactionAccountNumber())
+                        .price(tre.getPrice())
+                        .transactionAfterBalance(tre.getTransactionAfterBalance())
+                        .transactionName(tre.getTransactionName()).build()).collect(Collectors.toList());
+    }
+
+    private static void isTransactionAllowed(CreateTransactionRequest request, Account withdrawalAccount, Account depositAccount) {
+        // 계좌 존재여부 확인
+        if (withdrawalAccount == null) {
+            throw new CustomException(CustomErrorCode.WITHDRAWAL_ACCOUNT_NOT_FOUND);
+        }
+        if (depositAccount == null) {
+            throw new CustomException(CustomErrorCode.DEPOSIT_ACCOUNT_NOT_FOUND);
+        }
+
+        // 원화계좌인지 확인
+        if (!"DOMESTIC".equals(withdrawalAccount.getAccountType()) || !"DOMESTIC".equals(depositAccount.getAccountType())) {
+            throw new CustomException(CustomErrorCode.KRW_ACCOUNT_ONLY);
+        }
+
+        // 출금계좌에 잔액 확인
+        if (withdrawalAccount.getAccountBalance() < request.getTransactionBalance()) {
+            throw new CustomException(CustomErrorCode.INSUFFICIENT_BALANCE);
         }
     }
 
+    // 계좌번호 생성: 은행코드(124) + 랜덤8자리 수 + 통화코드(3자리)
     private String generateAccountNumber(String currency) {
         String accountNumber;
         do {
-            String uuid = UUID.randomUUID().toString().replace("-", "");
-            String sub = uuid.substring(0, 8);  // UUID에서 앞 16자리만 사용
-            accountNumber = "124" + sub + currency;
-        } while (krwAccountRepository.existsByAccountNumber(accountNumber));
+            Random random = new Random();
+            // 8자리 랜덤수
+            int randomNumber = random.nextInt(100000000);
+            String formattedNumber = String.format("%08d", randomNumber);
+            accountNumber = "124" + formattedNumber + currency;
+        } while (accountRepository.existsByAccountNumber(accountNumber));
         return accountNumber;
     }
 

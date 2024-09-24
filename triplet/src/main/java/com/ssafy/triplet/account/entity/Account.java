@@ -9,35 +9,43 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Builder
 @Getter @Setter
 @NoArgsConstructor
-public class ForeignAccount {
+@AllArgsConstructor
+public class Account {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
+    @Builder.Default
     private String bankCode = "124";
+    @Builder.Default
     private String bankName = "바나나은행";
+    @Column(unique = true)
     private String accountNumber;
     private String accountName;
-    private String accountType = "OVERSEAS"; // 외화
+    private String accountType;
     private String currency;
     private LocalDateTime accountCreatedDate;
     private LocalDateTime accountExpiryDate;
+    @Builder.Default
     private double accountBalance = 0;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "foreignAccount")
-    private List<ForeignTransactionList> foreignTransactionList = new ArrayList<>();
+    @OneToMany(mappedBy = "account")
+    private List<TransactionList> transactionList = new ArrayList<>();
 
-    public ForeignAccount(String accountNumber, String accountName, String currency, LocalDateTime accountCreatedDate, LocalDateTime accountExpiryDate) {
+    public Account(String accountNumber, LocalDateTime accountCreatedDate, LocalDateTime accountExpiryDate) {
         this.accountNumber = accountNumber;
-        this.accountName = accountName;
-        this.currency = currency;
         this.accountCreatedDate = accountCreatedDate;
         this.accountExpiryDate = accountExpiryDate;
     }
-}
 
+    public void createTransaction(TransactionList transaction) {
+        transactionList.add(transaction);
+        transaction.setAccount(this);
+    }
+}
