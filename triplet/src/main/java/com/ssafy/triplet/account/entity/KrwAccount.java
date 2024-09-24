@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -30,7 +31,7 @@ public class KrwAccount {
     private Member member;
 
     @OneToMany(mappedBy = "krwAccount")
-    private List<TransactionList> transactionList;
+    private List<TransactionList> transactionList = new ArrayList<>();
 
     public KrwAccount(String accountNumber, LocalDateTime accountCreatedDate, LocalDateTime accountExpiryDate) {
         this.accountNumber = accountNumber;

@@ -12,10 +12,12 @@ import com.ssafy.triplet.exception.CustomErrorCode;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -58,12 +60,12 @@ public class MemberService {
                 .phoneNumber(request.getPhoneNumber())
                 .role("ROLE_USER")
                 .build();
-
+        Member savedMember = memberRepository.save(member);
+        log.info("savedMemberId = {}", savedMember.getId());
         // 계좌 자동생성
-        accountService.createAccount(member);
-        accountService.generateForeignAccounts(member);
-        // 회원가입 후 자동로그인
-        memberRepository.save(member);
+        accountService.createAccount(savedMember);
+        accountService.generateForeignAccounts(savedMember);
+        // 자동으로 로그인
         autoLogin(request.getMemberId(), response);
     }
 

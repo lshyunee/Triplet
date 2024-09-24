@@ -5,6 +5,7 @@ import com.ssafy.triplet.account.entity.KrwAccount;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -32,7 +33,8 @@ public class Member {
     private KrwAccount krwAccount;
 
     @OneToMany(mappedBy = "member")
-    private List<ForeignAccount> foreignAccounts;
+    @Builder.Default
+    private List<ForeignAccount> foreignAccounts = new ArrayList<>();
 
     public void createMyKrwAccount(KrwAccount krwAccount) {
         this.krwAccount = krwAccount;
