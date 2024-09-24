@@ -3,13 +3,16 @@ import { Link, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import useAxios from '../../../hooks/useAxios';
+import useInput from '../../../hooks/useInput';
 import BackHeader from '../../../components/header/BackHeader';
 
 const HowP = styled.p`
     font-size : 12px;
+    margin-left : 18px;
     margin-bottom : 3px;
     color : #888888;
 `;
+
 
 const ExplainP = styled.p`
     font-size : 10px;
@@ -29,13 +32,13 @@ const CheckP = styled.p`
     font-size : 12px;
     color : #008DE7;
     margin-top: 0;
+    margin-left : 18px;
 `
 
 const InputDiv = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 20px;
-    margin-top:20px;
+    margin-top:40px;
 `;
 
 const ExplainDiv = styled.div`
@@ -53,6 +56,7 @@ const StyledInput = styled.input`
     box-sizing: border-box;
     padding : 10px;
     margin-right : 12px;
+    margin-left : 16px;
 `;
 
 const StyledInputFront = styled.input`
@@ -66,6 +70,7 @@ const StyledInputFront = styled.input`
     height : 44px;
 `;
 
+
 const CheckDiv = styled.div`
     display: flex;
     flex-direction: row;
@@ -73,8 +78,10 @@ const CheckDiv = styled.div`
     ${StyledInput} {
         width:246px;
         margin-bottom: 4px;
+        margin-right : 8px;
     }
 `;
+
 
 const StyledBtn = styled.button`
     width:74px;
@@ -92,10 +99,12 @@ const RegistDiv = styled.div`
 
     ${StyledInputFront}{
         width : 80px;
+        margin-left : 16px;
     }
 
     ${StyledInput}{
         width : 36px;
+        margin-left : 0px;
     }
 
 `;
@@ -107,11 +116,13 @@ const PhoneDiv = styled.div`
     ${StyledInput}{
         width : 61px;
         margin-right: 8px;
+        margin-left : 0px;
     }
 
     ${StyledInputFront}{
         width : 52px;
         margin-right: 8px;
+        margin-left : 16px;
     }
 
     ${StyledBtn}{
@@ -123,6 +134,14 @@ const PhoneDiv = styled.div`
         margin-right: 8px;
     }
 `
+
+
+const ConfirmDiv = styled.div`
+    display : flex;
+    width : 100%;
+    align-items : center;
+    margin-left : 16px;
+`;
 
 const ConfirmBox = styled.button`
     width : 328px;
@@ -141,32 +160,6 @@ const SignupPage = () => {
     const navigate = useNavigate();
     const title = "회원가입";
 
-    const useInput = (validator?: (value: string) => boolean) => {
-        const [value, setValue] = useState('');
-      
-        const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-          const {
-            target: { value },
-          } = event;
-      
-          // validator가 없으면 기본적으로 true로 설정
-          let willUpdate = true;
-      
-          // validator가 제공된 경우만 실행
-          if (validator && typeof validator === 'function') {
-            willUpdate = validator(value);
-          }
-      
-          // validator 통과한 경우에만 value 업데이트
-          if (willUpdate) {
-            setValue(value);
-          }
-        };
-      
-        return { value, onChange };
-      };
-      
-
     const validId = (value:string) : boolean => {
         const regex = /^[a-zA-z0-9]*$/;
         return value.length <= 16 && regex.test(value);
@@ -177,18 +170,24 @@ const SignupPage = () => {
         return value.length <= 15 && regex.test(value);
     }
 
+    const validNum = (value:string): boolean => {
+        const regex = /^[0-9]*$/;
+        return regex.test(value);
+    }
+
     const id = useInput(validId);
     const pw = useInput(validPw);
     const pwCheck = useInput(validPw);
     const name = useInput();
-    const identificationNumFront = useInput();
-    const identificationNumBack = useInput();
-    const phoneNumFront = useInput();
-    const phoneNumMiddle = useInput();
-    const phoneNumBack = useInput();
-    const certificationNum = useInput();
+    const identificationNumFront = useInput(validNum);
+    const identificationNumBack = useInput(validNum);
+    const phoneNumFront = useInput(validNum);
+    const phoneNumMiddle = useInput(validNum);
+    const phoneNumBack = useInput(validNum);
+    const certificationNum = useInput(validNum);
 
     const [ phoneNum, setPhoneNum ] = useState('');
+    const [ identificationNum, setIdentificationNum ] = useState('');
 
     // 아이디 중복 체크
     const { data: duplicatedData, error: duplicatedError, loading: duplicatedLoading,
@@ -213,6 +212,11 @@ const SignupPage = () => {
         // 의존성 배열에서 duplicatedData를 제외하여 불필요한 상태 변경 방지
       }, [duplicatedStatus]); // duplicatedStatus만 의존성 배열에 포함
 
+      // 주민등록번호
+      useEffect(() => {
+        setIdentificationNum(`${identificationNumFront}${identificationNumBack}`);
+    }, [identificationNumFront, identificationNumBack])
+
       // 전화번호 인증
     useEffect(() => {
         setPhoneNum(`${phoneNumFront}${phoneNumMiddle}${phoneNumBack}`);
@@ -234,6 +238,14 @@ const SignupPage = () => {
     const certificateCheck = () => {
         smsRefetch();
     }
+
+    const [ isCheck, setIsCheck ] = useState(false);
+
+    useEffect (() => {
+        if(smsStatus===200){
+            setIsCheck(true);
+        }
+    }, [smsStatus]);
 
     return(
         <div>
@@ -266,11 +278,11 @@ const SignupPage = () => {
                 </RegistDiv>
                 <HowP>전화번호</HowP>
                 <PhoneDiv>
-                    <StyledInputFront type="text" {...phoneNumFront}/>
-                    <NumP>-</NumP>
-                    <StyledInput type="text" {...phoneNumMiddle}/>
-                    <NumP>-</NumP>
-                    <StyledInput type="text" {...phoneNumBack}/>
+                <StyledInputFront type="text" {...phoneNumFront} disabled={isCheck} />
+                        <NumP>-</NumP>
+                        <StyledInput type="text" {...phoneNumMiddle} disabled={isCheck}/>
+                        <NumP>-</NumP>
+                        <StyledInput type="text" {...phoneNumBack} disabled={isCheck}/>
                     <StyledBtn onClick={certificateSend}>인증번호 발송</StyledBtn>
                 </PhoneDiv>
                 <HowP>인증번호</HowP>
@@ -279,7 +291,9 @@ const SignupPage = () => {
                     <StyledBtn onClick={certificateCheck}>확인</StyledBtn>
                 </CheckDiv>
                 <CheckP>인증되었습니다.</CheckP>
-                <ConfirmBox>회원가입</ConfirmBox>
+                <ConfirmDiv>  
+                        <ConfirmBox>회원 가입</ConfirmBox>
+                    </ConfirmDiv>
             </InputDiv>
         </div>
     )

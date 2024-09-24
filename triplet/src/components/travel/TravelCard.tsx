@@ -127,6 +127,8 @@ const PriceInfoP = styled.p`
 `;
 
 const TravelCard = () => {
+
+
     return (
         <PositionDiv>
             <CardDiv>

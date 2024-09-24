@@ -10,15 +10,17 @@ import { ReactComponent as TravelPlan} from '../../assets/main/travelPlan.svg';
 import { ReactComponent as RightArrow} from '../../assets/common/rightArrow.svg';
 
 const HomeDiv = styled.div`
-    width:100%;
-    height:100%;
-    display:flex;
-    flex-direction : column;
-    align-items : center;
-    background-color : #F3F4F6;
-
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #F3F4F6;
+    padding-top: 60px; /* Header의 높이만큼 패딩을 추가 */
+    margin-top : 12px;
+    
     > * {
-        margin-bottom : 12px;
+        margin-bottom: 12px;
     }
 `;
 
@@ -148,8 +150,9 @@ const HomePage = () => {
     }, [])
 
     return (
-        <HomeDiv>
+        <>
             <Header/>
+            <HomeDiv>
             <TravelCard/>
             <LittleDiv>
                 <LittleTitleDiv>
@@ -182,7 +185,8 @@ const HomePage = () => {
                     <RightArrow/>
                 </TitleDiv>
             </LargeDiv>
-        </HomeDiv>
+            </HomeDiv>
+        </>
     );
 };
 

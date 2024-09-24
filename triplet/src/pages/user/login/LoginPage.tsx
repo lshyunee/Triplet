@@ -5,6 +5,7 @@ import { loginSuccess } from '../../../features/auth/authSlice';
 import styled from 'styled-components';
 
 import useAxios from '../../../hooks/useAxios';
+import useInput from '../../../hooks/useInput';
 
 const BigDiv = styled.div`
     display:flex;
@@ -74,29 +75,6 @@ const LoginPage = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const useInput = (validator:Function) => {
-
-        const [ value, setValue ] = useState('');
-        const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-            const {
-                target : { value }
-            } = event;
-            let willUpdate = true;
-            // validator 실행
-            if (typeof validator === "function") {
-                willUpdate = validator(value);
-            }
-
-            // validator가 true일 때만 값 업데이트
-            if (willUpdate) {
-                setValue(value);
-            }
-        }
-
-        return { value, onChange };
-    }
-
-    
     const validId = (value:string): boolean => {
         const regex = /^[a-zA-z0-9]*$/;
         return value.length <= 16 && regex.test(value);
