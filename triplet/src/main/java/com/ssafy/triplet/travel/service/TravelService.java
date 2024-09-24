@@ -36,6 +36,7 @@ public class TravelService {
     private final CountryRepository countryRepository;
     private final TravelTransactionListRepository transactionListRepository;
     private final MerchantRepository merchantRepository;
+    private final TravelWalletRepository travelWalletRepository;
     private final S3Service s3Service;
 
     @Transactional
@@ -46,11 +47,18 @@ public class TravelService {
         Travel savedTravel = travelRepository.save(travel);
         insertTravelMembers(userId, travel.getId());
         saveTravelBudgets(request, savedTravel);
+
+        TravelWallet travelWallet = new TravelWallet();
+        travelWallet.setTravelId(savedTravel);
+        String travelId = savedTravel.getId() + "";
+        String walletNumber = "124" + travelId;
+        travelWallet.setWalletNumber(walletNumber);
+        travelWallet.setCurrency(savedTravel.getCountry().getCurrency());
+        Member member = memberRepository.findById(userId).orElseThrow(() -> new CustomException("M0010", "존재하지 않는 회원입니다."));
+        travelWallet.setCreatorId(member);
+        travelWalletRepository.save(travelWallet);
         return buildTravelResponse(savedTravel, inviteCode);
     }
-
-//    여행 생성 시 계좌번호 생성
-//    String walletNumber = "124-" + (1000 + new Random().nextInt(9000)) + "-1247";
 
     @Transactional
     public TravelResponse updateTravel(Long travelId, TravelRequest request, MultipartFile image, Long userId) throws IOException {
