@@ -6,6 +6,7 @@ import ExchangeRate from '../../components/pay/ExchangeRate';
 import Header from '../../components/header/Header';
 import { useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 
 const s = {
@@ -59,23 +60,41 @@ const s = {
 		width: 65px;
 		height: 36px;
 		border-radius: 50px;
+		cursor: pointer;
 	`,
 	ButtonArea: styled.div`
 		display: flex;
 		justify-content: space-between;
 		margin: 0 20px;
 		padding-bottom: 20px;
-	`
+	`,
+	CreateButton: styled.button`
+		background-color: #008DE7;
+		border: 0;
+		color: #ffffff;
+		font-size: 14px;
+		font-weight: 600;
+		width: 100%;
+		height: 44px;
+		border-radius: 10px;
+		margin-top: 12px;
+		cursor: pointer;
+	`,
 }
 
 
 const PayPage = () => {
 	const dispatch = useDispatch();
 
-    useEffect(() => {
-        dispatch(pageMove("pay"));
-    }, [])
+	useEffect(() => {
+		dispatch(pageMove("pay"));
+	}, []);
 
+	const navigate = useNavigate();
+
+	const handleCreateButtonClick = () => {
+		navigate('/pay/create-account');
+	}
 	return (
 		<>
 			<Header/>
@@ -89,6 +108,16 @@ const PayPage = () => {
 					<s.ButtonArea>
 						<s.CardContent>20,000,000원</s.CardContent>
 						<s.CardButton>송금</s.CardButton>
+					</s.ButtonArea>
+				</s.Card>
+				<s.Card>
+					<s.CardTitleArea>
+						<s.CardTitle>내 통장</s.CardTitle>
+						<RightArrow/>
+					</s.CardTitleArea>
+					<s.CardCaption>등록된 계좌가 없습니다.</s.CardCaption>
+					<s.ButtonArea>
+						<s.CreateButton onClick={handleCreateButtonClick}>원화 계좌 개설하기</s.CreateButton>
 					</s.ButtonArea>
 				</s.Card>
 				<s.Card>
