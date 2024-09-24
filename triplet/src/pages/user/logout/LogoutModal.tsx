@@ -1,5 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
+import { logout } from '../../../features/auth/authSlice';
+import useAxios from '../../../hooks/useAxios';
 
 const ModalLayout = styled.div`
   position: fixed;
@@ -11,27 +16,20 @@ const ModalLayout = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 0; /* 추가 */
-  margin: 0; /* 추가 */
 `;
-
 
 const ModalContentDiv = styled.div`
   background-color: white;
   max-width: 360px;
   width: 80%;
-  height: auto;
   padding-top: 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between; /* 내용 간격 고정 */
+  justify-content: space-between;
   border-radius: 8px;
-  border: none;
   overflow: hidden;
-  box-sizing: border-box;
 `;
-
 
 const Title = styled.div`
   font-size: 18px;
@@ -48,12 +46,8 @@ const Description = styled.div`
 const ConfirmDiv = styled.div`
   display: flex;
   width: 100%;
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  align-items: stretch; /* 추가 */
+  align-items: stretch;
 `;
-
 
 const Button = styled.button<{ isCancel?: boolean }>`
   width: 50%;
@@ -65,11 +59,9 @@ const Button = styled.button<{ isCancel?: boolean }>`
   border: none;
   cursor: pointer;
   padding: 0;
-  margin: 0; /* 추가 */
+  margin: 0;
   vertical-align: top;
-  box-sizing: border-box;
 `;
-
 
 interface ModalProps {
   isOpen: boolean;
@@ -77,26 +69,39 @@ interface ModalProps {
 }
 
 const LogoutModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  if (!isOpen) return null;
+  // Hook은 항상 호출되도록 한다.
+  const { data: logoutData, error: logoutError, loading: logoutLoading,
+    status: logoutStatus, refetch: logoutRefetch}
+    = useAxios('/logout', 'POST', { manual: true });
 
-  const handleOverlayClick = (e: React.MouseEvent) => {
-    onClose();
+  const handleLogout = () => {
+    // 로그아웃을 클릭했을 때만 실제 로그아웃 API 호출
+    logoutRefetch();
   };
 
-  const handleContentClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
+  useEffect(() => {
+    if (logoutStatus === 200) {
+      dispatch(logout());
+      navigate("/login");
+    }
+  }, [logoutStatus, dispatch, navigate]);
 
+  // 조건부로 return 대신, 렌더링 부분에서 조건 제어
+  if (!isOpen) {
+    return null;
+  }
 
   return (
-    <ModalLayout onClick={handleOverlayClick}>
-      <ModalContentDiv onClick={handleContentClick}>
+    <ModalLayout onClick={onClose}>
+      <ModalContentDiv>
         <Title>로그아웃</Title>
         <Description>로그아웃 하시겠습니까?</Description>
         <ConfirmDiv>
           <Button isCancel onClick={onClose}>취소</Button>
-          <Button >확인</Button>
+          <Button onClick={handleLogout}>확인</Button>
         </ConfirmDiv>
       </ModalContentDiv>
     </ModalLayout>
