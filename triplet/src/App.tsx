@@ -39,8 +39,6 @@ const Div = styled.div`
 
 const App: React.FC = () => {
 
-  const [loading, setLoading] = useState(false);
-
   const location = useLocation();
   const navigate = useNavigate();
   const [isActive, setIsActive] = useState(true);
@@ -62,9 +60,29 @@ const App: React.FC = () => {
       }
   }, [])
 
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then((registration) => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            setIsLoading(false); // 서비스 워커가 등록되면 로딩 완료
+          }, (error) => {
+            console.log('ServiceWorker registration failed: ', error);
+            setIsLoading(false); // 서비스 워커 등록 실패 시에도 로딩 완료
+          });
+      });
+    } else {
+      setIsLoading(false); // 서비스 워커가 지원되지 않으면 바로 로딩 완료
+    }
+  }, []);
+
   return (
     <Div>
       <GlobalStyle />
+      {isLoading && <SplashScreen />}
       <AppRoutes/>
       {isActive && <Navbar />}  {/* isActive가 true일 때만 Navbar 렌더링 */}
     </Div>
