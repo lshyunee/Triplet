@@ -1,5 +1,6 @@
 package com.ssafy.triplet.member.service;
 
+import com.ssafy.triplet.account.service.AccountService;
 import com.ssafy.triplet.auth.jwt.JwtUtil;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.dto.request.*;
@@ -24,8 +25,9 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public void signUp(SignupRequest request, HttpServletResponse response) {
+    private final AccountService accountService;
 
+    public void signUp(SignupRequest request, HttpServletResponse response) {
         // 아이디 중복확인
         Member existMember = memberRepository.findByMemberId(request.getMemberId());
         if (existMember != null) {
@@ -56,9 +58,12 @@ public class MemberService {
                 .phoneNumber(request.getPhoneNumber())
                 .role("ROLE_USER")
                 .build();
-        // 회원가입
+
+        // 계좌 자동생성
+        accountService.createAccount(member);
+        accountService.generateForeignAccounts(member);
+        // 회원가입 후 자동로그인
         memberRepository.save(member);
-        // 자동 로그인 처리 (토큰발급)
         autoLogin(request.getMemberId(), response);
     }
 

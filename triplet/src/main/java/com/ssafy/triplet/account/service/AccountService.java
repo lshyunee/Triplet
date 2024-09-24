@@ -1,8 +1,6 @@
 package com.ssafy.triplet.account.service;
 
 import com.ssafy.triplet.account.dto.request.TransactionListRequest;
-import com.ssafy.triplet.account.dto.response.CreateAccountResponse;
-import com.ssafy.triplet.account.dto.response.CurrencyResponse;
 import com.ssafy.triplet.account.dto.response.AccountDetailResponse;
 import com.ssafy.triplet.account.dto.response.TransactionListResponse;
 import com.ssafy.triplet.account.entity.ForeignAccount;
@@ -19,7 +17,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -33,30 +33,45 @@ public class AccountService {
     private final TransactionListRepository transactionListRepository;
     private final ForeignTransactionListRepository foreignTransactionListRepository;
 
-    public CreateAccountResponse createAccount(String memberId) {
-        Member member = memberRepository.findByMemberId(memberId);
-        if (member == null) {
-            throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
-        }
-        // 계좌번호 고유값 생성
-        String accountNumber;
-        do {
-            accountNumber = generateAccountNumber();
-        } while (krwAccountRepository.existsByAccountNumber(accountNumber));
+    // 원화계좌 생성
+    public void createAccount(Member member) {
+        String accountNumber = generateAccountNumber("000");
         // 계좌 개설일, 만료일은 개설일 + 5년
         LocalDateTime created = LocalDateTime.now();
         LocalDateTime expiry = created.plusYears(5);
-
+        // 원화계좌 생성
         KrwAccount krwAccount = new KrwAccount(accountNumber, created, expiry);
         member.createMyKrwAccount(krwAccount);
         krwAccountRepository.save(krwAccount);
+    }
 
-        return CreateAccountResponse.builder()
-                .accountId(krwAccount.getAccountId())
-                .bankCode(krwAccount.getBankCode())
-                .accountNumber(krwAccount.getAccountNumber())
-                .accountType(krwAccount.getAccountType())
-                .currency(krwAccount.getCurrency()).build();
+    // 국가별 외화지갑 자동생성
+    public void generateForeignAccounts(Member member) {
+        Map<String, String> countryCurrencyMap = new HashMap<>();
+        countryCurrencyMap.put("미국", "001");
+        countryCurrencyMap.put("유럽", "002");
+        countryCurrencyMap.put("일본", "003");
+        countryCurrencyMap.put("중국", "004");
+        countryCurrencyMap.put("영국", "005");
+        countryCurrencyMap.put("스위스", "006");
+        countryCurrencyMap.put("캐나다", "007");
+        // 국가별 외화지갑 생성
+        for (Map.Entry<String, String> entry : countryCurrencyMap.entrySet()) {
+            createForeignAccount(member, entry.getValue(), entry.getKey());
+        }
+    }
+
+    // 외화지갑 생성
+    public void createForeignAccount(Member member, String currency, String accountName) {
+        // 계좌번호 고유값 생성
+        String accountNumber = generateAccountNumber(currency);
+        // 계좌 개설일, 만료일은 개설일 + 5년
+        LocalDateTime created = LocalDateTime.now();
+        LocalDateTime expiry = created.plusYears(5);
+        // 외화지갑 생성
+        ForeignAccount foreignAccount = new ForeignAccount(accountNumber, accountName, currency, created, expiry);
+        member.createMyForeignAccount(foreignAccount);
+        foreignAccountRepository.save(foreignAccount);
     }
 
     public AccountDetailResponse getKrwAccount(String memberId) {
@@ -137,16 +152,6 @@ public class AccountService {
         }
     }
 
-    public void deleteAccountById(Long accountId) {
-        if (krwAccountRepository.existsByAccountId(accountId)) {
-            krwAccountRepository.deleteById(accountId);
-        } else if (foreignAccountRepository.existsByAccountId(accountId)) {
-            foreignAccountRepository.deleteById(accountId);
-        } else {
-            throw new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND);
-        }
-    }
-
     public List<TransactionListResponse> getTransactionList(TransactionListRequest request) {
         Long accountId = request.getAccountId();
         if (krwAccountRepository.existsByAccountId(accountId)) {
@@ -176,9 +181,14 @@ public class AccountService {
         }
     }
 
-    private String generateAccountNumber() {
-        String uuid = UUID.randomUUID().toString().replace("-", "");
-        return uuid.substring(0, 16);  // UUID에서 앞 16자리만 사용
+    private String generateAccountNumber(String currency) {
+        String accountNumber;
+        do {
+            String uuid = UUID.randomUUID().toString().replace("-", "");
+            String sub = uuid.substring(0, 8);  // UUID에서 앞 16자리만 사용
+            accountNumber = "124" + sub + currency;
+        } while (krwAccountRepository.existsByAccountNumber(accountNumber));
+        return accountNumber;
     }
 
 }

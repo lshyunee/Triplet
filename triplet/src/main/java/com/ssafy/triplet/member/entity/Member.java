@@ -39,4 +39,9 @@ public class Member {
         krwAccount.setMember(this);
     }
 
+    public void createMyForeignAccount(ForeignAccount foreignAccount) {
+        this.foreignAccounts.add(foreignAccount);
+        foreignAccount.setMember(this);
+    }
+
 }

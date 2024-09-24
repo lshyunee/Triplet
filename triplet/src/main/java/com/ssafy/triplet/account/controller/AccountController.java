@@ -1,7 +1,6 @@
 package com.ssafy.triplet.account.controller;
 
 import com.ssafy.triplet.account.dto.request.TransactionListRequest;
-import com.ssafy.triplet.account.dto.response.CreateAccountResponse;
 import com.ssafy.triplet.account.dto.response.AccountDetailResponse;
 import com.ssafy.triplet.account.dto.response.TransactionListResponse;
 import com.ssafy.triplet.account.service.AccountService;
@@ -23,12 +22,6 @@ public class AccountController {
 
     private final AccountService accountService;
 
-    @PostMapping("/account")
-    public ResponseEntity<?> createAccount(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
-        CreateAccountResponse account = accountService.createAccount(customUserPrincipal.getMemberId());
-        return ResponseEntity.ok().body(new ApiResponse<>("200", "계좌 개설 성공", account));
-    }
-
     @GetMapping("/account")
     public ResponseEntity<?> findAccount(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         AccountDetailResponse krwAccount = accountService.getKrwAccount(customUserPrincipal.getMemberId());
@@ -48,12 +41,6 @@ public class AccountController {
     public ResponseEntity<?> findAccountById(@PathVariable("accountId") Long accountId) {
         AccountDetailResponse accountById = accountService.getAccountById(accountId);
         return ResponseEntity.ok().body(new ApiResponse<>("200", "계좌 상세조회 성공", accountById));
-    }
-
-    @DeleteMapping("/account/{accountId}")
-    public ResponseEntity<?> deleteAccountById(@PathVariable("accountId") Long accountId) {
-        accountService.deleteAccountById(accountId);
-        return ResponseEntity.ok().body(new ApiResponse<Void>("200", "계좌 해지 성공"));
     }
 
     @PostMapping("/transaction")
