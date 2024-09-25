@@ -7,7 +7,7 @@ import useAxios from '../../hooks/useAxios';
 import { useNavigate } from 'react-router-dom';
 
 const EntireDiv = styled.div`
-    height : 800px;
+    /* height : 800px; */
 `
 
 const HowP = styled.p`
@@ -38,11 +38,13 @@ const StyledInput = styled.input`
 
 const PasswordDiv = styled.div`
     margin : 0 16px 0;
-    height : 800px;
-    padding-top : 196px;
+    height : calc(100vh - 112px);
+    padding-top : 56px;
+
 `;
 
 const CurrentDiv = styled.div`
+margin-top: 100px;
 `
 
 const NewDiv = styled.div`
@@ -55,7 +57,7 @@ const NewConfirmDiv = styled.div`
 `;
 
 const ConfirmBtn = styled.button`
-    width : 100%;
+    /* width : 100%; */
     height : 44px;
     background-color : #008DE7;
     color : #FFFFFF;
@@ -64,6 +66,12 @@ const ConfirmBtn = styled.button`
     font-size : 14px;
     border : none;
     margin-bottom : 28px;
+    position: fixed;
+    bottom: 56px;
+    left: 0;
+    right: 0;
+    margin-right: 16px;
+    margin-left: 16px;
 `;
 
 const PasswordEditPage = () => {
@@ -98,7 +106,7 @@ const PasswordEditPage = () => {
     }, [pwStatus]);
 
     return (
-        <EntireDiv>
+        <>
             <BackHeader title={"비밀번호 변경"}/>
             <PasswordDiv>
                 <CurrentDiv>
@@ -118,7 +126,7 @@ const PasswordEditPage = () => {
                 </NewDiv>
                 <ConfirmBtn onClick={changePassword}>비밀번호 변경</ConfirmBtn>
             </PasswordDiv>
-        </EntireDiv>
+        </>
     );
 };
 
