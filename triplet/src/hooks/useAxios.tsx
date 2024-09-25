@@ -38,16 +38,10 @@ const useAxios = (
     }
   };
 
-  useEffect(() => {
-    // 오류 상태일 때 요청을 중단하여 무한 요청 방지
-    if (!hasError) {
-      fetchData();
-    }
-  }, [url, method, body, trigger]); // trigger가 변경될 때마다 useEffect 실행
 
   // refetch 함수 정의
   const refetch = () => {
-    setTrigger(prev => prev + 1); // trigger 값을 변경하여 useEffect를 트리거
+    fetchData();
   };
 
   return { data, loading, error, status, refetch };
