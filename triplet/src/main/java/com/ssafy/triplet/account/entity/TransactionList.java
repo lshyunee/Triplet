@@ -25,7 +25,7 @@ public class TransactionList {
     private String transactionName;
 
     @ManyToOne
-    @JoinColumn(name = "krw_account_id")
-    private KrwAccount krwAccount;
+    @JoinColumn(name = "account_id")
+    private Account account;
 
 }
