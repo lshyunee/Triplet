@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import styled from 'styled-components';
 import BackHeader from '../../components/header/BackHeader';
 import { useDispatch } from 'react-redux';
@@ -7,6 +7,8 @@ import { ReactComponent as Wallet } from '../../assets/pay/wallet.svg';
 import { ReactComponent as Calendar } from '../../assets/pay/calendar.svg';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import { isDate } from 'util/types';
+import { addDays } from 'react-datepicker/dist/date_utils';
 
 const s = {
   Container: styled.div`
@@ -71,15 +73,88 @@ const s = {
   CalendarTextArea: styled.div`
     display: flex;
     align-items: center;
+    width: 100%;
+    justify-content: center;
+    cursor: pointer;
   `,
   StyledDatePicker: styled(DatePicker)`
+    text-align: center;
     border: none;
     font-size: 12px;
     font-weight: 500;
-  
+    background-color: #F9FAFC;
+    width: 150px;
+    pointer-events: none;
+    outline: none;
+    caret-color: transparent;
   `,
-
-
+  DateText: styled.span`
+    font-size: 12px;
+    font-weight: 500;
+    color: #444444;
+  `,
+  DateLine: styled.hr`
+    border: solid 0.1px #D9D9D9;
+    margin: 0;
+    margin-top: 8px;
+  `,
+  PaymentTime: styled.span`
+    font-size: 12px;
+    font-weight: 400;
+    color: #666666;
+    
+  `,
+  PaymentTitle: styled.span`
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 8px;
+  `,
+  PaymentTypeBlue: styled.span`
+    font-size: 12px;
+    font-weight: 400;
+    color: #008DE7;
+  `,
+  PaymentTypeRed: styled.span`
+    font-size: 12px;
+    font-weight: 400;
+    color: #EB5C5C;
+  `,
+  PaymentAmountBlue: styled.span`
+    font-size: 16px;
+    font-weight: 600;
+    color: #008DE7;
+    margin-top: 8px;
+  `,
+  PaymentAmountRed: styled.span`
+    font-size: 16px;
+    font-weight: 600;
+    color: #EB5C5C;
+    margin-top: 8px;
+  `,
+  BalanceText: styled.span`
+    font-size: 12px;
+    font-weight: 400;
+    color: #666666;
+    margin-top: 8px;
+  `,
+  PaymentTitleArea: styled.div`
+    display: flex;
+    flex-direction: column;
+  `,
+  PaymentAmountArea: styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+  `,
+  PaymentArea: styled.div`
+    display: flex;
+    justify-content: space-between;
+    margin: 16px 0;
+  `,
+  PaymentLine: styled.hr`
+    border: solid 0.1px #EFEFEF;
+    margin: 0;
+  `
 }
 
 const AccountDetailPage = () => {
@@ -89,19 +164,22 @@ const AccountDetailPage = () => {
     dispatch(pageMove("pay"));
   }, []);
 
-  const [startDate, setStartDate] = useState<any | null>(null);
-  const [endDate, setEndDate] = useState<any | null>(null);
+  const today =  new Date();
+  const week = new Date(new Date().setDate(new Date().getDate() -7))
 
-  const handleStartDateChange = (date: any) => {
-    console.log('start', date);
-    setStartDate(date);
-  };
-  const handleEndDateChange = (date: any) => {
-    console.log('end', date);
-    setEndDate(date);
-  };
+  const [dateRange, setDateRange] = useState<any | null>([week, today]);
+  const [start, end] = dateRange;
 
+  const dateInputRef = useRef<DatePicker>(null)
+  
+  const [isDateOpen, setIsDateOpen] = useState<boolean>(false);
 
+  useEffect(() => {
+    if (isDateOpen === true) {
+      dateInputRef.current?.setFocus()
+      setIsDateOpen(false)
+    };
+  }, [isDateOpen])
 
   return (
     <>
@@ -119,22 +197,46 @@ const AccountDetailPage = () => {
         </s.ButtonArea>
       </s.Card>
       <s.CalendarButton>
-        <s.CalendarTextArea>
+        <s.CalendarTextArea onClick={() => setIsDateOpen(true)}>
           <Calendar/>
-          <s.CalendarText>2024.08.03 ~ 2024.09.03</s.CalendarText>
+          <s.StyledDatePicker
+            selectsRange={true}
+            startDate={start}
+            endDate={end}
+            maxDate={today}
+            onChange={((range: any) => setDateRange(range))}
+            dateFormat={"yyyy.MM.dd"}
+            ref={dateInputRef}
+          />
         </s.CalendarTextArea>
       </s.CalendarButton>
-      <s.StyledDatePicker
-        selected={startDate}
-        onChange={(date: any) => handleStartDateChange(date)}
-        dateFormat={"yyyy.MM.dd"}
-      />
-      <s.StyledDatePicker
-        selected={endDate}
-        onChange={(date: any) => handleEndDateChange(date)}
-        dateFormat={"yyyy.MM.dd"}
-        minDate={startDate}
-      />
+      <s.DateText>2024.09.09</s.DateText>
+      <s.DateLine/>
+      <s.PaymentArea>
+        <s.PaymentTitleArea>
+          <s.PaymentTime>20:25:55</s.PaymentTime>
+          <s.PaymentTitle>김철수</s.PaymentTitle>
+        </s.PaymentTitleArea>
+        <s.PaymentAmountArea>
+          <s.PaymentTypeBlue>출금</s.PaymentTypeBlue>
+          <s.PaymentAmountBlue>4,290원</s.PaymentAmountBlue>
+          <s.BalanceText>잔액 118,309원</s.BalanceText>
+        </s.PaymentAmountArea>
+      </s.PaymentArea>
+      <s.PaymentLine/>
+
+      <s.PaymentArea>
+        <s.PaymentTitleArea>
+          <s.PaymentTime>20:25:55</s.PaymentTime>
+          <s.PaymentTitle>김철수</s.PaymentTitle>
+        </s.PaymentTitleArea>
+        <s.PaymentAmountArea>
+          <s.PaymentTypeRed>입금</s.PaymentTypeRed>
+          <s.PaymentAmountRed>4,290원</s.PaymentAmountRed>
+          <s.BalanceText>잔액 118,309원</s.BalanceText>
+        </s.PaymentAmountArea>
+      </s.PaymentArea>
+      <s.PaymentLine/>
     </s.Container>
     </>
   );
