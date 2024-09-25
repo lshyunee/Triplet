@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ForeignAccountRechargeResponse {
+public class AccountRechargeResponse {
     private String accountNumber;
     private double accountBalance;
 }

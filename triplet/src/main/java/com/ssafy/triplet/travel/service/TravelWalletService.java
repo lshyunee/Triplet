@@ -1,6 +1,6 @@
 package com.ssafy.triplet.travel.service;
 
-import com.ssafy.triplet.account.dto.response.ForeignAccountRechargeResponse;
+import com.ssafy.triplet.account.dto.response.AccountRechargeResponse;
 import com.ssafy.triplet.account.service.AccountService;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.entity.Member;
@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,14 +48,15 @@ public class TravelWalletService {
     public TransactionListResponse rechargeTravelWallet(Long userId, TravelWalletRechargeRequest request) {
         Travel travel = travelRepository.findById(request.getTravelId()).orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
         String currency = travel.getCountry().getCurrency();
-        ForeignAccountRechargeResponse response =  accountService.findAccountForRecharge(userId, currency);
+        AccountRechargeResponse response =  accountService.findAccountForRecharge(userId, currency);
         if (response.getAccountBalance() < request.getChargeCost()) {
             throw new CustomException("A0006", "계좌 잔액이 부족하여 거래가 실패했습니다.");
         }
         double balance = response.getAccountBalance() - request.getChargeCost();
         accountService.rechargeForTravelAccount(response.getAccountNumber(), balance);
-        travelWalletRepository.rechargeTravelWallet(request.getTravelId(), request.getChargeCost());
         double balanceTravelWallet = travelWalletRepository.findBalanceByTravel(travel);
+        double plus = balanceTravelWallet + request.getChargeCost();
+        travelWalletRepository.rechargeTravelWallet(request.getTravelId(), plus);
         return addRechargeForTransactionList(travel, 7, balanceTravelWallet, request);
     }
 
