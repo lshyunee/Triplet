@@ -15,11 +15,13 @@ const s = {
     padding-top: 56px;
     padding-left: 16px;
     padding-right: 16px;
+    height: calc(100vh - 112px);
   `,
   Card: styled.div`
     background-color: #E5F3FF;
     padding: 20px;
     border-radius: 20px;
+    margin-top: 12px;
   `,
   CardTitle: styled.span`
     font-size: 14px;
@@ -64,6 +66,8 @@ const s = {
     justify-content: center;
     width: 256px;
     margin: 0 auto;
+    margin-top: 12px;
+    margin-bottom: 20px;
   `,
   CalendarText: styled.span`
     font-size: 12px;
