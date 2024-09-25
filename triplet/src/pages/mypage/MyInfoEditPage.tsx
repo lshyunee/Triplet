@@ -5,52 +5,48 @@ import styled from 'styled-components';
 import useAxios from '../../hooks/useAxios';
 import useInput from '../../hooks/useInput';
 
+const EditDiv = styled.div`
+    height : 800px;
+`
+
 const HowP = styled.p`
     font-size : 12px;
-    margin-left : 18px;
-    margin-bottom : 3px;
+    margin : 0px 18px 3px;
     color : #888888;
 `;
 
 const InputDiv = styled.div`
     display: flex;
     flex-direction: column;
-    margin-top:40px;
     padding-top : 56px;
+    margin : 40px 16px;
 `;
 
 const NumP = styled.p`
     font-size : 14px;
     color : #424242;
-    margin-right : 12px;
 `;
 
 const CheckP = styled.p`
     font-size : 12px;
     color : #008DE7;
-    margin-top: 0;
-    margin-left : 18px;
 `
 const StyledInput = styled.input`
     background-color : #F9FAFC;
-    width:328px;
+    width:100%;
     height:44px;
     margin-bottom : 10px;
     border-radius : 10px;
     border : 1px solid #F0F0F0;
     box-sizing: border-box;
-    padding : 10px;
-    margin-right : 12px;
-    margin-left : 16px;
 `;
 
 const StyledInputFront = styled.input`
     background-color : #F9FAFC;
     border-radius : 10px;
-    margin-bottom : 10px;
     border : 1px solid #F0F0F0;
     box-sizing: border-box;
-    margin-right : 12px;
+    width : 50%;
     padding : 10px;
     height : 44px;
 `;
@@ -58,76 +54,57 @@ const StyledInputFront = styled.input`
 const StyledBtn = styled.button`
     width:74px;
     height:44px;
+    border : 1px solid #008DE7;
     border-radius : 10px;
     font-weight: 600;
     background-color : white;
     color : #008DE7;
-    border : 1px solid #008DE7;
+    flex-shrink: 0;
+    margin-left : 8px;
 `;
 
 const RegistDiv = styled.div`
     display : flex;
     flex-direction: row;
 
-    ${StyledInputFront}{
-        width : 80px;
-        margin-left : 16px;
+    ${StyledInputFront} {
+        width : 52px;
+        margin-right : 12px;
     }
 
-    ${StyledInput}{
+    ${StyledInput} {
         width : 36px;
-        margin-left : 0px;
+        margin-left : 12px;
+        margin-right : 8px;
     }
 
 `;
 
 const PhoneDiv = styled.div`
-    display : flex;
+    display : flex;  
     flex-direction: row;
-    
-    ${StyledInput}{
-        width : 61px;
-        margin-right: 8px;
-        margin-left : 0px;
-    }
 
-    ${StyledInputFront}{
-        width : 52px;
-        margin-right: 8px;
-        margin-left : 16px;
-    }
-
-    ${StyledBtn}{
+    ${StyledBtn} {
         width : 100px;
-        font-size : 12px;
     }
 
-    ${NumP}{
-        margin-right: 8px;
-    }
-`
+`;
 
 const CheckDiv = styled.div`
     display: flex;
     flex-direction: row;
-
-    ${StyledInput} {
-        width:246px;
-        margin-bottom: 4px;
-        margin-right : 8px;
-    }
 `;
 
 
 const ConfirmDiv = styled.div`
     display : flex;
     width : 100%;
+    margin-top : 166px;
     align-items : center;
-    margin-left : 16px;
 `;
 
 const ConfirmBox = styled.button`
-    width : 328px;
+    width : 100%;
     height : 44px;
     background-color : #008DE7;
     color : #FFFFFF;
@@ -135,7 +112,6 @@ const ConfirmBox = styled.button`
     font-weight: 600;
     font-size : 14px;
     border : none;
-    margin-top : 150px;
 `;
 
 
@@ -207,7 +183,7 @@ const MyInfoEditPage = () => {
     }
 
     return (
-        <div>
+        <EditDiv>
             <BackHeader title={"내 정보 수정"}/>
             <InputDiv>
                 <HowP>이름</HowP>
@@ -238,7 +214,7 @@ const MyInfoEditPage = () => {
                         <ConfirmBox onClick={myInfoEdit}>수정 완료</ConfirmBox>
                     </ConfirmDiv>
             </InputDiv>
-        </div>
+        </EditDiv>
     );
 };
 
