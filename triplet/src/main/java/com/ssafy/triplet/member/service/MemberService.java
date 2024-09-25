@@ -68,19 +68,24 @@ public class MemberService {
         autoLogin(request.getMemberId(), response);
     }
 
-    public boolean createSimplePassword(SimplePasswordRequest request, String memberId) {
+    public void createSimplePassword(SimplePasswordRequest request, String memberId) {
         Member member = memberRepository.findByMemberId(memberId);
+        if (member == null) {
+            throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
+        }
         // 간편비밀번호랑 간편비밀번호확인 검증
-        if (!request.getNewSimplePassword().equals(request.getNewSimplePasswordConfirm())) {
-            return false;
+        if (request.getNewSimplePasswordConfirm() == null || !request.getNewSimplePassword().equals(request.getNewSimplePasswordConfirm())) {
+            throw new CustomException(CustomErrorCode.PASSWORD_MISMATCH);
         }
         member.setSimplePassword(request.getNewSimplePassword());
-        return true;
     }
 
     public boolean confirmSimplePassword(SimplePasswordConfirmRequest request, String memberId) {
         // 간편비밀번호 확인: true -> 확인 성공
         Member member = memberRepository.findByMemberId(memberId);
+        if (member == null) {
+            throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
+        }
         return request.getSimplePassword().equals(member.getSimplePassword());
     }
 
@@ -109,22 +114,29 @@ public class MemberService {
             throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
         }
         // 주민번호에서 생일, 성별 꺼내기
-        String identificationNumber = request.getIdentificationNumber();
-        String birth = identificationNumber.substring(0, 6);
-        String lastNum = identificationNumber.substring(6);
-        boolean gender = "1".equals(lastNum) || "3".equals(lastNum); // 1: 남, 0: 여
-        // 업데이트
-        member.setGender(gender);
-        member.setBirth(birth);
-        member.setName(request.getName());
-        member.setPhoneNumber(request.getPhoneNumber());
+        if (request.getIdentificationNumber() != null) {
+            String identificationNumber = request.getIdentificationNumber();
+            String birth = identificationNumber.substring(0, 6);
+            String lastNum = identificationNumber.substring(6);
+            boolean gender = "1".equals(lastNum) || "3".equals(lastNum); // 1: 남, 0: 여
+            // 업데이트
+            member.setGender(gender);
+            member.setBirth(birth);
+        }
+        if (request.getName() != null) {
+            member.setName(request.getName());
+        }
+        if (request.getPhoneNumber() != null) {
+            member.setPhoneNumber(request.getPhoneNumber());
+        }
+        Member updatedMember = memberRepository.save(member);
         // 변경된 정보 반환
         return MemberResponse.builder()
-                .memberId(member.getMemberId())
-                .name(request.getName())
-                .phoneNumber(request.getPhoneNumber())
-                .birth(birth)
-                .gender(gender).build();
+                .memberId(updatedMember.getMemberId())
+                .name(updatedMember.getName())
+                .phoneNumber(updatedMember.getPhoneNumber())
+                .birth(updatedMember.getBirth())
+                .gender(updatedMember.getGender()).build();
     }
 
     public void updatePassword(PasswordUpdateRequest request, String memberId) {
@@ -133,11 +145,11 @@ public class MemberService {
             throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
         }
         // 입력한 기존 비밀번호랑 실제 내 비밀번호 일치하는지 확인
-        if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
+        if (request.getPassword() == null || !passwordEncoder.matches(request.getPassword(), member.getPassword())) {
             throw new CustomException(CustomErrorCode.INCORRECT_PASSWORD);
         }
         // 새 비밀번호랑 새 비밀번호 확인이 일치하는지 확인
-        if (!request.getNewPassword().equals(request.getNewPasswordConfirm())) {
+        if (request.getNewPasswordConfirm() == null || !request.getNewPassword().equals(request.getNewPasswordConfirm())) {
             throw new CustomException(CustomErrorCode.PASSWORD_MISMATCH);
         }
         member.setPassword(request.getNewPassword());
