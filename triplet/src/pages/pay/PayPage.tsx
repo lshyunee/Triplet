@@ -24,6 +24,15 @@ const s = {
 		display: flex;
 		flex-direction: column;
 	`,
+	MyCard: styled.div`
+		background-color: #ffffff;
+		border-radius: 20px;
+		margin: 0 16px;
+		margin-bottom: 12px;
+		cursor: pointer;
+		display: flex;
+		flex-direction: column;
+	`,
 	CurrencyArea: styled.div`
 		margin-top: 10px;
 		margin-bottom: 10px;
@@ -90,11 +99,26 @@ const PayPage = () => {
 		dispatch(pageMove("pay"));
 	}, []);
 
+	const navigate = useNavigate();
+
+	const accountOnClick = () => {
+		navigate('/pay/account-detail');
+	};
+	
+	const onclick = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation();
+		window.alert('야호');
+	};
+
+	const walletOnClick = () => {
+		navigate('/pay/global-wallet');
+	};
+
 	return (
 		<>
 			<Header/>
 			<s.Container>
-				<s.Card>
+				<s.MyCard onClick={accountOnClick}>
 					<s.CardTitleArea>
 						<s.CardTitle>내 통장</s.CardTitle>
 						<RightArrow/>
@@ -102,10 +126,10 @@ const PayPage = () => {
 					<s.CardCaption>은행 312-9446-0093</s.CardCaption>
 					<s.ButtonArea>
 						<s.CardContent>20,000,000원</s.CardContent>
-						<s.CardButton>송금</s.CardButton>
+						<s.CardButton onClick={onclick}>송금</s.CardButton>
 					</s.ButtonArea>
-				</s.Card>
-				<s.Card>
+				</s.MyCard>
+				<s.MyCard onClick={walletOnClick}>
 					<s.CardTitleArea>
 						<s.CardTitle>내 외화 지갑</s.CardTitle>
 						<RightArrow/>
@@ -140,7 +164,7 @@ const PayPage = () => {
 							foreignCurrency={1000}
 						/>
 					</s.CurrencyArea>
-				</s.Card>
+				</s.MyCard>
 				<s.Card>
 					<s.CardTitleArea>
 						<s.CardTitle>실시간 환율</s.CardTitle>

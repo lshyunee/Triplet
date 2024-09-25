@@ -17,6 +17,7 @@ import SimplePasswordSetPage from '../pages/user/simplePassword/SimplePasswordSe
 import SimplePasswordConfirmPage from '../pages/user/simplePassword/SimplePasswordConfirmPage';
 import SimplePasswordSetConfirmPage from '../pages/user/simplePassword/SimplePasswordSetConfirmPage';
 import AccountDetailPage from '../pages/pay/AccountDetailPage';
+import GlobalWalletPage from '../pages/pay/GlobalWalletPage';
 
 
 const AppRoutes: React.FC = () => (
@@ -34,6 +35,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/simple-password/setConfirm" element={<SimplePasswordSetConfirmPage/>}/>            
             <Route path="/pay" element={<Pay/>}/>
             <Route path="/pay/account-detail" element={<AccountDetailPage/>}/>
+            <Route path="/pay/global-wallet" element={<GlobalWalletPage/>}/>
             <Route path="/travels" element={<Travels/>}/>
             <Route path="/alarm" element={<Alarm/>}/>
         </Routes>
