@@ -7,6 +7,8 @@ import styled from 'styled-components';
 import useAxios from '../../../hooks/useAxios';
 import useInput from '../../../hooks/useInput';
 
+import ErrorModal from '../../../components/modal/ErrorModal';
+
 const TitleP = styled.p`
     font-size : 32px;
     font-weight : 800;
@@ -116,6 +118,18 @@ const LoginPage = () => {
     // 로그인 버튼 핸들러
     const handleLogin = () => {
         loginRefetch(); // 클릭 시 요청 재시도
+        if (loginStatus === 400){
+            if (loginData.code === "M0002") {
+                setErrorMsg(loginData.message);
+                isErrorOpen();
+            } else if (loginData.code === "M0009") {
+                setErrorMsg(loginData.message);
+                isErrorOpen();
+            }
+        } else if (loginStatus === 500){
+            setErrorMsg("현재 서버 연결이 안됩니다.");
+            isErrorOpen();
+        }
     };
 
     // 네이버 로그인 버튼 핸들러
@@ -123,15 +137,25 @@ const LoginPage = () => {
         naverRefetch(); // 클릭 시 요청 재시도
     };
 
+    const [ errorMsg, setErrorMsg ] = useState('');
+
     // 로그인 상태 변경 시 처리
     useEffect(() => {
         if (loginStatus === 200) {
-        dispatch(loginSuccess());
-        navigate('/home');
-        } else if (loginStatus === 400) {
-        console.log("로그인 정보가 잘못되었습니다.");
+            dispatch(loginSuccess());
+            navigate('/home');
         }
     }, [loginStatus, dispatch, navigate]);
+
+    const [ isError, setIsError ] = useState(false);
+    
+    const isErrorOpen = () => {
+        setIsError(true);
+    }
+
+    const closeError = () => {
+        setIsError(false);
+    }
 
     return (
         <>
@@ -149,6 +173,7 @@ const LoginPage = () => {
                     <SignupP>회원가입</SignupP>
                 </StyledLink>
             </SignupDiv>
+            <ErrorModal isOpen={isError} onClose={closeError} msg={errorMsg}></ErrorModal>
         </BigDiv>
         </>
     );
