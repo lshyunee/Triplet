@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RequestMapping("/api/v1")
@@ -44,8 +45,8 @@ public class AccountController {
 
     @PostMapping("/transaction")
     public ResponseEntity<?> findTransactions(@RequestBody TransactionListRequest request) {
-        List<TransactionListResponse> transactionList = accountService.getTransactionList(request);
-        return ResponseEntity.ok().body(new ApiResponse<>("200", "거래내역 조회 성공", transactionList));
+        Map<String, List<TransactionListResponse>> transactions = accountService.getTransactionList(request);
+        return ResponseEntity.ok().body(new ApiResponse<>("200", "거래내역 조회 성공", transactions));
     }
 
     @PostMapping("/transaction/create")
