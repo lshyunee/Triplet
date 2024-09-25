@@ -6,18 +6,19 @@ import useInput from '../../hooks/useInput';
 import useAxios from '../../hooks/useAxios';
 import { useNavigate } from 'react-router-dom';
 
+const EntireDiv = styled.div`
+    height : 800px;
+`
+
 const HowP = styled.p`
     font-size : 12px;
-    margin-left : 18px;
-    margin-bottom : 3px;
+    margin : 0 0 4px;
     color : #888888;
 `;
 
 const ExplainP = styled.p`
     font-size : 10px;
-    padding-top : 2px;
-    margin-bottom : 3px;
-    margin-left : 4px;
+    margin : 0 0 4px;
     color : #AAAAAA;
 `;
 
@@ -27,36 +28,34 @@ const ExplainDiv = styled.div`
 `;
 
 const StyledInput = styled.input`
+    width : 100%;
     background-color : #F9FAFC;
-    width:328px;
     height:44px;
-    margin-bottom : 10px;
     border-radius : 10px;
     border : 1px solid #F0F0F0;
     box-sizing: border-box;
-    padding : 10px;
-    margin-right : 12px;
-    margin-left : 16px;
+`;
+
+const PasswordDiv = styled.div`
+    margin : 0 16px 0;
+    height : 800px;
+    padding-top : 196px;
 `;
 
 const CurrentDiv = styled.div`
-    margin-top : 120px;
-    padding-top : 56px;
 `
 
 const NewDiv = styled.div`
-    margin-top : 60px
+    margin-top : 60px;
 `
 
-const ConfirmDiv = styled.div`
-    display : flex;
-    width : 100%;
-    align-items : center;
-    margin-left : 16px;
+const NewConfirmDiv = styled.div`   
+    margin-top : 32px;
+    margin-bottom : 145px;
 `;
 
-const ConfirmBox = styled.button`
-    width : 328px;
+const ConfirmBtn = styled.button`
+    width : 100%;
     height : 44px;
     background-color : #008DE7;
     color : #FFFFFF;
@@ -64,7 +63,7 @@ const ConfirmBox = styled.button`
     font-weight: 600;
     font-size : 14px;
     border : none;
-    margin-top : 120px;
+    margin-bottom : 28px;
 `;
 
 const PasswordEditPage = () => {
@@ -99,25 +98,27 @@ const PasswordEditPage = () => {
     }, [pwStatus]);
 
     return (
-        <div>
+        <EntireDiv>
             <BackHeader title={"비밀번호 변경"}/>
-            <CurrentDiv>
-                <HowP>현재 비밀번호</HowP>
-                <StyledInput type="password" {...pw} />
-            </CurrentDiv>
-            <NewDiv>
-                <ExplainDiv>
-                    <HowP>새 비밀번호</HowP>
-                    <ExplainP>(영문, 숫자, 특수문자 포함 8~15자)</ExplainP>
-                </ExplainDiv>
-                <StyledInput type="password" {...newPw}/>
-                <HowP>새 비밀번호 확인</HowP>
-                <StyledInput type="password" {...newPwCheck} />
-            </NewDiv>
-            <ConfirmDiv>  
-                <ConfirmBox onClick={changePassword}>비밀번호 변경</ConfirmBox>
-            </ConfirmDiv>
-        </div>
+            <PasswordDiv>
+                <CurrentDiv>
+                    <HowP>현재 비밀번호</HowP>
+                    <StyledInput type="password" {...pw} />
+                </CurrentDiv>
+                <NewDiv>
+                    <ExplainDiv>
+                        <HowP>새 비밀번호</HowP>
+                        <ExplainP>(영문, 숫자, 특수문자 포함 8~15자)</ExplainP>
+                    </ExplainDiv>
+                    <StyledInput type="password" {...newPw}/>
+                    <NewConfirmDiv>
+                        <HowP>새 비밀번호 확인</HowP>
+                        <StyledInput type="password" {...newPwCheck} />
+                    </NewConfirmDiv>
+                </NewDiv>
+                <ConfirmBtn onClick={changePassword}>비밀번호 변경</ConfirmBtn>
+            </PasswordDiv>
+        </EntireDiv>
     );
 };
 
