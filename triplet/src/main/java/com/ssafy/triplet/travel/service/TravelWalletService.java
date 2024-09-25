@@ -45,20 +45,48 @@ public class TravelWalletService {
     }
 
     @Transactional
-    public TransactionListResponse rechargeTravelWallet(Long userId, TravelWalletRechargeRequest request) {
-        Travel travel = travelRepository.findById(request.getTravelId()).orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
-        String currency = travel.getCountry().getCurrency();
-        AccountRechargeResponse response =  accountService.findAccountForRecharge(userId, currency);
-        if (response.getAccountBalance() < request.getChargeCost()) {
-            throw new CustomException("A0006", "계좌 잔액이 부족하여 거래가 실패했습니다.");
-        }
-        double balance = response.getAccountBalance() - request.getChargeCost();
-        accountService.rechargeForTravelAccount(response.getAccountNumber(), balance);
-        double balanceTravelWallet = travelWalletRepository.findBalanceByTravel(travel);
-        double plus = balanceTravelWallet + request.getChargeCost();
-        travelWalletRepository.rechargeTravelWallet(request.getTravelId(), plus);
-        return addRechargeForTransactionList(travel, 7, balanceTravelWallet, request);
+    public TransactionListResponse rechargeTravelWallet(Long userId, TravelWalletRechargeRequest request, int category) {
+        return processWalletTransaction(userId, request, category);
     }
+
+    @Transactional
+    public TransactionListResponse returnTravelWallet(Long userId, TravelWalletRechargeRequest request, int category) {
+        return processWalletTransaction(userId, request, category);
+    }
+
+    private TransactionListResponse processWalletTransaction(Long userId, TravelWalletRechargeRequest request, int category) {
+        Travel travel = findTravelById(request.getTravelId());
+        AccountRechargeResponse response = findAccountBalanceForRecharge(userId, travel.getCountry().getCurrency());
+        double balanceTravelWallet = travelWalletRepository.findBalanceByTravel(travel);
+        double updatedAccountBalance;
+        double updatedWalletBalance;
+        if (category == 7) {
+            if (response.getAccountBalance() < request.getChargeCost()) {
+                throw new CustomException("A0006", "계좌 잔액이 부족하여 거래가 실패했습니다.");
+            }
+            updatedAccountBalance = response.getAccountBalance() - request.getChargeCost();
+            updatedWalletBalance = balanceTravelWallet + request.getChargeCost();
+        } else {
+            if (balanceTravelWallet < request.getChargeCost()) {
+                throw new CustomException("A0006", "계좌 잔액이 부족하여 거래가 실패했습니다.");
+            }
+            updatedAccountBalance = response.getAccountBalance() + request.getChargeCost();
+            updatedWalletBalance = balanceTravelWallet - request.getChargeCost();
+        }
+        accountService.rechargeForTravelAccount(response.getAccountNumber(), updatedAccountBalance);
+        travelWalletRepository.rechargeTravelWallet(request.getTravelId(), updatedWalletBalance);
+        return addRechargeForTransactionList(travel, category, updatedWalletBalance, request);
+    }
+
+    private Travel findTravelById(Long travelId) {
+        return travelRepository.findById(travelId)
+                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+    }
+
+    private AccountRechargeResponse findAccountBalanceForRecharge(Long userId, String currency) {
+        return accountService.findAccountForRecharge(userId, currency);
+    }
+
 
     public TransactionListResponse addRechargeForTransactionList(Travel travel, int categoryId, double balanceTravelWallet, TravelWalletRechargeRequest request) {
         TravelTransactionList list = new TravelTransactionList();

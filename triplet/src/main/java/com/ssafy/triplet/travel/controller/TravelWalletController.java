@@ -52,8 +52,20 @@ public class TravelWalletController {
                                                                          @RequestBody TravelWalletRechargeRequest request) {
         try {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
-            TransactionListResponse response = travelWalletService.rechargeTravelWallet(userId, request);
+            TransactionListResponse response = travelWalletService.rechargeTravelWallet(userId, request, 7);
             return ResponseEntity.ok(new ApiResponse<>("200", "충전이 완료되었습니다.", response));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
+    @PostMapping("/return")
+    public ResponseEntity<ApiResponse<TransactionListResponse>> returnCost(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+                                                                         @RequestBody TravelWalletRechargeRequest request) {
+        try {
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
+            TransactionListResponse response = travelWalletService.returnTravelWallet(userId, request, 8);
+            return ResponseEntity.ok(new ApiResponse<>("200", "반환이 완료되었습니다.", response));
         } catch (Exception e) {
             return handleException(e);
         }
