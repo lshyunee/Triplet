@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from 'styled-components';
 import BackHeader from '../../components/header/BackHeader';
 import { useDispatch } from 'react-redux';
@@ -71,7 +71,13 @@ const s = {
   CalendarTextArea: styled.div`
     display: flex;
     align-items: center;
-  `
+  `,
+  StyledDatePicker: styled(DatePicker)`
+    border: none;
+    font-size: 12px;
+    font-weight: 500;
+  
+  `,
 
 
 }
@@ -82,6 +88,19 @@ const AccountDetailPage = () => {
   useEffect(() => {
     dispatch(pageMove("pay"));
   }, []);
+
+  const [startDate, setStartDate] = useState<any | null>(null);
+  const [endDate, setEndDate] = useState<any | null>(null);
+
+  const handleStartDateChange = (date: any) => {
+    console.log('start', date);
+    setStartDate(date);
+  };
+  const handleEndDateChange = (date: any) => {
+    console.log('end', date);
+    setEndDate(date);
+  };
+
 
 
   return (
@@ -105,7 +124,17 @@ const AccountDetailPage = () => {
           <s.CalendarText>2024.08.03 ~ 2024.09.03</s.CalendarText>
         </s.CalendarTextArea>
       </s.CalendarButton>
-      <DatePicker/>
+      <s.StyledDatePicker
+        selected={startDate}
+        onChange={(date: any) => handleStartDateChange(date)}
+        dateFormat={"yyyy.MM.dd"}
+      />
+      <s.StyledDatePicker
+        selected={endDate}
+        onChange={(date: any) => handleEndDateChange(date)}
+        dateFormat={"yyyy.MM.dd"}
+        minDate={startDate}
+      />
     </s.Container>
     </>
   );
