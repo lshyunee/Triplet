@@ -164,30 +164,6 @@ public class TravelController {
         }
     }
 
-    @GetMapping("/transaction/{travelId}")
-    public ResponseEntity<ApiResponse<List<TransactionListResponse>>> getTransactions(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
-                                                                                      @PathVariable Long travelId) {
-        try {
-            List<TransactionListResponse> list = travelService.getTransactionList(travelId);
-            if (list.isEmpty()) {
-                ResponseEntity.ok(new ApiResponse<>("200", "거래 내역이 없습니다."));
-            }
-            return ResponseEntity.ok(new ApiResponse<>("200", "거래 내역이 조회되었습니다.", list));
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
-
-    @PutMapping("/transaction/{transactionId}/{categoryId}")
-    public ResponseEntity<ApiResponse<TransactionListResponse>> updateTransaction(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
-                                                                                  @PathVariable Long transactionId, @PathVariable int categoryId) {
-        try {
-            return ResponseEntity.ok(new ApiResponse<>("200", "거래 내역이 수정되었습니다.", travelService.modifyTransaction(transactionId, categoryId)));
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
-
     @GetMapping("/categories")
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getCategories() {
         try {

@@ -34,8 +34,6 @@ public class TravelService {
     private final TravelBudgetRepository travelBudgetRepository;
     private final CategoryRepository categoryRepository;
     private final CountryRepository countryRepository;
-    private final TravelTransactionListRepository transactionListRepository;
-    private final MerchantRepository merchantRepository;
     private final TravelWalletService travelWalletService;
     private final S3Service s3Service;
 
@@ -177,30 +175,6 @@ public class TravelService {
 
     public List<CountryResponse> countryList() {
         return countryRepository.getAllCountries();
-    }
-
-    public List<TransactionListResponse> getTransactionList(Long travelId) {
-        if (!travelRepository.existsById(travelId)) {
-            throw new CustomException("T0004", "여행이 존재하지 않습니다.");
-        }
-        List<TravelTransactionList> trList = transactionListRepository.findByTravelIdOrderByTransactionDateDesc(travelId);
-        List<TransactionListResponse> transactionListResponseList = new ArrayList<>();
-        for (TravelTransactionList travelTransactionList : trList) {
-            transactionListResponseList.add(convertToTransactionListResponse(travelTransactionList));
-        }
-        return transactionListResponseList;
-    }
-
-    public TransactionListResponse modifyTransaction(Long transactionId, int categoryId) {
-        if (!transactionListRepository.existsById(transactionId)) {
-            throw new CustomException("A0004", "거래 고유 번호가 유효하지 않습니다.");
-        }
-        TravelTransactionList transaction = transactionListRepository.getTransactionListById(transactionId);
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new CustomException("A0009", "카테고리 ID가 유효하지 않습니다."));
-        transaction.setCategory(category);
-        TravelTransactionList updatedTransaction = transactionListRepository.save(transaction);
-        return convertToTransactionListResponse(updatedTransaction);
     }
 
     public List<CategoryResponse> getCategoryList() {
@@ -378,21 +352,6 @@ public class TravelService {
         response.setMemberCount(travel.getMemberCount());
         response.setCurrency(travel.getCountry().getCurrency());
         response.setTotalBudget(travel.getTotalBudget());
-        return response;
-    }
-
-    // 여행 지출 내역
-    private TransactionListResponse convertToTransactionListResponse(TravelTransactionList travelTransactionList) {
-        TransactionListResponse response = new TransactionListResponse();
-        response.setTransactionId(travelTransactionList.getId());
-        response.setPrice(travelTransactionList.getPrice());
-        response.setTransactionDate(travelTransactionList.getTransactionDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
-        response.setCategoryName(categoryRepository.findCategoryNameByCategoryId(travelTransactionList.getCategory().getCategoryId()));
-        response.setCategoryId(travelTransactionList.getCategory().getCategoryId());
-        response.setMerchantName(merchantRepository.findMerchantNameById(travelTransactionList.getMerchantId()));
-        response.setTravelId(travelTransactionList.getTravel().getId());
-        response.setBalance(travelTransactionList.getBalance());
-        response.setTransactionType(travelTransactionList.getTransactionType());
         return response;
     }
 }

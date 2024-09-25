@@ -40,26 +40,10 @@ public class TravelSpecification {
     // 여행 시기 필터링 (계절별 검색)
     public static Specification<Travel> travelMonth(int month) {
         return (root, query, criteriaBuilder) -> {
-            int startMonth;
-            int endMonth;
-            if (month >= 3 && month <= 5) {
-                startMonth = 3;
-                endMonth = 5;
-            } else if (month >= 6 && month <= 8) {
-                startMonth = 6;
-                endMonth = 8;
-            } else if (month >= 9 && month <= 11) {
-                startMonth = 9;
-                endMonth = 11;
-            } else {
-                if (month == 12) {
-                    startMonth = 12;
-                    endMonth = 2;
-                } else {
-                    startMonth = 1;
-                    endMonth = 2;
-                }
-            }
+            int [][] month_range_list = {{12, 2}, {12, 2},{3, 5},{3, 5},{3, 5},{6, 8},{6, 8},{6, 8},{9, 11},{9, 11},{9, 11}};
+            int [] month_range = month_range_list[month - 1];
+            int startMonth = month_range[0];
+            int endMonth = month_range[1];
             return criteriaBuilder.between(criteriaBuilder.function("month", Integer.class, root.get("startDate")), startMonth, endMonth);
         };
     }

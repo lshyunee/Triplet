@@ -4,6 +4,7 @@ import com.ssafy.triplet.account.dto.request.CreateTransactionRequest;
 import com.ssafy.triplet.account.dto.request.TransactionListRequest;
 import com.ssafy.triplet.account.dto.response.AccountDetailResponse;
 import com.ssafy.triplet.account.dto.response.CreateTransactionResponse;
+import com.ssafy.triplet.account.dto.response.AccountRechargeResponse;
 import com.ssafy.triplet.account.dto.response.TransactionListResponse;
 import com.ssafy.triplet.account.entity.Account;
 import com.ssafy.triplet.account.entity.TransactionList;
@@ -93,6 +94,14 @@ public class AccountService {
                 .accountExpiryDate(expiry).build();
         member.createMyForeignAccount(account);
         accountRepository.save(account);
+    }
+
+    public AccountRechargeResponse findAccountForRecharge(Long memberId, String currency) {
+        return accountRepository.findAccountNumberByMemberIdAndCurrency(memberId, currency);
+    }
+
+    public void rechargeForTravelAccount(String accountNumber, double accountBalance) {
+        accountRepository.rechargeTravelAccount(accountNumber, accountBalance);
     }
 
     // 원화계좌 조회
