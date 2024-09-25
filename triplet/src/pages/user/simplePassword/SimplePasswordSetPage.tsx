@@ -15,24 +15,30 @@ const shuffleArray = (array: number[]) => {
         .map(({ value }) => value);
 };
 
+const PasswordDiv = styled.div`
+    height : calc(100vh - 112px);
+    margin : 0 78px 0;
+    padding-top : 56px;
+`
+
 const TitleDiv = styled.div`
-    margin-top : 126px;
-    text-align: center;
+    width : 100%;
+    display : flex;
+    flex-direction : column;
+    text-align : center;
+    padding-top : 100px;
 `;
 
 const Title = styled.p`
-    margin: 10px 0;
     font-size: 16px;
+    margin : 0 0 12px;
     font-weight: 700;
 `;
 
 const Description = styled.p`
-    display : flex;
-    align-items: center;
-    justify-content : center;
     height : 34px;
-    margin-bottom: 20px;
     font-size:14px;
+    margin : 0 0;
     font-weight: 500;
     color: #333;
 `;
@@ -40,9 +46,8 @@ const Description = styled.p`
 
 const PasswordDots = styled.div`
     display: flex;
-    justify-content: center;
-    margin: 20px 0;
-    margin-bottom: 146px;
+    margin-top : 24px;
+    justify-content : center;
 `;
 
 const Dot = styled.div<{ isActive: boolean }>`
@@ -56,28 +61,33 @@ const Dot = styled.div<{ isActive: boolean }>`
 const NumberPad = styled.div`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    max-width: 300px;
-    margin: 0 auto;
+    justify-content : center;
+    margin-top : 102px;
 `;
 
 const NumberButton = styled.button`
-    padding: 20px;
     font-size: 20px;
     font-weight: 600;
     background-color: white;
+    margin : 20px 50px;
     border: none;
-      margin-top : 10px;
+    padding : 0px;
 `;
 
 const BottomButtons = styled.div`
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 15px;
-    max-width: 300px;
-    margin: 0 auto;
-    margin-top : 10px;
+    justify-content : center;
 `;
+
+const ButtonDiv = styled.div`
+    position : fixed;
+    bottom : 55px;
+    left : 0;
+    right : 0;
+    margin-left : 55px;
+    margin-right : 55px; 
+`
 
 const IconButton = styled.button`
     background-color: transparent;
@@ -86,7 +96,8 @@ const IconButton = styled.button`
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    margin : 20px 44px;
+    padding : 0px;
 `;
 
 const SimplePasswordSetPage: React.FC = () => {
@@ -126,43 +137,47 @@ const SimplePasswordSetPage: React.FC = () => {
     return (
         <div>
             <BackHeader title={"간편비밀번호 설정"} />
-            <TitleDiv>
-                <Title>간편비밀번호 설정</Title>
-                <Description>
-                    계좌 개설, 송금, 결제, 해지 시 사용할
-                    <br />
-                    간편비밀번호를 설정해주세요.
-                </Description>
-            </TitleDiv>
+            <PasswordDiv>
+                <TitleDiv>
+                    <Title>간편비밀번호 설정</Title>
+                    <Description>
+                        계좌 개설, 송금, 결제, 해지 시 사용할
+                        <br />
+                        간편비밀번호를 설정해주세요.
+                    </Description>
+                </TitleDiv>
 
-            <PasswordDots>
-                {Array(6)
-                    .fill(null)
-                    .map((_, idx) => (
-                        <Dot key={idx} isActive={password[idx] !== undefined} />
-                    ))}
-            </PasswordDots>
+                <PasswordDots>
+                    {Array(6)
+                        .fill(null)
+                        .map((_, idx) => (
+                            <Dot key={idx} isActive={password[idx] !== undefined} />
+                        ))}
+                </PasswordDots>
 
-            <NumberPad>
-                {numbers.slice(0, 9).map((num) => (
-                    <NumberButton key={num} onClick={() => handleNumberClick(num)}>
-                        {num}
-                    </NumberButton>
-                ))}
-            </NumberPad>
+                <ButtonDiv>
+                    <NumberPad>
+                        {numbers.slice(0, 9).map((num) => (
+                            <NumberButton key={num} onClick={() => handleNumberClick(num)}>
+                                {num}
+                            </NumberButton>
+                        ))}
+                    </NumberPad>
 
-            {/* 숫자 0 및 아이콘 버튼 */}
-            <BottomButtons>
-                <IconButton onClick={handleReset}>
-                    <RepeatIcon />
-                </IconButton>
-                <NumberButton onClick={() => handleNumberClick(numbers[9])}>
-                    {numbers[9]}
-                </NumberButton>
-                <IconButton onClick={handleBackspace}>
-                    <RemoveIcon />
-                </IconButton>
-            </BottomButtons>
+                    {/* 숫자 0 및 아이콘 버튼 */}
+                    <BottomButtons>
+                        <IconButton onClick={handleReset}>
+                            <RepeatIcon />
+                        </IconButton>
+                        <NumberButton onClick={() => handleNumberClick(numbers[9])}>
+                            {numbers[9]}
+                        </NumberButton>
+                        <IconButton onClick={handleBackspace}>
+                            <RemoveIcon />
+                        </IconButton>
+                    </BottomButtons>
+                </ButtonDiv>
+            </PasswordDiv>
         </div>
     );
 };
