@@ -7,8 +7,8 @@ import lombok.Getter;
 @Getter
 public class SimplePasswordConfirmRequest {
 
-    @NotNull
-    @Pattern(regexp = "^[0-9]{6}$") // 6자리 숫자
+    @NotNull(message = "간편 비밀번호는 6자리의 숫자입니다.")
+    @Pattern(regexp = "^[0-9]{6}$", message = "간편 비밀번호는 6자리의 숫자입니다.") // 6자리 숫자
     private String simplePassword;
 
 }

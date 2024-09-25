@@ -18,8 +18,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -100,6 +104,7 @@ public class AccountService {
         accountRepository.rechargeTravelAccount(accountNumber, accountBalance);
     }
 
+    // 원화계좌 조회
     public AccountDetailResponse getKrwAccount(String memberId) {
         Member member = memberRepository.findByMemberId(memberId);
         if (member == null) {
@@ -121,6 +126,7 @@ public class AccountService {
                 .accountBalance(account.getAccountBalance()).build();
     }
 
+    // 외화지갑 목록 조회
     public List<AccountDetailResponse> getForeignAccounts(String memberId) {
         Member member = memberRepository.findByMemberId(memberId);
         if (member == null) {
@@ -141,6 +147,7 @@ public class AccountService {
                         .accountBalance(foreignAccount.getAccountBalance()).build()).collect(Collectors.toList());
     }
 
+    // 계좌 상세조회
     public AccountDetailResponse getAccountById(Long accountId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND));
         return AccountDetailResponse.builder()
@@ -157,6 +164,7 @@ public class AccountService {
                 .accountBalance(account.getAccountBalance()).build();
     }
 
+    // 원화계좌 송금 (거래 생성)
     public List<CreateTransactionResponse> createTransaction(CreateTransactionRequest request) {
         Account withdrawalAccount = accountRepository.findByAccountNumber(request.getWithdrawalAccountNumber());
         Account depositAccount = accountRepository.findByAccountNumber(request.getDepositAccountNumber());
@@ -177,7 +185,7 @@ public class AccountService {
                 .transactionAccountNumber(depositAccount.getAccountNumber())
                 .price(request.getTransactionBalance())
                 .transactionAfterBalance(withdrawal)
-                .transactionName("출금").build();
+                .transactionName(depositAccount.getMember().getName()).build();
         TransactionList savedWithdrawal = transactionListRepository.save(withdrawalTransaction);
         withdrawalAccount.createTransaction(savedWithdrawal);
 
@@ -187,7 +195,7 @@ public class AccountService {
                 .transactionAccountNumber(withdrawalAccount.getAccountNumber())
                 .price(request.getTransactionBalance())
                 .transactionAfterBalance(deposit)
-                .transactionName("입금").build();
+                .transactionName(withdrawalAccount.getMember().getName()).build();
         TransactionList savedDeposit = transactionListRepository.save(depositTransaction);
         depositAccount.createTransaction(savedDeposit);
 
@@ -212,21 +220,90 @@ public class AccountService {
         return responses;
     }
 
-    public List<TransactionListResponse> getTransactionList(TransactionListRequest request) {
+    // 거래내역 조회
+    public Map<String, List<TransactionListResponse>> getTransactionList(TransactionListRequest request) {
         Long accountId = request.getAccountId();
         accountRepository.findById(accountId).orElseThrow(() -> new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND));
-        return transactionListRepository.findByAccountId(accountId).stream()
-                .map(tre -> TransactionListResponse.builder()
-                        .transactionId(tre.getId())
-                        .transactionDate(tre.getTransactionDate().toString())
-                        .transactionType(tre.getTransactionType())
-                        .transactionTypeName(tre.getTransactionTypeName())
-                        .transactionAccountNumber(tre.getTransactionAccountNumber())
-                        .price(tre.getPrice())
-                        .transactionAfterBalance(tre.getTransactionAfterBalance())
-                        .transactionName(tre.getTransactionName()).build()).collect(Collectors.toList());
+
+        // 조회 날짜 범위
+        LocalDate startDate = extractDateFromString(request.getStartDate(), CustomErrorCode.INVALID_START_DATE);
+        LocalDate endDate = extractDateFromString(request.getEndDate(), CustomErrorCode.INVALID_END_DATE);
+
+        LocalDateTime start = startDate.atStartOfDay();
+        LocalDateTime end = endDate.atTime(LocalTime.MAX);
+
+        // 조회 결과 날짜별로 그룹화
+        List<TransactionList> transactions = transactionListRepository.findByTransactionDateBetween(accountId, start, end);
+        Map<LocalDate, List<TransactionList>> groupedBy = transactions.stream()
+                .collect(Collectors.groupingBy(transaction -> transaction.getTransactionDate().toLocalDate()));
+
+        return convertTransactionsToDTO(groupedBy);
     }
 
+    // 요청 문자열에서 날짜 추출
+    // 형식 유효성검사, 날짜 유효성검사
+    private LocalDate extractDateFromString(String dateString, CustomErrorCode errorCode) {
+        // 반환할 날짜
+        LocalDate returnDate;
+
+        Map<String, Integer> monthMap = Map.ofEntries(
+                Map.entry("Jan", 1),
+                Map.entry("Feb", 2),
+                Map.entry("Mar", 3),
+                Map.entry("Apr", 4),
+                Map.entry("May", 5),
+                Map.entry("Jun", 6),
+                Map.entry("Jul", 7),
+                Map.entry("Aug", 8),
+                Map.entry("Sep", 9),
+                Map.entry("Oct", 10),
+                Map.entry("Nov", 11),
+                Map.entry("Dec", 12)
+        );
+
+        // 월, 일, 년 추출 / 시작일 유효성 검사
+        String regex = "\\w+\\s(\\w{3})\\s(\\d{2})\\s(\\d{4})";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher startDateMatcher = pattern.matcher(dateString);
+
+        // 올바른 날짜 형식이 있는지 확인
+        if (startDateMatcher.find()) {
+            String month = startDateMatcher.group(1);
+            String day = startDateMatcher.group(2);
+            String year = startDateMatcher.group(3);
+
+            // LocalDate 로 변환
+            returnDate = LocalDate.of(Integer.parseInt(year), monthMap.get(month), Integer.parseInt(day));
+            // 오늘 날짜 가져오기
+            LocalDate today = LocalDate.now();
+            // 오늘 이후의 날짜인지 확인
+            if (returnDate.isAfter(today)) {
+                throw new CustomException(CustomErrorCode.DATE_EXCEEDS_TODAY);
+            }
+        } else {
+            throw new CustomException(errorCode);
+        }
+        return returnDate;
+    }
+
+    // 날짜별 그룹화된 거래내역 Dto 로 변환
+    public Map<String, List<TransactionListResponse>> convertTransactionsToDTO(Map<LocalDate, List<TransactionList>> groupedTransactions) {
+        return groupedTransactions.entrySet().stream()
+                .collect(Collectors.toMap(
+                        entry -> entry.getKey().toString(),
+                        entry -> entry.getValue().stream().map(t -> TransactionListResponse.builder()
+                                .transactionId(t.getId())
+                                .transactionDate(t.getTransactionDate().toString())
+                                .transactionType(t.getTransactionType())
+                                .transactionTypeName(t.getTransactionTypeName())
+                                .transactionAccountNumber(t.getTransactionAccountNumber())
+                                .price(t.getPrice())
+                                .transactionAfterBalance(t.getTransactionAfterBalance())
+                                .transactionName(t.getTransactionName()).build()).collect(Collectors.toList())
+                ));
+    }
+
+    // 거래 생성 유효성 검사
     private static void isTransactionAllowed(CreateTransactionRequest request, Account withdrawalAccount, Account depositAccount) {
         // 계좌 존재여부 확인
         if (withdrawalAccount == null) {
