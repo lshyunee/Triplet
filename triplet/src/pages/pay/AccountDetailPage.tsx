@@ -10,6 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { isDate } from 'util/types';
 import { addDays } from 'react-datepicker/dist/date_utils';
 
+
 const s = {
   Container: styled.div`
     padding-top: 56px;
@@ -169,22 +170,23 @@ const AccountDetailPage = () => {
   }, []);
 
   const today =  new Date();
-  const week = new Date(new Date().setDate(new Date().getDate() -7))
+  const week = new Date(new Date().setDate(new Date().getDate() -7));
 
   const [dateRange, setDateRange] = useState<any | null>([week, today]);
   const [start, end] = dateRange;
 
-  const dateInputRef = useRef<DatePicker>(null)
+  const dateInputRef = useRef<DatePicker>(null);
   
   const [isDateOpen, setIsDateOpen] = useState<boolean>(false);
 
   useEffect(() => {
     if (isDateOpen === true) {
-      dateInputRef.current?.setFocus()
-      setIsDateOpen(false)
+      dateInputRef.current?.setFocus();
+      setIsDateOpen(false);
     };
-  }, [isDateOpen])
+  }, [isDateOpen]);
 
+  
   return (
     <>
     <BackHeader title='내 계좌'/>
