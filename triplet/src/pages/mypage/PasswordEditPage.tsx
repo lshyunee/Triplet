@@ -6,9 +6,6 @@ import useInput from '../../hooks/useInput';
 import useAxios from '../../hooks/useAxios';
 import { useNavigate } from 'react-router-dom';
 
-const EntireDiv = styled.div`
-    /* height : 800px; */
-`
 
 const HowP = styled.p`
     font-size : 12px;
@@ -57,7 +54,6 @@ const NewConfirmDiv = styled.div`
 `;
 
 const ConfirmBtn = styled.button`
-    /* width : 100%; */
     height : 44px;
     background-color : #008DE7;
     color : #FFFFFF;

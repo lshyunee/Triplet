@@ -5,37 +5,37 @@ import styled from 'styled-components';
 import useAxios from '../../hooks/useAxios';
 import useInput from '../../hooks/useInput';
 
-const EditDiv = styled.div`
-    height : 800px;
-`
-
 const HowP = styled.p`
     font-size : 12px;
-    margin : 0px 18px 3px;
+    margin : 0px 0px 4px;
     color : #888888;
 `;
 
-const InputDiv = styled.div`
-    display: flex;
-    flex-direction: column;
+const EntireDiv = styled.div`
+    margin : 0px 16px 0;
+    height : calc(100vh - 112px);
     padding-top : 56px;
-    margin : 40px 16px;
+`;
+
+const InputDiv = styled.div`
+    margin-top : 40px;
 `;
 
 const NumP = styled.p`
+    margin : auto 4px;
     font-size : 14px;
     color : #424242;
 `;
 
 const CheckP = styled.p`
     font-size : 12px;
+    margin : 4px 0 0 0;
     color : #008DE7;
 `
 const StyledInput = styled.input`
     background-color : #F9FAFC;
     width:100%;
     height:44px;
-    margin-bottom : 10px;
     border-radius : 10px;
     border : 1px solid #F0F0F0;
     box-sizing: border-box;
@@ -62,6 +62,10 @@ const StyledBtn = styled.button`
     flex-shrink: 0;
     margin-left : 8px;
 `;
+
+const InputDistanceDiv = styled.div`
+    margin-bottom : 32px;
+`
 
 const RegistDiv = styled.div`
     display : flex;
@@ -95,16 +99,7 @@ const CheckDiv = styled.div`
     flex-direction: row;
 `;
 
-
-const ConfirmDiv = styled.div`
-    display : flex;
-    width : 100%;
-    margin-top : 166px;
-    align-items : center;
-`;
-
-const ConfirmBox = styled.button`
-    width : 100%;
+const ConfirmBtn = styled.button`
     height : 44px;
     background-color : #008DE7;
     color : #FFFFFF;
@@ -112,6 +107,13 @@ const ConfirmBox = styled.button`
     font-weight: 600;
     font-size : 14px;
     border : none;
+    margin-bottom : 28px;
+    position: fixed;
+    bottom: 56px;
+    left: 0;
+    right: 0;
+    margin-right: 16px;
+    margin-left: 16px;
 `;
 
 
@@ -183,38 +185,46 @@ const MyInfoEditPage = () => {
     }
 
     return (
-        <EditDiv>
+        <>
             <BackHeader title={"내 정보 수정"}/>
-            <InputDiv>
-                <HowP>이름</HowP>
-                    <StyledInput type="text" {...name}/>
-                    <HowP>주민등록번호</HowP>
-                    <RegistDiv>
-                        <StyledInputFront type="text" {...identificationNumFront}/>
-                        <NumP>-</NumP>
-                        <StyledInput type="text" {...identificationNumBack}/>
-                        <NumP>* * * * * *</NumP>
-                    </RegistDiv>
-                <HowP>전화번호</HowP>
-                    <PhoneDiv>
-                        <StyledInputFront type="text" {...phoneNumFront} disabled={isCheck} />
-                        <NumP>-</NumP>
-                        <StyledInput type="text" {...phoneNumMiddle} disabled={isCheck}/>
-                        <NumP>-</NumP>
-                        <StyledInput type="text" {...phoneNumBack} disabled={isCheck}/>
-                        <StyledBtn onClick={certificateSend}>인증번호 발송</StyledBtn>
-                    </PhoneDiv>
-                    <HowP>인증번호</HowP>
-                    <CheckDiv>
-                        <StyledInput type="text" {...certificationNum} />
-                        <StyledBtn onClick={certificateCheck}>확인</StyledBtn>
-                    </CheckDiv>
-                    <CheckP>인증되었습니다.</CheckP>
-                    <ConfirmDiv>  
-                        <ConfirmBox onClick={myInfoEdit}>수정 완료</ConfirmBox>
-                    </ConfirmDiv>
-            </InputDiv>
-        </EditDiv>
+            <EntireDiv>
+                <InputDiv>
+                    <InputDistanceDiv>
+                        <HowP>이름</HowP>
+                        <StyledInput type="text" {...name}/>
+                    </InputDistanceDiv>   
+                    <InputDistanceDiv>
+                        <HowP>주민등록번호</HowP>
+                        <RegistDiv>
+                            <StyledInputFront type="text" {...identificationNumFront}/>
+                            <NumP>-</NumP>
+                            <StyledInput type="text" {...identificationNumBack}/>
+                            <NumP>* * * * * *</NumP>
+                        </RegistDiv>
+                    </InputDistanceDiv>
+                    <InputDistanceDiv>
+                        <HowP>전화번호</HowP>
+                        <PhoneDiv>
+                            <StyledInputFront type="text" {...phoneNumFront} disabled={isCheck} />
+                            <NumP>-</NumP>
+                            <StyledInput type="text" {...phoneNumMiddle} disabled={isCheck}/>
+                            <NumP>-</NumP>
+                            <StyledInput type="text" {...phoneNumBack} disabled={isCheck}/>
+                            <StyledBtn onClick={certificateSend}>인증번호 발송</StyledBtn>
+                        </PhoneDiv>
+                    </InputDistanceDiv>
+                    <InputDistanceDiv>
+                        <HowP>인증번호</HowP>
+                        <CheckDiv>
+                            <StyledInput type="text" {...certificationNum} />
+                            <StyledBtn onClick={certificateCheck}>확인</StyledBtn>
+                        </CheckDiv>
+                        <CheckP>인증되었습니다.</CheckP>
+                    </InputDistanceDiv>
+                    <ConfirmBtn onClick={myInfoEdit}>수정 완료</ConfirmBtn>
+                </InputDiv>
+            </EntireDiv>
+        </>
     );
 };
 
