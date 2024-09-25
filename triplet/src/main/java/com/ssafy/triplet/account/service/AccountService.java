@@ -4,6 +4,7 @@ import com.ssafy.triplet.account.dto.request.CreateTransactionRequest;
 import com.ssafy.triplet.account.dto.request.TransactionListRequest;
 import com.ssafy.triplet.account.dto.response.AccountDetailResponse;
 import com.ssafy.triplet.account.dto.response.CreateTransactionResponse;
+import com.ssafy.triplet.account.dto.response.ForeignAccountRechargeResponse;
 import com.ssafy.triplet.account.dto.response.TransactionListResponse;
 import com.ssafy.triplet.account.entity.ForeignAccount;
 import com.ssafy.triplet.account.entity.KrwAccount;
@@ -76,6 +77,14 @@ public class AccountService {
         ForeignAccount foreignAccount = new ForeignAccount(accountNumber, accountName, currency, created, expiry);
         member.createMyForeignAccount(foreignAccount);
         foreignAccountRepository.save(foreignAccount);
+    }
+
+    public ForeignAccountRechargeResponse findAccountForRecharge(Long memberId, String currency) {
+        return foreignAccountRepository.findAccountNumberByMemberIdAndCurrency(memberId, currency);
+    }
+
+    public void rechargeForTravelAccount(String accountNumber, double accountBalance) {
+        foreignAccountRepository.rechargeTravelAccount(accountNumber, accountBalance);
     }
 
     public AccountDetailResponse getKrwAccount(String memberId) {
