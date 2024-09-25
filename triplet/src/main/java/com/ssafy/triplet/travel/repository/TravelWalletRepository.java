@@ -14,7 +14,6 @@ public interface TravelWalletRepository extends JpaRepository<TravelWallet, Long
     @Query("UPDATE TravelWallet t SET t.balance = :amount WHERE t.travelId.id = :travelId")
     void rechargeTravelWallet(Long travelId, double amount);
 
-
     @Query("SELECT t.balance FROM TravelWallet t WHERE t.travelId = :travel")
     double findBalanceByTravel(Travel travel);
 }
