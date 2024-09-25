@@ -41,6 +41,7 @@ const StyledInput = styled.input`
 
 const CurrentDiv = styled.div`
     margin-top : 120px;
+    padding-top : 56px;
 `
 
 const NewDiv = styled.div`
@@ -81,7 +82,7 @@ const PasswordEditPage = () => {
 
     const { data: pwData, error: pwError, loading: pwLoading,
         status: pwStatus, refetch: pwRefetch
-    } = useAxios('/api/v1/user/password', 'PUT',{
+    } = useAxios('/user/password', 'PUT',{
         password : pw,
         newPassword : newPw,
         newPasswordConfirm : newPwCheck

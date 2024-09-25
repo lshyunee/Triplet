@@ -9,6 +9,15 @@ import { ReactComponent as SimplePay} from '../../assets/main/simplePay.svg';
 import { ReactComponent as TravelPlan} from '../../assets/main/travelPlan.svg';
 import { ReactComponent as RightArrow} from '../../assets/common/rightArrow.svg';
 
+import { ReactComponent as USFlag } from '../../assets/pay/us.svg';
+import { ReactComponent as EUFlag } from '../../assets/pay/eu.svg';
+import { ReactComponent as JPFlag } from '../../assets/pay/jp.svg';
+import { ReactComponent as CHFlag } from '../../assets/pay/ch.svg';
+import { ReactComponent as UKFlag } from '../../assets/pay/uk.svg';
+import { ReactComponent as SWFlag } from '../../assets/pay/sw.svg';
+import { ReactComponent as CAFlag } from '../../assets/pay/ca.svg';
+
+
 const HomeDiv = styled.div`
     width: 100%;
     height: 100%;
@@ -54,12 +63,11 @@ const LittleDiv = styled.div`
 `
 
 const TitleDiv = styled.div`
-    box-sizing: border-box;
-    width: 100%;
-    display : flex;
-    flex-direction : row;
-    align-items: center;
-    justify-content : space-between;
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin: 0 20px;
+padding-top: 20px;
 `;
 
 const DetailP = styled.p`
@@ -69,15 +77,13 @@ const DetailP = styled.p`
 `;
 
 const LargeDiv = styled.div`
-    box-sizing: border-box;
     width : 328px;
-    height : 235px;
-    display : flex;
-    flex-direction : column;
-    background-color : white;
-    border-radius : 20px;
-    align-items: center;
-    padding : 16px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    margin: 0 16px;
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
     
     ${TitleP}{
         margin-top : 0px;

@@ -16,6 +16,7 @@ const InputDiv = styled.div`
     display: flex;
     flex-direction: column;
     margin-top:40px;
+    padding-top : 56px;
 `;
 
 const NumP = styled.p`
@@ -193,7 +194,7 @@ const MyInfoEditPage = () => {
 
     const { data: editData, error: editError, loading: editLoading,
         status: editStatus, refetch: editRefetch }
-        = useAxios('/api/v1/user/my', 'PUT', {
+        = useAxios('/user/my', 'PUT', {
             name : name,
             phoneNumber : phoneNum,
             identificationNumber : identificationNum

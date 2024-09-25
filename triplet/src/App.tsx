@@ -39,8 +39,6 @@ const Div = styled.div`
 
 const App: React.FC = () => {
 
-  const [loading, setLoading] = useState(false);
-
   const location = useLocation();
   const navigate = useNavigate();
   const [isActive, setIsActive] = useState(true);
@@ -48,7 +46,7 @@ const App: React.FC = () => {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
   useEffect(() => {
-    const offPages = ["/login", "/signup", "/simple-password/set", "/simple-password/confirm"];
+    const offPages = ["/login", "/signup", "/simple-password/set","/simple-password/setConfirm" ,"/simple-password/confirm"];
     if (offPages.includes(location.pathname)) {
       setIsActive(false);
     } else {
@@ -62,28 +60,29 @@ const App: React.FC = () => {
       }
   }, [])
 
-  useEffect(()=>{
-    if('serviceWorker' in navigator){
-      window.addEventListener('load', () =>{
-        navigator.serviceWorker
-          .register('/service-worker.js')
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
           .then((registration) => {
-            console.log("Service Worker register", registration.scope);
-            setLoading(false);
-          })
-          .catch((error) => {
-            console.log("로딩 실패");
-            setLoading(false);
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+            setIsLoading(false); // 서비스 워커가 등록되면 로딩 완료
+          }, (error) => {
+            console.log('ServiceWorker registration failed: ', error);
+            setIsLoading(false); // 서비스 워커 등록 실패 시에도 로딩 완료
           });
       });
-    }else{
-      setLoading(false);
+    } else {
+      setIsLoading(false); // 서비스 워커가 지원되지 않으면 바로 로딩 완료
     }
   }, []);
 
   return (
     <Div>
       <GlobalStyle />
+      {/* {isLoading && <SplashScreen />} */}
       <AppRoutes/>
       {isActive && <Navbar />}  {/* isActive가 true일 때만 Navbar 렌더링 */}
     </Div>

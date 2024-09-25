@@ -8,10 +8,13 @@ import { pageMove } from '../../features/navigation/naviSlice';
 import useAxios from '../../hooks/useAxios';
 import { ReactComponent as RightArrow} from '../../assets/common/rightArrow.svg';
 
+import Logout from '../user/logout/LogoutModal';
+
 const PageDiv = styled.div`
     background-color : #F3F4F6;
     width: 100%;
     height: 100%;
+    padding-top : 56px;
     
     > *{
         margin-bottom : 8px;
@@ -104,6 +107,7 @@ const MyPage = () => {
     const [ name, setName ] = useState('');
     const [ birth, setBirth ] = useState('');
     const [ phoneNum, setPhoneNum ] = useState('');
+    const [ isLogOutOpen, setIsLogOutOpen ] = useState(false);
 
     useEffect(() => {
         dispatch(pageMove("mypage"));
@@ -111,7 +115,7 @@ const MyPage = () => {
 
     const { data: infoData, error: infoError, loading: infoLoading,
         status: infoStatus, refetch: infoRefetch }
-        = useAxios('/api/v1/user/my', 'GET');
+        = useAxios('/user/my', 'GET');
 
     useEffect(() => {
         infoRefetch();
@@ -124,6 +128,14 @@ const MyPage = () => {
             setPhoneNum(infoData.phoneNumber);
         }
     },[infoStatus]);
+
+    const openLogout = () => {
+        setIsLogOutOpen(true);
+    };
+
+    const closeLogout = () => {
+        setIsLogOutOpen(false);
+    } 
 
     return (
         <>
@@ -164,7 +176,7 @@ const MyPage = () => {
                             <RightArrow/>
                         </ConfigDiv>
                     </StyledLink>
-                    <ConfigDiv>
+                    <ConfigDiv onClick={openLogout}>
                         <CategoryP>로그아웃</CategoryP>
                         <RightArrow/>
                     </ConfigDiv>
@@ -173,6 +185,7 @@ const MyPage = () => {
                         <RightArrow/>
                     </ConfigDiv>
                 </MyInfoConfigDiv>
+                <Logout isOpen={isLogOutOpen} onClose={closeLogout}></Logout>
             </PageDiv>
         </>
     );

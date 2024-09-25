@@ -15,7 +15,7 @@ const shuffleArray = (array: number[]) => {
 };
 
 const TitleDiv = styled.div`
-    margin-top : 70px;
+    margin-top : 126px;
     text-align : center;
 `
 
@@ -26,11 +26,16 @@ const Title = styled.p`
 `;
 
 const Description = styled.p`
-  margin-bottom: 20px;
-  font-size:14px;
-  font-weight: 500;
-  color: #333;
+    display : flex;
+    align-items: center;
+    justify-content : center;
+    height : 34px;
+    margin-bottom: 20px;
+    font-size:14px;
+    font-weight: 500;
+    color: #333;
 `;
+
 
 
 const PasswordDots = styled.div`
@@ -57,19 +62,22 @@ const NumberPad = styled.div`
 `;
 
 const NumberButton = styled.button`
-  padding: 20px;
-  font-size: 20px;
-  font-weight : 600;
-  background-color : white;
-  border: none;
+    padding: 20px;
+    font-size: 20px;
+    font-weight: 600;
+    background-color: white;
+    border: none;
+      margin-top : 10px;
 `;
 
+
 const BottomButtons = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  max-width: 300px;
-  margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    max-width: 300px;
+    margin: 0 auto;
+    margin-top : 10px;
 `;
 
 const IconButton = styled.button`
@@ -94,7 +102,6 @@ const SimplePasswordConfirmPage = () => {
     const handleNumberClick = (num: number) => {
         if (password.length < 6) {
             setPassword([...password, num]);
-            setNumbers(shuffleArray([...numbers]));
         }
     };
 
@@ -106,6 +113,7 @@ const SimplePasswordConfirmPage = () => {
     // 초기화 버튼 클릭 핸들러
     const handleReset = () => {
         setPassword([]);
+        setNumbers(shuffleArray([...numbers]));
     };
 
     return (
