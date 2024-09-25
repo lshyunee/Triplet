@@ -78,6 +78,7 @@ const DetailP = styled.p`
 
 const LargeDiv = styled.div`
     width : 328px;
+    height : 200px;
     background-color: #ffffff;
     border-radius: 20px;
     margin: 0 16px;
