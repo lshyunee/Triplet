@@ -90,11 +90,6 @@ const PayPage = () => {
 		dispatch(pageMove("pay"));
 	}, []);
 
-	const navigate = useNavigate();
-
-	const handleCreateButtonClick = () => {
-		navigate('/pay/create-account');
-	}
 	return (
 		<>
 			<Header/>
@@ -108,16 +103,6 @@ const PayPage = () => {
 					<s.ButtonArea>
 						<s.CardContent>20,000,000원</s.CardContent>
 						<s.CardButton>송금</s.CardButton>
-					</s.ButtonArea>
-				</s.Card>
-				<s.Card>
-					<s.CardTitleArea>
-						<s.CardTitle>내 통장</s.CardTitle>
-						<RightArrow/>
-					</s.CardTitleArea>
-					<s.CardCaption>등록된 계좌가 없습니다.</s.CardCaption>
-					<s.ButtonArea>
-						<s.CreateButton onClick={handleCreateButtonClick}>원화 계좌 개설하기</s.CreateButton>
 					</s.ButtonArea>
 				</s.Card>
 				<s.Card>
@@ -159,7 +144,6 @@ const PayPage = () => {
 				<s.Card>
 					<s.CardTitleArea>
 						<s.CardTitle>실시간 환율</s.CardTitle>
-						<RightArrow/>
 					</s.CardTitleArea>
 					<s.CurrencyArea>
 						<ExchangeRate

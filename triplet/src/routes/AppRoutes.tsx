@@ -16,6 +16,7 @@ import PasswordEditPage from '../pages/mypage/PasswordEditPage';
 import SimplePasswordSetPage from '../pages/user/simplePassword/SimplePasswordSetPage';
 import SimplePasswordConfirmPage from '../pages/user/simplePassword/SimplePasswordConfirmPage';
 import SimplePasswordSetConfirmPage from '../pages/user/simplePassword/SimplePasswordSetConfirmPage';
+import AccountDetailPage from '../pages/pay/AccountDetailPage';
 
 
 const AppRoutes: React.FC = () => (
@@ -32,6 +33,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/simple-password/confirm" element={<SimplePasswordConfirmPage/>}/>
             <Route path="/simple-password/setConfirm" element={<SimplePasswordSetConfirmPage/>}/>            
             <Route path="/pay" element={<Pay/>}/>
+            <Route path="/pay/account-detail" element={<AccountDetailPage/>}/>
             <Route path="/travels" element={<Travels/>}/>
             <Route path="/alarm" element={<Alarm/>}/>
         </Routes>
