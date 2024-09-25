@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Getter
@@ -21,7 +22,7 @@ public class TravelTransactionList {
     private double price;
 
     @Column(name = "transaction_date", nullable = false)
-    private Date transactionDate;
+    private LocalDateTime transactionDate;
 
     @Column(name = "balance", nullable = false)
     private double balance;
