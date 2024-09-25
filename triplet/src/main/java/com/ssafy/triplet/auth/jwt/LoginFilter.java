@@ -51,8 +51,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         String role = authorities.iterator().next().getAuthority();
 
         // access, refresh 토큰 발급
-        String access = jwtUtil.createJwt("access", username, role, 600000L);
-        String refresh = jwtUtil.createJwt("refresh", username, role, 86400000L);
+        String access = jwtUtil.createJwt("access", username, role, 1200000L);
+        String refresh = jwtUtil.createJwt("refresh", username, role, 14400000L);
 
         // 쿠키에 토큰 정보 담기
         response.addCookie(createCookie("Authorization", access));

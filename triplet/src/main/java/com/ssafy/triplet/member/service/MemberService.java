@@ -153,8 +153,8 @@ public class MemberService {
 
     private void autoLogin(String memberId, HttpServletResponse response) {
         // access, refresh 토큰 발급
-        String access = jwtUtil.createJwt("access", memberId, "ROLE_USER", 600000L);
-        String refresh = jwtUtil.createJwt("refresh", memberId, "ROLE_USER", 86400000L);
+        String access = jwtUtil.createJwt("access", memberId, "ROLE_USER", 1200000L);
+        String refresh = jwtUtil.createJwt("refresh", memberId, "ROLE_USER", 14400000L);
 
         // 쿠키에 토큰 정보 담기
         response.addCookie(createCookie("Authorization", access));

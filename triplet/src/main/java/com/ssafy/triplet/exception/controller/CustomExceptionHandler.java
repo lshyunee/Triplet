@@ -21,12 +21,4 @@ public class CustomExceptionHandler {
                 .body(new ApiResponse<Void>(errorCode, message));
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception e) {
-        log.info("[handleException] = {}", e.getMessage());
-        return ResponseEntity
-                .internalServerError()
-                .body(new ApiResponse<Void>("E0000", "서버 에러가 발생했습니다."));
-    }
-
 }
