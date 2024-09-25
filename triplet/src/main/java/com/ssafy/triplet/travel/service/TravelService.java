@@ -34,7 +34,6 @@ public class TravelService {
     private final TravelBudgetRepository travelBudgetRepository;
     private final CategoryRepository categoryRepository;
     private final CountryRepository countryRepository;
-    private final MerchantRepository merchantRepository;
     private final TravelWalletService travelWalletService;
     private final S3Service s3Service;
 
