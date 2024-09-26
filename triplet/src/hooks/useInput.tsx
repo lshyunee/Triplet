@@ -22,7 +22,7 @@ const useInput = (validator?: (value: string) => boolean) => {
       }
     };
   
-    return { value, onChange };
+    return { value, onChange, setValue };
   };
 
   export default useInput;

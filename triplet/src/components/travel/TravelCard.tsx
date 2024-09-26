@@ -9,7 +9,7 @@ const PositionDiv = styled.div`
 `;
 
 const CardDiv = styled.div`
-    width: 328px;
+    width: 100%;
     height: 227px;
     border-radius: 20px;
     position: relative;
