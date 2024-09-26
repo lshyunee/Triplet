@@ -8,6 +8,7 @@ import useAxios from '../../../hooks/useAxios';
 import useInput from '../../../hooks/useInput';
 
 import ErrorModal from '../../../components/modal/ErrorModal';
+import CompleteModal from '../../../components/modal/CompleteModal';
 
 const TitleP = styled.p`
     font-size : 32px;
@@ -118,19 +119,24 @@ const LoginPage = () => {
     // 로그인 버튼 핸들러
     const handleLogin = () => {
         loginRefetch(); // 클릭 시 요청 재시도
-        if (loginStatus === 400){
-            if (loginData.code === "M0002") {
-                setErrorMsg(loginData.message);
-                isErrorOpen();
-            } else if (loginData.code === "M0009") {
-                setErrorMsg(loginData.message);
-                isErrorOpen();
-            }
-        } else if (loginStatus === 500){
-            setErrorMsg("현재 서버 연결이 안됩니다.");
+    };
+    
+    useEffect(() => {
+        
+        if(loginData!==null){
+            console.log(loginData);
+            setCompleteMsg("로그인이 완료되었습니다.");
+            isCompleteOpen();
+        }
+
+        if(loginError!==null){
+            console.log(loginError);
+            const message = loginError.response.data.message || "로그인이 불가능합니다."
+            setErrorMsg(message);
             isErrorOpen();
         }
-    };
+
+    }, [loginData, loginError]);
 
     // 네이버 로그인 버튼 핸들러
     const handleNaverLogin = () => {
@@ -157,6 +163,17 @@ const LoginPage = () => {
         setIsError(false);
     }
 
+    const [ isComplete, setIsComplete ] = useState(false);
+    const [ completeMsg, setCompleteMsg ] = useState('');
+
+    const isCompleteOpen = () => {
+        setIsComplete(true);
+    }
+
+    const closeComplete = () => {
+        setIsComplete(false);
+    }
+
     return (
         <>
         <BigDiv>
@@ -174,6 +191,7 @@ const LoginPage = () => {
                 </StyledLink>
             </SignupDiv>
             <ErrorModal isOpen={isError} onClose={closeError} msg={errorMsg}></ErrorModal>
+            <CompleteModal isOpen={isComplete} onClose={closeComplete} msg={completeMsg}></CompleteModal>
         </BigDiv>
         </>
     );

@@ -115,19 +115,20 @@ const MyPage = () => {
 
     const { data: infoData, error: infoError, loading: infoLoading,
         status: infoStatus, refetch: infoRefetch }
-        = useAxios('/api/v1/user/my', 'GET');
+        = useAxios('/user/my', 'GET');
 
     useEffect(() => {
         infoRefetch();
     },[])
 
     useEffect(() => {
-        if(infoStatus===200){
-            setName(infoData.name);
-            setBirth(infoData.birth);
-            setPhoneNum(infoData.phoneNumber);
+        if(infoData!==null){
+            console.log(infoData);
+            setName(infoData.data.name);
+            setBirth(infoData.data.birth);
+            setPhoneNum(infoData.data.phoneNumber);
         }
-    },[infoStatus]);
+    },[infoData]);
 
     const openLogout = () => {
         setIsLogOutOpen(true);
