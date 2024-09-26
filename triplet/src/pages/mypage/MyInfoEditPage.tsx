@@ -2,6 +2,8 @@ import React, {useState, useEffect} from 'react';
 import BackHeader from '../../components/header/BackHeader';
 import styled from 'styled-components';
 
+import ErrorModal from '../../components/modal/ErrorModal';
+
 import useAxios from '../../hooks/useAxios';
 import useInput from '../../hooks/useInput';
 
@@ -135,23 +137,29 @@ const MyInfoEditPage = () => {
     const [ phoneNum, setPhoneNum ] = useState('');
     const [ identificationNum, setIdentificationNum ] = useState('');
 
-    // 전화번호 인증
-    useEffect(() => {
-        setPhoneNum(`${phoneNumFront}${phoneNumMiddle}${phoneNumBack}`);
-    }, [phoneNumFront, phoneNumMiddle, phoneNumBack])
-
-    // 주민등록번호
-    useEffect(() => {
-        setIdentificationNum(`${identificationNumFront}${identificationNumBack}`);
+      // 주민등록번호
+      useEffect(() => {
+        setIdentificationNum(`${identificationNumFront.value}${identificationNumBack.value}`);
     }, [identificationNumFront, identificationNumBack])
+
+      // 전화번호 인증
+    useEffect(() => {
+        setPhoneNum(`${phoneNumFront.value}${phoneNumMiddle.value}${phoneNumBack.value}`);
+    }, [phoneNumFront, phoneNumMiddle, phoneNumBack])
 
     const { data: phoneData, error: phoneError, loading: phoneLoading,
         status: phoneStatus, refetch: phoneRefetch }
         = useAxios('/sms/send','POST',{phoneNumber : phoneNum});
 
-    const certificateSend = () => {
-        phoneRefetch();
-    };
+        const certificateSend = () => {
+            console.log("전화번호"+phoneNum);
+            phoneRefetch();
+            if(phoneStatus===400){
+                console.log(phoneData);
+                setErrorMsg(phoneData.message);
+                isErrorOpen();
+            }
+        };
 
     const { data : smsData, error: smsError, loading: smsLoading,
         status: smsStatus, refetch: smsRefetch}
@@ -182,6 +190,17 @@ const MyInfoEditPage = () => {
         if(isCheck === true){
             editRefetch();
         }   
+    }
+
+    const [ isError, setIsError ] = useState(false);
+    const [ errorMsg, setErrorMsg ] = useState('');
+    
+    const isErrorOpen = () => {
+        setIsError(true);
+    }
+
+    const closeError = () => {
+        setIsError(false);
     }
 
     return (
@@ -224,6 +243,7 @@ const MyInfoEditPage = () => {
                     <ConfirmBtn onClick={myInfoEdit}>수정 완료</ConfirmBtn>
                 </InputDiv>
             </EntireDiv>
+            <ErrorModal isOpen={isError} onClose={closeError} msg={errorMsg}></ErrorModal>
         </>
     );
 };

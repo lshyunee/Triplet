@@ -17,20 +17,16 @@ import { ReactComponent as UKFlag } from '../../assets/pay/uk.svg';
 import { ReactComponent as SWFlag } from '../../assets/pay/sw.svg';
 import { ReactComponent as CAFlag } from '../../assets/pay/ca.svg';
 
+const MainDiv = styled.div`
+    background-color: #F3F4F6;
+    min-height : 100vh;
+`
 
 const HomeDiv = styled.div`
-    width: 100%;
-    height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    background-color: #F3F4F6;
-    padding-top: 60px; /* Header의 높이만큼 패딩을 추가 */
-    margin-top : 12px;
-    
-    > * {
-        margin-bottom: 12px;
-    }
+    padding-top: 68px; /* Header의 높이만큼 패딩을 추가 */
+    margin : 0 16px;
 `;
 
 const TitleP = styled.p`
@@ -45,17 +41,17 @@ const LittleTitleDiv = styled.div`
 `;
 
 const LittleDiv = styled.div`
+    width: 100%;
     box-sizing: border-box;
-    width : 328px;
     height : 64px;
     display : flex;
     flex-direction : row;
     background-color : white;
     border-radius : 20px;
     align-items: center;
-    padding-left : 12px;
-    padding-right: 12px;
+    padding : 16px;
     justify-content : space-between;
+    margin-top : 12px;
     
     ${TitleP}{
         margin-left: 12px;
@@ -63,11 +59,10 @@ const LittleDiv = styled.div`
 `
 
 const TitleDiv = styled.div`
-display: flex;
-align-items: center;
-justify-content: space-between;
-margin: 0 20px;
-padding-top: 20px;
+    height : 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 `;
 
 const DetailP = styled.p`
@@ -77,30 +72,23 @@ const DetailP = styled.p`
 `;
 
 const LargeDiv = styled.div`
-    width : 328px;
     height : 200px;
     background-color: #ffffff;
     border-radius: 20px;
-    margin: 0 16px;
-    margin-bottom: 12px;
     display: flex;
     flex-direction: column;
-    
-    ${TitleP}{
-        margin-top : 0px;
-        margin-bottom : 0px;
-    }
-
+    padding : 20px;
+    margin-bottom : 32px;
 `;
 
 const Card = styled.div`
-    width : 328px;
     background-color: #ffffff;
     border-radius: 20px;
-    margin: 0 16px;
     margin-bottom: 12px;
+    padding : 20px;
     display: flex;
     flex-direction: column;
+    margin-top : 12px;
 `;
 
 const CardTitle = styled.span`
@@ -109,43 +97,38 @@ const CardTitle = styled.span`
 `;
 
 const CardTitleArea = styled.div`
-display: flex;
-align-items: center;
-justify-content: space-between;
-margin: 0 20px;
-padding-top: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 `;
 
 const CardCaption = styled.span`
-font-size: 14px;
-font-weight: 400;
-color: #666666;
-margin: 0 20px;
-padding-top: 24px;
+    font-size: 14px;
+    font-weight: 400;
+    color: #666666;
+    padding-top: 24px;
 `;
 
 const CardContent = styled.span`
-font-size: 16px;
-font-weight: 600;
-align-self: flex-end;
+    font-size: 16px;
+    font-weight: 600;
+    align-self: flex-end;
 `;
 
 const CardButton = styled.button`
-border: 0;
-background-color: #E6F2FF;
-color: #008DE7;
-font-size: 14px;
-font-weight: 600;
-width: 65px;
-height: 36px;
-border-radius: 50px;
+    border: 0;
+    background-color: #E6F2FF;
+    color: #008DE7;
+    font-size: 14px;
+    font-weight: 600;
+    width: 65px;
+    height: 36px;
+    border-radius: 50px;
 `;
 
 const ButtonArea = styled.div`
-display: flex;
-justify-content: space-between;
-margin: 0 20px;
-padding-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
 `;
 
 const HomePage = () => {
@@ -157,43 +140,43 @@ const HomePage = () => {
     }, [])
 
     return (
-        <>
+        <MainDiv>
             <Header/>
             <HomeDiv>
-            <TravelCard/>
-            <LittleDiv>
-                <LittleTitleDiv>
-                    <SimplePay/>
-                    <TitleP>간편결제</TitleP>
-                </LittleTitleDiv>
-                <RightArrow/>
-            </LittleDiv>
-            <LittleDiv>
-                <LittleTitleDiv>
-                    <TravelPlan/>
-                    <TitleP>여행 계획 만들기</TitleP>
-                </LittleTitleDiv>
-                <RightArrow/>
-            </LittleDiv>
-            <Card>
-                <CardTitleArea>
-                    <CardTitle>내 통장</CardTitle>
+                <TravelCard/>
+                <LittleDiv>
+                    <LittleTitleDiv>
+                        <SimplePay/>
+                        <TitleP>간편결제</TitleP>
+                    </LittleTitleDiv>
                     <RightArrow/>
-                </CardTitleArea>
-                <CardCaption>은행 312-9446-0093</CardCaption>
-                <ButtonArea>
-                    <CardContent>20,000,000원</CardContent>
-                    <CardButton>송금</CardButton>
-                </ButtonArea>
-            </Card>
-            <LargeDiv>
-                <TitleDiv>
-                    <TitleP>내 외화 지갑</TitleP>
+                </LittleDiv>
+                <LittleDiv>
+                    <LittleTitleDiv>
+                        <TravelPlan/>
+                        <TitleP>여행 계획 만들기</TitleP>
+                    </LittleTitleDiv>
                     <RightArrow/>
-                </TitleDiv>
-            </LargeDiv>
+                </LittleDiv>
+                <Card>
+                    <CardTitleArea>
+                        <CardTitle>내 통장</CardTitle>
+                        <RightArrow/>
+                    </CardTitleArea>
+                    <CardCaption>은행 312-9446-0093</CardCaption>
+                    <ButtonArea>
+                        <CardContent>20,000,000원</CardContent>
+                        <CardButton>송금</CardButton>
+                    </ButtonArea>
+                </Card>
+                <LargeDiv>
+                    <TitleDiv>
+                        <TitleP>내 외화 지갑</TitleP>
+                        <RightArrow/>
+                    </TitleDiv>
+                </LargeDiv>
             </HomeDiv>
-        </>
+        </MainDiv>
     );
 };
 

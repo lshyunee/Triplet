@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux';
 import useAxios from '../../../hooks/useAxios';
 import useInput from '../../../hooks/useInput';
 import BackHeader from '../../../components/header/BackHeader';
+import ErrorModal from '../../../components/modal/ErrorModal';
 
 const HowP = styled.p`
     font-size : 12px;
@@ -74,7 +75,6 @@ const CheckDiv = styled.div`
 
     ${StyledInput} {
         margin-bottom: 4px;
-        margin-right : 8px;
     }
 `;
 
@@ -82,11 +82,11 @@ const CheckDiv = styled.div`
 const StyledBtn = styled.button`
     width:74px;
     height:44px;
-    border : 1px solid #008DE7;
+    border : 1px solid ${ (props) => props.disabled ? '#A1A1A1': '#008DE7'};
     border-radius : 10px;
     font-weight: 600;
-    background-color : white;
-    color : #008DE7;
+    background-color : ${ (props) => props.disabled ? '#A1A1A1' : 'white'};
+    color : ${ (props) => props.disabled ? 'white' : '#008DE7'};
     flex-shrink: 0;
     margin-left : 8px;
 `;
@@ -175,27 +175,17 @@ const SignupPage = () => {
     const idDuplicationCheck = () => {
         // 중복 체크 요청을 실행하기 위해 refetch 호출
         duplicatedRefetch();
+        setIsDuplicated(duplicatedData.data.isDuplicated);
     };
 
-    useEffect(() => {
-        // 상태 업데이트를 불필요하게 반복하지 않도록, 명확한 조건 설정
-        if (duplicatedStatus === 200 || duplicatedStatus === 401) {
-          // 상태를 이미 업데이트한 경우 중복 호출 방지
-          if (isDuplicated !== duplicatedData.isDuplicated) {
-            setIsDuplicated(duplicatedData.isDuplicated);
-          }
-        }
-        // 의존성 배열에서 duplicatedData를 제외하여 불필요한 상태 변경 방지
-      }, [duplicatedStatus]); // duplicatedStatus만 의존성 배열에 포함
-
       // 주민등록번호
-      useEffect(() => {
-        setIdentificationNum(`${identificationNumFront}${identificationNumBack}`);
+    useEffect(() => {
+        setIdentificationNum(`${identificationNumFront.value}${identificationNumBack.value}`);
     }, [identificationNumFront, identificationNumBack])
 
       // 전화번호 인증
     useEffect(() => {
-        setPhoneNum(`${phoneNumFront}${phoneNumMiddle}${phoneNumBack}`);
+        setPhoneNum(`${phoneNumFront.value}${phoneNumMiddle.value}${phoneNumBack.value}`);
     }, [phoneNumFront, phoneNumMiddle, phoneNumBack])
 
     const { data: phoneData, error: phoneError, loading: phoneLoading,
@@ -203,7 +193,16 @@ const SignupPage = () => {
         = useAxios('/sms/send','POST',{phoneNumber : phoneNum});
 
     const certificateSend = () => {
+        console.log("전화번호"+phoneNum);
         phoneRefetch();
+        if(phoneStatus===200){
+            console.log(phoneData);
+        }
+        if(phoneStatus===400){
+            console.log(phoneData);
+            setErrorMsg(phoneData.message);
+            isErrorOpen();
+        }
     };
 
     const { data : smsData, error: smsError, loading: smsLoading,
@@ -213,6 +212,15 @@ const SignupPage = () => {
 
     const certificateCheck = () => {
         smsRefetch();
+        if(smsStatus===400){
+            if(smsData.code==="M0007"){
+                setErrorMsg(smsData.message);
+                isErrorOpen();
+            }else if(smsData.code==="M0014"){
+                setErrorMsg(smsData.message);
+                isErrorOpen();
+            }
+        }
     }
 
     const [ isCheck, setIsCheck ] = useState(false);
@@ -222,6 +230,17 @@ const SignupPage = () => {
             setIsCheck(true);
         }
     }, [smsStatus]);
+
+    const [ isError, setIsError ] = useState(false);
+    const [ errorMsg, setErrorMsg ] = useState('');
+    
+    const isErrorOpen = () => {
+        setIsError(true);
+    }
+
+    const closeError = () => {
+        setIsError(false);
+    }
 
     return(
         <div>
@@ -233,7 +252,7 @@ const SignupPage = () => {
                 </ExplainDiv>
                 <CheckDiv>
                     <StyledInput type="text" {...id} />
-                    <StyledBtn onClick={idDuplicationCheck}>중복확인</StyledBtn>
+                    <StyledBtn onClick={idDuplicationCheck} disabled={false}>중복확인</StyledBtn>
                 </CheckDiv>
                 <CheckP>{isDuplicated ? " " : "사용 가능한 아이디입니다."}</CheckP>
                 <ExplainDiv>
@@ -259,18 +278,19 @@ const SignupPage = () => {
                     <StyledInput type="text" {...phoneNumMiddle} disabled={isCheck}/>
                     <NumP>-</NumP>
                     <StyledInput type="text" {...phoneNumBack} disabled={isCheck}/>
-                    <StyledBtn onClick={certificateSend}>인증번호 발송</StyledBtn>
+                    <StyledBtn onClick={certificateSend} disabled={isCheck}>인증번호 발송</StyledBtn>
                 </PhoneDiv>
                 <HowP>인증번호</HowP>
                 <CheckDiv>
-                    <StyledInput type="text" {...certificationNum} />
-                    <StyledBtn onClick={certificateCheck}>확인</StyledBtn>
+                    <StyledInput type="text" {...certificationNum} disabled={isCheck}/>
+                    <StyledBtn onClick={certificateCheck} disabled={isCheck}>확인</StyledBtn>
                 </CheckDiv>
                 <CheckP>인증되었습니다.</CheckP>
                 <ConfirmDiv>  
                         <ConfirmBox>회원 가입</ConfirmBox>
                     </ConfirmDiv>
             </InputDiv>
+            <ErrorModal isOpen={isError} onClose={closeError} msg={errorMsg}></ErrorModal>
         </div>
     )
 }

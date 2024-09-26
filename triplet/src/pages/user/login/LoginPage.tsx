@@ -137,8 +137,6 @@ const LoginPage = () => {
         naverRefetch(); // 클릭 시 요청 재시도
     };
 
-    const [ errorMsg, setErrorMsg ] = useState('');
-
     // 로그인 상태 변경 시 처리
     useEffect(() => {
         if (loginStatus === 200) {
@@ -147,7 +145,9 @@ const LoginPage = () => {
         }
     }, [loginStatus, dispatch, navigate]);
 
+    // 에러 모달
     const [ isError, setIsError ] = useState(false);
+    const [ errorMsg, setErrorMsg ] = useState('');
     
     const isErrorOpen = () => {
         setIsError(true);
