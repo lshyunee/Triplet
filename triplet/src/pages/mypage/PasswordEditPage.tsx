@@ -6,6 +6,8 @@ import useInput from '../../hooks/useInput';
 import useAxios from '../../hooks/useAxios';
 import { useNavigate } from 'react-router-dom';
 
+import CompleteModal from '../../components/modal/CompleteModal';
+import ErrorModal from '../../components/modal/ErrorModal';
 
 const HowP = styled.p`
     font-size : 12px;
@@ -92,14 +94,43 @@ const PasswordEditPage = () => {
     });
 
     const changePassword = () => {
-        pwRefetch();
+       pwRefetch();
     }
 
     useEffect (() => {
-        if(pwStatus === 200){
+        if(pwData !== null){
+            setMsg("비밀번호 변경이 완료되었습니다.");
+            isModalOpen();
             navigate(-1);
         }
-    }, [pwStatus]);
+        if(pwError !== null){
+            const message = pwError.response.data.message || '올바르지 않은 비밀번호입니다.';
+            setErrorMsg(message);
+            isErrorOpen();
+        }
+    }, [pwData, pwError]);
+
+    const [ isModel, setIsModel ] = useState(false);
+    const [ msg, setMsg ] = useState('');
+
+    const isModalOpen = () => {
+        setIsModel(true);
+    }
+
+    const isModelClose = () => {
+        setIsModel(false);
+    }
+
+    const [ isErrorModal, setIsErrorModal ] = useState(false);
+    const [ errorMsg, setErrorMsg ] = useState('');
+
+    const isErrorOpen = () => {
+        setIsErrorModal(true);
+    }
+
+    const isErrorClose = () => {
+        setIsErrorModal(false);
+    }
 
     return (
         <>
@@ -122,6 +153,8 @@ const PasswordEditPage = () => {
                 </NewDiv>
                 <ConfirmBtn onClick={changePassword}>비밀번호 변경</ConfirmBtn>
             </PasswordDiv>
+            <ErrorModal isOpen={isErrorModal} onClose={isErrorClose} msg={errorMsg}></ErrorModal>
+            <CompleteModal isOpen={isModel} onClose={isModelClose} msg={msg} ></CompleteModal>
         </>
     );
 };
