@@ -174,16 +174,18 @@ public class TravelService {
 
     @Transactional
     public TravelResponse inviteTravel(String inviteCode, Long userId) {
-        Long travelId = travelRepository.findTravelIdByInviteCode(inviteCode);
-        if (travelId == null) {
+        Travel travel = travelRepository.findTravelIdByInviteCode(inviteCode);
+        if (travel == null) {
             throw new CustomException("T0001", "초대코드가 유효하지 않습니다.");
         }
-        Optional<TravelMember> travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId);
+        Optional<TravelMember> travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travel.getId());
         if (travelMember.isPresent()) {
             throw new CustomException("T0015", "해당 유저는 이미 이 여행에 속해 있습니다.");
         }
-        insertTravelMembers(userId, travelId);
-        Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        if (travel.getMemberCount() <= travelMemberRepository.countByTravelId(travel.getId())) {
+            throw new CustomException("T0017", "여행 인원이 초과되었습니다.");
+        }
+        insertTravelMembers(userId, travel.getId());
         insertGroupAccountStake(userId, travel);
         return buildTravelResponse(travel, travel.getInviteCode());
     }
@@ -204,14 +206,12 @@ public class TravelService {
 
     public Page<TravelListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                      Integer month, Integer minDays, Integer maxDays, int page, int size) {
-
         Specification<Travel> spec = Specification.where(TravelSpecification.excludeCreator(userId))
                 .and(countryName != null ? TravelSpecification.countryNameContains(countryName) : null)
                 .and(memberCount != null ? TravelSpecification.memberCountEquals(memberCount) : null)
                 .and(minBudget != null && maxBudget != null ? TravelSpecification.totalBudgetWonBetween(minBudget, maxBudget) : null)
                 .and(month != null ? TravelSpecification.travelMonth(month) : null)
                 .and(minDays != null && maxDays != null ? TravelSpecification.travelDurationBetween(minDays, maxDays) : null);
-
         Pageable pageable = PageRequest.of(page, size);
         return travelRepository.findAll(spec, pageable)
                 .map(this::convertToTravelListResponse);
