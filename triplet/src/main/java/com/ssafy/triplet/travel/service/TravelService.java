@@ -228,43 +228,70 @@ public class TravelService {
 
     @Transactional
     public void finishTravel(Long travelId) {
-        Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
         double balance = travelWalletRepository.findBalanceByTravel(travelId);
         if (balance != 0) {
             if (travel.getMemberCount() == 1) {
-                AccountRechargeResponse response = accountRepository.findAccountNumberByMemberIdAndCurrency(travel.getCreatorId(), travel.getCountry().getCurrency());
-                double updatedAccountBalance = response.getAccountBalance() + balance;
-                accountService.rechargeForTravelAccount(response.getAccountNumber(), updatedAccountBalance);
+                handleSingleMemberTravel(balance, travel);
             } else {
-                Long travelWalletId = travelWalletRepository.findTravelWalletIdByTravel(travelId);
-                List<Object[]> memberAndMoneyList = groupAccountStakeRepostory.findMemberAndTotalMoneyByTravelId(travelWalletId);
-                double totalMoney = 0;
-                for (Object[] row : memberAndMoneyList) {
-                    totalMoney += (Double) row[1];
-                }
-                double distributedBalance = 0;
-                for (Object[] row : memberAndMoneyList) {
-                    Long memberId = (Long) row[0];
-                    Double memberMoney = (Double) row[1];
-                    double contributionPercentage = memberMoney / totalMoney;
-                    double amountToDistribute = Math.floor(balance * contributionPercentage);
-                    distributedBalance += amountToDistribute;
-                    distributeToMemberAccount(memberId, amountToDistribute, travel.getCountry().getCurrency(), travelId);
-                }
-                double remainingBalance = balance - distributedBalance;
-                Long creatorId = travelRepository.findCreatorIdByTravelId(travelId);
-                distributeToMemberAccount(creatorId, remainingBalance, travel.getCountry().getCurrency(), travelId);
+                handleMultiMemberTravel(balance, travelId, travel);
             }
         }
         travelRepository.updateStatusByTravelId(travelId, true);
         travelWalletRepository.deleteByTravelId(travelId);
     }
 
-    // 금액 분배 처리하는 메서드
+    private void handleSingleMemberTravel(double balance, Travel travel) {
+        AccountRechargeResponse response = accountRepository.findAccountNumberByMemberIdAndCurrency(
+                travel.getCreatorId(), travel.getCountry().getCurrency());
+        double updatedAccountBalance = response.getAccountBalance() + balance;
+        accountService.rechargeForTravelAccount(response.getAccountNumber(), updatedAccountBalance);
+    }
+
+    private void handleMultiMemberTravel(double balance, Long travelId, Travel travel) {
+        Long travelWalletId = travelWalletRepository.findTravelWalletIdByTravel(travelId);
+        List<Object[]> memberAndMoneyList = groupAccountStakeRepostory.findMemberAndTotalMoneyByTravelId(travelWalletId);
+        double totalMoney = calculateTotalMoney(memberAndMoneyList);
+        double distributedBalance = distributeBalanceToMembers(memberAndMoneyList, balance, totalMoney, travel);
+        distributeRemainingBalance(balance, distributedBalance, travelId, travel);
+    }
+
+    private double calculateTotalMoney(List<Object[]> memberAndMoneyList) {
+        return memberAndMoneyList.stream()
+                .mapToDouble(row -> (Double) row[1])
+                .sum();
+    }
+
+    private double distributeBalanceToMembers(List<Object[]> memberAndMoneyList, double balance, double totalMoney, Travel travel) {
+        double distributedBalance = 0;
+        for (Object[] row : memberAndMoneyList) {
+            Long memberId = (Long) row[0];
+            Double memberMoney = (Double) row[1];
+            if (memberMoney != 0) {
+                double contributionPercentage = memberMoney / totalMoney;
+                double amountToDistribute = Math.floor(balance * contributionPercentage);
+                distributedBalance += amountToDistribute;
+                distributeToMemberAccount(memberId, amountToDistribute, travel.getCountry().getCurrency(), travel.getId());
+            }
+        }
+        return distributedBalance;
+    }
+
+    private void distributeRemainingBalance(double balance, double distributedBalance, Long travelId, Travel travel) {
+        double remainingBalance = balance - distributedBalance;
+        Long creatorId = travelRepository.findCreatorIdByTravelId(travelId);
+        distributeToMemberAccount(creatorId, remainingBalance, travel.getCountry().getCurrency(), travelId);
+    }
+
     private void distributeToMemberAccount(Long memberId, double amount, String currency, Long travelId) {
         AccountRechargeResponse response = accountRepository.findAccountNumberByMemberIdAndCurrency(memberId, currency);
         double updatedAccountBalance = response.getAccountBalance() + amount;
         accountService.rechargeForTravelAccount(response.getAccountNumber(), updatedAccountBalance);
+        updateTravelWalletBalance(travelId, amount);
+    }
+
+    private void updateTravelWalletBalance(Long travelId, double amount) {
         double balanceTravelWallet = travelWalletRepository.findBalanceByTravel(travelId);
         double updatedWalletBalance = balanceTravelWallet - amount;
         travelWalletRepository.rechargeTravelWallet(travelId, updatedWalletBalance);
