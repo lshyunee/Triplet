@@ -207,7 +207,15 @@ public class TravelController {
         }
     }
 
-
+    @PostMapping("/finish/{travelId}")
+    public ResponseEntity<ApiResponse<TravelResponse>> finishTravel(@PathVariable Long travelId) {
+        try {
+            travelService.finishTravel(travelId);
+            return ResponseEntity.ok(new ApiResponse<>("200", "여행이 종료되었습니다."));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
 
 
     // 예외처리 메서드
