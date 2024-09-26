@@ -2,7 +2,10 @@ import React, {useState, useEffect} from 'react';
 import BackHeader from '../../components/header/BackHeader';
 import styled from 'styled-components';
 
+import { useNavigate } from 'react-router-dom';
+
 import ErrorModal from '../../components/modal/ErrorModal';
+import CompleteModal from '../../components/modal/CompleteModal';
 
 import useAxios from '../../hooks/useAxios';
 import useInput from '../../hooks/useInput';
@@ -40,7 +43,7 @@ const StyledInput = styled.input`
     height:44px;
     border-radius : 10px;
     border : 1px solid #F0F0F0;
-    box-sizing: border-box;
+    text-align:center;
 `;
 
 const StyledInputFront = styled.input`
@@ -51,6 +54,7 @@ const StyledInputFront = styled.input`
     width : 50%;
     padding : 10px;
     height : 44px;
+    text-align:center;
 `;
 
 const StyledBtn = styled.button`
@@ -67,6 +71,11 @@ const StyledBtn = styled.button`
 
 const InputDistanceDiv = styled.div`
     margin-bottom : 32px;
+
+    ${StyledInput}{
+        text-align: left;
+        padding-left : 10px;
+    }
 `
 
 const RegistDiv = styled.div`
@@ -74,7 +83,7 @@ const RegistDiv = styled.div`
     flex-direction: row;
 
     ${StyledInputFront} {
-        width : 52px;
+        width : 80px;
         margin-right : 12px;
     }
 
@@ -121,21 +130,63 @@ const ConfirmBtn = styled.button`
 
 const MyInfoEditPage = () => {
 
+    const navigate = useNavigate();
+
     const validNum = (value:string): boolean => {
         const regex = /^[0-9]*$/;
         return regex.test(value);
     }
 
+    const validPhoneNumFront = (value:string): boolean => {
+        const regex = /^[0-9]*$/;
+        return value.length <=3 && regex.test(value);
+    }
+
+    const validPhoneNum = (value:string): boolean => {
+        const regex = /^[0-9]*$/;
+        return value.length <=4 && regex.test(value);
+    }
+
+    const validIdentificationFront = (value:string): boolean => {
+        const regex = /^[0-9]*$/;
+        return value.length <=6 && regex.test(value);
+    }
+
+    const validIdentificationBack = (value:string): boolean => {
+        const regex = /^[0-9]*$/;
+        return value.length <=1 && regex.test(value);
+    }
+
     const name = useInput();
-    const identificationNumFront = useInput(validNum);
-    const identificationNumBack = useInput(validNum);
-    const phoneNumFront = useInput(validNum);
-    const phoneNumMiddle = useInput(validNum);
-    const phoneNumBack = useInput(validNum);
+    const identificationNumFront = useInput(validIdentificationFront);
+    const identificationNumBack = useInput(validIdentificationBack);
+    const phoneNumFront = useInput(validPhoneNumFront);
+    const phoneNumMiddle = useInput(validPhoneNum);
+    const phoneNumBack = useInput(validPhoneNum);
     const certificationNum = useInput(validNum);
 
     const [ phoneNum, setPhoneNum ] = useState('');
     const [ identificationNum, setIdentificationNum ] = useState('');
+
+    const { data: infoData, error: infoError, loading: infoLoading,
+            status: infoStatus, refetch: infoRefetch}
+            = useAxios("/user/my",'GET');
+
+    useEffect(() => {
+        infoRefetch();
+    },[])
+
+    useEffect(() => {
+        
+        if(infoData !== null){
+            name.setValue(infoData.data.name);
+            identificationNumFront.setValue(infoData.data.birth);
+            phoneNumFront.setValue(infoData.data.phoneNumber.slice(0,3));
+            phoneNumMiddle.setValue(infoData.data.phoneNumber.slice(3,7));
+            phoneNumBack.setValue(infoData.data.phoneNumber.slice(7,11));
+        }
+
+    },[infoData])
 
       // 주민등록번호
       useEffect(() => {
@@ -152,31 +203,47 @@ const MyInfoEditPage = () => {
         = useAxios('/sms/send','POST',{phoneNumber : phoneNum});
 
         const certificateSend = () => {
-            console.log("전화번호"+phoneNum);
             phoneRefetch();
-            if(phoneStatus===400){
-                console.log(phoneData);
-                setErrorMsg(phoneData.message);
-                isErrorOpen();
-            }
         };
+
+    useEffect(() => {
+        if( phoneError!==null ){
+            const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
+            setErrorMsg(message);
+            isErrorOpen();
+        }
+    }, [phoneData, phoneError])
 
     const { data : smsData, error: smsError, loading: smsLoading,
         status: smsStatus, refetch: smsRefetch}
         = useAxios('/sms/confirm', 'POST', 
-            {phoneNumber : phoneNum, certificationNumber: certificationNum});
+            {phoneNumber : phoneNum, certificationNumber: certificationNum.value});
 
     const certificateCheck = () => {
         smsRefetch();
     }
 
+    useEffect(() => {
+        if(phoneError!==null && phoneStatus!==200){
+            console.log(phoneError);
+            const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
+            setErrorMsg(message);
+            isErrorOpen();
+        }
+    }, [phoneData, phoneError])
+
     const [ isCheck, setIsCheck ] = useState(false);
 
     useEffect (() => {
-        if(smsStatus===200){
+        if(smsData!==null){
             setIsCheck(true);
+        }else if (smsError!==null){
+            console.log(smsError);
+            const message = smsError.response.data.message || '전화번호를 인증할 수 없습니다.';
+            setErrorMsg(message);
+            isErrorOpen();
         }
-    }, [smsStatus]);
+    }, [smsData, smsError]);
 
     const { data: editData, error: editError, loading: editLoading,
         status: editStatus, refetch: editRefetch }
@@ -187,11 +254,33 @@ const MyInfoEditPage = () => {
         });
 
     const myInfoEdit = () => {
+        if(name.value.length===0){
+            setErrorMsg("이름을 입력해주세요.");
+            isErrorOpen();
+            return;
+        }
         if(isCheck === true){
             editRefetch();
         }   
     }
 
+    useEffect(() => {
+
+        if(editData !== null){
+            setMsg("정보 수정이 완료 되었습니다.");
+            isModalOpen();
+            navigate(-1);
+        }
+
+        if(editError !== null){
+            const message = editError.response.data.message || "정보 수정이 불가능합니다.";
+            setErrorMsg(message);
+            isErrorOpen();
+        }
+
+    },[editData, editError]);
+
+    // 에러 모달
     const [ isError, setIsError ] = useState(false);
     const [ errorMsg, setErrorMsg ] = useState('');
     
@@ -201,6 +290,18 @@ const MyInfoEditPage = () => {
 
     const closeError = () => {
         setIsError(false);
+    }
+
+    // 완료 모달
+    const [ isModel, setIsModel ] = useState(false);
+    const [ msg, setMsg ] = useState('');
+
+    const isModalOpen = () => {
+        setIsModel(true);
+    }
+
+    const isModelClose = () => {
+        setIsModel(false);
     }
 
     return (
@@ -217,7 +318,7 @@ const MyInfoEditPage = () => {
                         <RegistDiv>
                             <StyledInputFront type="text" {...identificationNumFront}/>
                             <NumP>-</NumP>
-                            <StyledInput type="text" {...identificationNumBack}/>
+                            <StyledInput type="text" {...identificationNumBack} disabled={false}/>
                             <NumP>* * * * * *</NumP>
                         </RegistDiv>
                     </InputDistanceDiv>
@@ -229,21 +330,22 @@ const MyInfoEditPage = () => {
                             <StyledInput type="text" {...phoneNumMiddle} disabled={isCheck}/>
                             <NumP>-</NumP>
                             <StyledInput type="text" {...phoneNumBack} disabled={isCheck}/>
-                            <StyledBtn onClick={certificateSend}>인증번호 발송</StyledBtn>
+                            <StyledBtn onClick={certificateSend} disabled={isCheck}>인증번호 발송</StyledBtn>
                         </PhoneDiv>
                     </InputDistanceDiv>
                     <InputDistanceDiv>
                         <HowP>인증번호</HowP>
                         <CheckDiv>
-                            <StyledInput type="text" {...certificationNum} />
-                            <StyledBtn onClick={certificateCheck}>확인</StyledBtn>
+                            <StyledInput type="text" {...certificationNum} disabled={isCheck}/>
+                            <StyledBtn onClick={certificateCheck} disabled={isCheck}>확인</StyledBtn>
                         </CheckDiv>
-                        <CheckP>인증되었습니다.</CheckP>
+                        <CheckP>{isCheck ? "인증되었습니다." : ""}</CheckP>
                     </InputDistanceDiv>
                     <ConfirmBtn onClick={myInfoEdit}>수정 완료</ConfirmBtn>
                 </InputDiv>
             </EntireDiv>
             <ErrorModal isOpen={isError} onClose={closeError} msg={errorMsg}></ErrorModal>
+            <CompleteModal isOpen={isModel} onClose={isModelClose} msg={msg} ></CompleteModal>
         </>
     );
 };
