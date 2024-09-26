@@ -196,11 +196,24 @@ public class TravelService {
         return categoryRepository.getAllCategories();
     }
 
-    public List<TravelBudgetResponse> getTravelBudgetList(Long travelId) {
+    public Map<String, Object> getTravelBudgetList(Long travelId) {
         Travel travel = travelRepository.findById(travelId)
                 .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
-        return travelBudgetRepository.findBudgetResponseByTravel(travel);
+        boolean isComplete = travel.isStatus();
+        List<?> budgetList;
+
+        if (!isComplete) {
+            budgetList = travelBudgetRepository.findBudgetResponseByTravel(travel);
+        } else {
+            budgetList = travelBudgetRepository.findCompleteBudgetResponseByTravel(travel);
+        }
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        resultMap.put("isComplete", isComplete);
+        resultMap.put("budgetList", budgetList);
+        return resultMap;
     }
+
+
 
     public Page<TravelListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                      Integer month, Integer minDays, Integer maxDays, int page, int size) {

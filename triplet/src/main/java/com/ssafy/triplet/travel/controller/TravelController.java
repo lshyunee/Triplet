@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/travels")
@@ -175,10 +177,10 @@ public class TravelController {
     }
 
     @GetMapping("/expenditure-expenses/{travelId}")
-    public ResponseEntity<ApiResponse<List<TravelBudgetResponse>>> getExpenditureExpenses(@PathVariable Long travelId) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getExpenditureExpenses(@PathVariable Long travelId) {
         try {
-            List<TravelBudgetResponse> list = travelService.getTravelBudgetList(travelId);
-            return ResponseEntity.ok(new ApiResponse<>("200", "카테고리별 지출현황이 조회되었습니다.", list));
+            Map<String, Object> response = travelService.getTravelBudgetList(travelId);
+            return ResponseEntity.ok(new ApiResponse<>("200", "카테고리별 지출현황이 조회되었습니다.", response));
         } catch (Exception e) {
             return handleException(e);
         }
