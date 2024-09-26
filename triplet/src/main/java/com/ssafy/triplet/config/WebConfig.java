@@ -21,7 +21,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry
                 .addMapping("/**")
-                .allowedOriginPatterns("*") // 허용할 출처 : 특정 도메인만 받을 수 있음
+                .allowedOriginPatterns("http://localhost:3000", "https://j11b202.p.ssafy.io") // 허용할 출처 : 특정 도메인만 받을 수 있음
                 .exposedHeaders("Set-Cookie", "Authorization", "Authorization-Refresh")
                 .allowedMethods("*")
                 .allowedHeaders("*")
@@ -33,7 +33,8 @@ public class WebConfig implements WebMvcConfigurer {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        configuration.addAllowedOriginPattern("*");
+        configuration.addAllowedOriginPattern("http://localhost:3000");
+        configuration.addAllowedOriginPattern("https://j11b202.p.ssafy.io");
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Collections.singletonList("*"));
