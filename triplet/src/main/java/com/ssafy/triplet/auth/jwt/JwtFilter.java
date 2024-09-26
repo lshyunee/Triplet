@@ -41,7 +41,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 "/api/v1/oauth2/authorization"
         );
         String requestURI = request.getRequestURI();
-
+        log.info("requestURI: {}", requestURI);
         if (whiteList.stream().anyMatch(requestURI::startsWith)) {
             filterChain.doFilter(request, response);
             return;
@@ -50,6 +50,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // 쿠키에서 access 토큰 가져옴
         String accessToken = null;
         Cookie[] cookies = request.getCookies();
+        log.info("cookies: {}", cookies);
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("Authorization".equals(cookie.getName())) {

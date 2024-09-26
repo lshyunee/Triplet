@@ -62,7 +62,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 + "; HttpOnly"
                 + (authorization.getSecure() ? "; Secure" : "")
                 + "; SameSite=None");
-        response.addCookie(authorization);
 
         Cookie authorizationRefresh = createCookie("Authorization-Refresh", refresh);
         response.addHeader("Set-Cookie", authorizationRefresh.getName() + "=" + authorizationRefresh.getValue()
@@ -71,7 +70,6 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
                 + "; HttpOnly"
                 + (authorizationRefresh.getSecure() ? "; Secure" : "")
                 + "; SameSite=None");
-        response.addCookie(authorizationRefresh);
 
         // JSON 응답 만들기
         response.setContentType("application/json");
@@ -116,7 +114,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
     private Cookie createCookie(String key, String value) {
         Cookie cookie = new Cookie(key, value);
         cookie.setMaxAge(24*60*60);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         return cookie;
