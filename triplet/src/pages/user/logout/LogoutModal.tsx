@@ -83,11 +83,11 @@ const LogoutModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   };
 
   useEffect(() => {
-    if (logoutStatus === 200) {
+    if (logoutData !== null) {
       dispatch(logout());
       navigate("/login");
     }
-  }, [logoutStatus, dispatch, navigate]);
+  }, [logoutData]);
 
   // 조건부로 return 대신, 렌더링 부분에서 조건 제어
   if (!isOpen) {
