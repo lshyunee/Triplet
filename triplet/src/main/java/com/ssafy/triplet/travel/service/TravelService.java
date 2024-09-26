@@ -272,6 +272,18 @@ public class TravelService {
         travelWalletRepository.rechargeTravelWallet(travelId, updatedWalletBalance);
     }
 
+    @Transactional
+    public void leaveTravel(Long userId, Long travelId) {
+        Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        Optional<TravelMember> travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId);
+        if (travelMember.isEmpty()) {
+            throw new CustomException("T0016", "해당 유저는 이미 이 여행에 속해 있지 않습니다.");
+        }
+        TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
+        groupAccountStakeRepostory.deleteGroupAccountStake(travelWallet, userId);
+        travelMemberRepository.deleteByMemberIdAndTravelId(userId, travelId);
+    }
+
 
     /* 중복 메서드 */
     // 필수 값 및 날짜 검증 메서드 (여행 생성, 여행 수정)
