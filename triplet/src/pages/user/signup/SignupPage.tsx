@@ -151,15 +151,35 @@ const SignupPage = () => {
         return regex.test(value);
     }
 
+    const validPhoneNumFront = (value:string): boolean => {
+        const regex = /^[0-9]*$/;
+        return value.length <=3 && regex.test(value);
+    }
+
+    const validPhoneNum = (value:string): boolean => {
+        const regex = /^[0-9]*$/;
+        return value.length <=4 && regex.test(value);
+    }
+
+    const validIdentificationFront = (value:string): boolean => {
+        const regex = /^[0-9]*$/;
+        return value.length <=6 && regex.test(value);
+    }
+
+    const validIdentificationBack = (value:string): boolean => {
+        const regex = /^[0-9]*$/;
+        return value.length <=1 && regex.test(value);
+    }
+
     const id = useInput(validId);
     const pw = useInput(validPw);
     const pwCheck = useInput(validPw);
     const name = useInput();
-    const identificationNumFront = useInput(validNum);
-    const identificationNumBack = useInput(validNum);
-    const phoneNumFront = useInput(validNum);
-    const phoneNumMiddle = useInput(validNum);
-    const phoneNumBack = useInput(validNum);
+    const identificationNumFront = useInput(validIdentificationFront);
+    const identificationNumBack = useInput(validIdentificationBack);
+    const phoneNumFront = useInput(validPhoneNumFront);
+    const phoneNumMiddle = useInput(validPhoneNum);
+    const phoneNumBack = useInput(validPhoneNum);
     const certificationNum = useInput(validNum);
 
     const [ phoneNum, setPhoneNum ] = useState('');
@@ -174,9 +194,26 @@ const SignupPage = () => {
 
     const idDuplicationCheck = () => {
         // 중복 체크 요청을 실행하기 위해 refetch 호출
-        duplicatedRefetch();
-        setIsDuplicated(duplicatedData.data.isDuplicated);
+        if(id.value.length>=5&&id.value.length<=16){
+            duplicatedRefetch();
+        }else{
+            setErrorMsg("아이디는 영문,숫자 포함 5~16자여야 합니다.");
+            isErrorOpen();
+        }
     };
+
+    useEffect(() => {
+
+        if(duplicatedData!==null){
+            setIsDuplicated(duplicatedData.data.isDuplicated);
+        }
+
+        if(duplicatedError!==null){
+            setErrorMsg("옳지 않은 아이디 입니다.");
+            isErrorOpen();
+        }
+
+    }, [duplicatedData, duplicatedError]);
 
       // 주민등록번호
     useEffect(() => {
@@ -193,44 +230,71 @@ const SignupPage = () => {
         = useAxios('/sms/send','POST',{phoneNumber : phoneNum});
 
     const certificateSend = () => {
-        console.log("전화번호"+phoneNum);
         phoneRefetch();
-        if(phoneStatus===200){
-            console.log(phoneData);
-        }
-        if(phoneStatus===400){
-            console.log(phoneData);
-            setErrorMsg(phoneData.message);
+    };
+
+    useEffect(() => {
+        if(phoneError!==null && phoneStatus!==200){
+            console.log(phoneError);
+            const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
+            setErrorMsg(message);
             isErrorOpen();
         }
-    };
+    }, [phoneData, phoneError])
 
     const { data : smsData, error: smsError, loading: smsLoading,
         status: smsStatus, refetch: smsRefetch}
         = useAxios('/sms/confirm', 'POST', 
-            {phoneNumber : phoneNum, certificationNumber: certificationNum});
+            {phoneNumber : phoneNum, certificationNumber: certificationNum.value});
 
     const certificateCheck = () => {
         smsRefetch();
-        if(smsStatus===400){
-            if(smsData.code==="M0007"){
-                setErrorMsg(smsData.message);
-                isErrorOpen();
-            }else if(smsData.code==="M0014"){
-                setErrorMsg(smsData.message);
-                isErrorOpen();
-            }
-        }
     }
-
+    
     const [ isCheck, setIsCheck ] = useState(false);
 
     useEffect (() => {
         if(smsStatus===200){
             setIsCheck(true);
+        }else if (smsError!==null){
+            const message = smsError.response.data.message || '전화번호를 인증할 수 없습니다.';
+            setErrorMsg(message);
+            isErrorOpen();
         }
-    }, [smsStatus]);
+    }, [smsData, smsError]);
 
+
+    const { data:signupData, loading:signupLoading, 
+        error:signupError, status:sigunupError, 
+        refetch:signupRefetch } =
+        useAxios("/signup",'POST',{
+            memberId : id.value,
+            password : pw.value,
+            passwordConfirm : pwCheck.value,
+            name : name.value,
+            phoneNumber : phoneNum,
+            identificationNumber : identificationNum
+        });
+
+    const signup = () => {
+        signupRefetch();
+    }
+
+    useEffect(()=>{
+        
+        if(signupData!==null){
+            navigate("/simple-password/set");
+        }
+
+        if(signupError!==null){
+            const message = signupError.response.data.message || '회원 정보 입력이 올바르지 않습니다.';
+            setErrorMsg(message);
+            isErrorOpen();
+        }
+
+    },[signupData, signupError]);
+
+    // 에러 모달
     const [ isError, setIsError ] = useState(false);
     const [ errorMsg, setErrorMsg ] = useState('');
     
@@ -285,9 +349,9 @@ const SignupPage = () => {
                     <StyledInput type="text" {...certificationNum} disabled={isCheck}/>
                     <StyledBtn onClick={certificateCheck} disabled={isCheck}>확인</StyledBtn>
                 </CheckDiv>
-                <CheckP>인증되었습니다.</CheckP>
+                <CheckP>{isCheck ? "인증되었습니다." : ""}</CheckP>
                 <ConfirmDiv>  
-                        <ConfirmBox>회원 가입</ConfirmBox>
+                        <ConfirmBox onClick={signup}>회원 가입</ConfirmBox>
                     </ConfirmDiv>
             </InputDiv>
             <ErrorModal isOpen={isError} onClose={closeError} msg={errorMsg}></ErrorModal>
