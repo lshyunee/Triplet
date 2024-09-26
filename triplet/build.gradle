@@ -30,6 +30,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	// QR
+	implementation group: 'com.google.zxing', name: 'javase', version: '3.5.0'
+	implementation group: 'com.google.zxing', name: 'core', version: '3.5.0'
+	//SMS
 	implementation 'net.nurigo:sdk:4.3.0'
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
