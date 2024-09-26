@@ -1,5 +1,8 @@
 package com.ssafy.triplet.travel.service;
 
+import com.ssafy.triplet.account.dto.response.AccountRechargeResponse;
+import com.ssafy.triplet.account.repository.AccountRepository;
+import com.ssafy.triplet.account.service.AccountService;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
@@ -34,7 +37,11 @@ public class TravelService {
     private final TravelBudgetRepository travelBudgetRepository;
     private final CategoryRepository categoryRepository;
     private final CountryRepository countryRepository;
+    private final GroupAccountStakeRepostory groupAccountStakeRepostory;
+    private final TravelWalletRepository travelWalletRepository;
+    private final AccountRepository accountRepository;
     private final TravelWalletService travelWalletService;
+    private final AccountService accountService;
     private final S3Service s3Service;
 
     @Transactional
@@ -46,6 +53,7 @@ public class TravelService {
         insertTravelMembers(userId, travel.getId());
         saveTravelBudgets(request, savedTravel);
         travelWalletService.makeTravelWallet(savedTravel, userId);
+        insertGroupAccountStake(userId, savedTravel);
         return buildTravelResponse(savedTravel, inviteCode);
     }
 
@@ -170,6 +178,7 @@ public class TravelService {
         }
         insertTravelMembers(userId, travelId);
         Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        insertGroupAccountStake(userId, travel);
         return buildTravelResponse(travel, travel.getInviteCode());
     }
 
@@ -212,6 +221,60 @@ public class TravelService {
         response.setNumber(page.getNumber());
         return response;
     }
+
+    @Transactional
+    public void finishTravel(Long travelId) {
+        Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        double balance = travelWalletRepository.findBalanceByTravel(travelId);
+        if (balance != 0) {
+            // 여행의 지갑 ID
+            Long travelWalletId = travelWalletRepository.findTravelWalletIdByTravel(travelId);
+
+            // 멤버와 해당 멤버가 낸 금액 리스트
+            List<Object[]> memberAndMoneyList = groupAccountStakeRepostory.findMemberAndTotalMoneyByTravelId(travelWalletId);
+
+            // 전체 금액 계산
+            double totalMoney = 0;
+            for (Object[] row : memberAndMoneyList) {
+                totalMoney += (Double) row[1];
+            }
+
+            // 전체 금액 중 남은 금액 분배
+            double distributedBalance = 0;
+            for (Object[] row : memberAndMoneyList) {
+                Long memberId = (Long) row[0];
+                Double memberMoney = (Double) row[1];
+
+                // 비율 계산 (멤버가 낸 금액 / 총 금액)
+                double contributionPercentage = memberMoney / totalMoney;
+
+                // 멤버가 받을 금액 = 남은 balance * 비율
+                double amountToDistribute = balance * contributionPercentage;
+                distributedBalance += amountToDistribute;  // 분배된 금액 누적
+
+                // 멤버에게 금액 분배
+                distributeToMemberAccount(memberId, amountToDistribute, travel.getCountry().getCurrency(), travelId);
+            }
+
+            double remainingBalance = balance - distributedBalance;
+            Long creatorId = travelRepository.findCreatorIdByTravelId(travelId);
+            distributeToMemberAccount(creatorId, remainingBalance, travel.getCountry().getCurrency(), travelId);
+        }
+
+        travelRepository.updateStatusByTravelId(travelId, true);
+        travelWalletRepository.deleteByTravelId(travelId);
+    }
+
+    // 금액 분배를 처리하는 메서드
+    private void distributeToMemberAccount(Long memberId, double amount, String currency, Long travelId) {
+        AccountRechargeResponse response = accountRepository.findAccountNumberByMemberIdAndCurrency(memberId, currency);
+        double updatedAccountBalance = response.getAccountBalance() + amount;
+        accountService.rechargeForTravelAccount(response.getAccountNumber(), updatedAccountBalance);
+        double balanceTravelWallet = travelWalletRepository.findBalanceByTravel(travelId);
+        double updatedWalletBalance = balanceTravelWallet - amount;
+        travelWalletRepository.rechargeTravelWallet(travelId, updatedWalletBalance);
+    }
+
 
 
 
@@ -310,7 +373,6 @@ public class TravelService {
     // 여행 예산 테이블 수정
     private void updateTravelBudgets(TravelRequest request, Travel travel) {
         List<TravelBudget> existingBudgets = travelBudgetRepository.findByTravel(travel);
-
         for (TravelRequest.BudgetDTO budgetDTO : request.getBudgets()) {
             TravelBudget existingBudget = existingBudgets.stream()
                     .filter(budget -> budget.getCategory() != null &&
@@ -353,5 +415,15 @@ public class TravelService {
         response.setCurrency(travel.getCountry().getCurrency());
         response.setTotalBudget(travel.getTotalBudget());
         return response;
+    }
+
+    public void insertGroupAccountStake(Long userId, Travel travel) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("M0010", "존재하지 않는 회원입니다."));
+        TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
+        GroupAccountStake groupAccountStake = new GroupAccountStake();
+        groupAccountStake.setMember(member);
+        groupAccountStake.setTravelWallet(travelWallet);
+        groupAccountStakeRepostory.save(groupAccountStake);
     }
 }

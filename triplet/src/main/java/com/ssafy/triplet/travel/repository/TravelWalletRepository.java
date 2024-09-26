@@ -5,8 +5,10 @@ import com.ssafy.triplet.travel.entity.TravelWallet;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+@Repository
 public interface TravelWalletRepository extends JpaRepository<TravelWallet, Long> {
 
     @Modifying
@@ -14,6 +16,16 @@ public interface TravelWalletRepository extends JpaRepository<TravelWallet, Long
     @Query("UPDATE TravelWallet t SET t.balance = :amount WHERE t.travelId.id = :travelId")
     void rechargeTravelWallet(Long travelId, double amount);
 
-    @Query("SELECT t.balance FROM TravelWallet t WHERE t.travelId = :travel")
-    double findBalanceByTravel(Travel travel);
+    @Query("SELECT t.balance FROM TravelWallet t WHERE t.travelId.id = :travelId")
+    double findBalanceByTravel(Long travelId);
+
+    TravelWallet findByTravelId(Travel travel);
+
+    @Query("SELECT t.id FROM TravelWallet t WHERE t.travelId.id = :travelId")
+    Long findTravelWalletIdByTravel(Long travelId);
+
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM TravelWallet t WHERE t.travelId.id = :travelId")
+    void deleteByTravelId(Long travelId);
 }

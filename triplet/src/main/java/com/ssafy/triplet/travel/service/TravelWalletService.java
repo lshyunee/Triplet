@@ -7,10 +7,7 @@ import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.travel.dto.request.TravelWalletRechargeRequest;
 import com.ssafy.triplet.travel.dto.response.TransactionListResponse;
-import com.ssafy.triplet.travel.entity.Category;
-import com.ssafy.triplet.travel.entity.Travel;
-import com.ssafy.triplet.travel.entity.TravelTransactionList;
-import com.ssafy.triplet.travel.entity.TravelWallet;
+import com.ssafy.triplet.travel.entity.*;
 import com.ssafy.triplet.travel.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -30,6 +27,7 @@ public class TravelWalletService {
     private final TravelTransactionListRepository transactionListRepository;
     private final CategoryRepository categoryRepository;
     private final MerchantRepository merchantRepository;
+    private final GroupAccountStakeRepostory groupAccountStakeRepostory;
 
     @Transactional
     public void makeTravelWallet(Travel savedTravel, Long userId) {
@@ -57,21 +55,31 @@ public class TravelWalletService {
     private TransactionListResponse processWalletTransaction(Long userId, TravelWalletRechargeRequest request, int category) {
         Travel travel = findTravelById(request.getTravelId());
         AccountRechargeResponse response = findAccountBalanceForRecharge(userId, travel.getCountry().getCurrency());
-        double balanceTravelWallet = travelWalletRepository.findBalanceByTravel(travel);
+        double balanceTravelWallet = travelWalletRepository.findBalanceByTravel(request.getTravelId());
         double updatedAccountBalance;
         double updatedWalletBalance;
-        if (category == 7) {
+        double updateGroupAccountStake;
+        TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("M0010", "존재하지 않는 회원입니다."));
+        Long groupAccountId = groupAccountStakeRepostory.findIdByTravelWalletIdAndMemberId(travelWallet, member);
+        if (category == 7) {    // 충전
             if (response.getAccountBalance() < request.getChargeCost()) {
                 throw new CustomException("A0006", "계좌 잔액이 부족하여 거래가 실패했습니다.");
             }
             updatedAccountBalance = response.getAccountBalance() - request.getChargeCost();
             updatedWalletBalance = balanceTravelWallet + request.getChargeCost();
-        } else {
+            updateGroupAccountStake = request.getChargeCost() + groupAccountStakeRepostory.findTotalMoneyByGroupAccountId(groupAccountId);
+            groupAccountStakeRepostory.updateTotalMoneyByTravelAndMember(updateGroupAccountStake, travelWallet, member);
+
+        } else {    // 반환
             if (balanceTravelWallet < request.getChargeCost()) {
                 throw new CustomException("A0006", "계좌 잔액이 부족하여 거래가 실패했습니다.");
             }
             updatedAccountBalance = response.getAccountBalance() + request.getChargeCost();
             updatedWalletBalance = balanceTravelWallet - request.getChargeCost();
+            updateGroupAccountStake = groupAccountStakeRepostory.findTotalMoneyByGroupAccountId(groupAccountId) - request.getChargeCost();
+            groupAccountStakeRepostory.updateTotalMoneyByTravelAndMember(updateGroupAccountStake, travelWallet, member);
         }
         accountService.rechargeForTravelAccount(response.getAccountNumber(), updatedAccountBalance);
         travelWalletRepository.rechargeTravelWallet(request.getTravelId(), updatedWalletBalance);
