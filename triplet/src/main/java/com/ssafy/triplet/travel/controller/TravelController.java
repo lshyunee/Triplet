@@ -217,6 +217,18 @@ public class TravelController {
         }
     }
 
+    @PostMapping("/leave/{travelId}")
+    public ResponseEntity<ApiResponse<TravelResponse>> leaveTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+                                                                   @PathVariable Long travelId) {
+        try {
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
+            travelService.leaveTravel(userId, travelId);
+            return ResponseEntity.ok(new ApiResponse<>("200", "유저가 여행에서 떠났습니다."));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
 
     // 예외처리 메서드
     private <T> ResponseEntity<ApiResponse<T>> handleException(Exception e) {
