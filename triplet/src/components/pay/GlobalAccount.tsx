@@ -38,18 +38,39 @@ const s = {
     display: flex;
     flex-direction: column;
     align-items: end;
+    
   `,
+  ExchangeButton: styled.button<ExchangeProps>`
+    background-color: #FFFFFF;
+    border: solid 1px #008DE7;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #008DE7;
+    width: 64px;
+    height: 36px;
+    margin-left: 16px;
+    display: ${(props) => (props.$isExchange === true ? '' : 'none')};
+  `,
+  ButtonArea: styled.div`
+    display: flex;
+  `
 }
 
 
 interface GlobalAccountProps {
   nation: String;
   foreignCurrency: number;
+  isExchange: boolean;
 };
+
+interface ExchangeProps {
+  $isExchange?: boolean;
+}
 
 
 const GlobalAccount = (props: GlobalAccountProps): JSX.Element => {
-  const { nation, foreignCurrency } = props;
+  const { nation, foreignCurrency, isExchange } = props;
 
   return (
     <>
@@ -72,47 +93,50 @@ const GlobalAccount = (props: GlobalAccountProps): JSX.Element => {
             return <s.CountryArea><CAFlag/><s.Country>캐나다</s.Country></s.CountryArea>
         }
       }) ()}
-      <s.CurrencyArea>
-        <div>
-          <s.ForeignCurrency>{foreignCurrency.toLocaleString()}</s.ForeignCurrency>
+      <s.ButtonArea>
+        <s.CurrencyArea>
+          <div>
+            <s.ForeignCurrency>{foreignCurrency.toLocaleString()}</s.ForeignCurrency>
+            {(() => {
+              switch (nation) {
+                case "미국":
+                  return <s.ForeignCurrency> USD</s.ForeignCurrency>
+                case "유럽":
+                  return <s.ForeignCurrency> EUR</s.ForeignCurrency>
+                case "일본":
+                  return <s.ForeignCurrency> JPY</s.ForeignCurrency>
+                case "중국":
+                  return <s.ForeignCurrency> CNY</s.ForeignCurrency>
+                case "영국":
+                  return <s.ForeignCurrency> GBP</s.ForeignCurrency>
+                case "스위스":
+                  return <s.ForeignCurrency> CHF</s.ForeignCurrency>
+                case "캐나다":
+                  return <s.ForeignCurrency> CAD</s.ForeignCurrency>
+              }
+            }) ()}
+          </div>
           {(() => {
             switch (nation) {
               case "미국":
-                return <s.ForeignCurrency> USD</s.ForeignCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*1).toLocaleString()}원</s.LocalCurrency>
               case "유럽":
-                return <s.ForeignCurrency> EUR</s.ForeignCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*2).toLocaleString()}원</s.LocalCurrency>
               case "일본":
-                return <s.ForeignCurrency> JPY</s.ForeignCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*3).toLocaleString()}원</s.LocalCurrency>
               case "중국":
-                return <s.ForeignCurrency> CNY</s.ForeignCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*4).toLocaleString()}원</s.LocalCurrency>
               case "영국":
-                return <s.ForeignCurrency> GBP</s.ForeignCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*5).toLocaleString()}원</s.LocalCurrency>
               case "스위스":
-                return <s.ForeignCurrency> CHF</s.ForeignCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*6).toLocaleString()}원</s.LocalCurrency>
               case "캐나다":
-                return <s.ForeignCurrency> CAD</s.ForeignCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*7).toLocaleString()}원</s.LocalCurrency>
             }
           }) ()}
-        </div>
-        {(() => {
-          switch (nation) {
-            case "미국":
-              return <s.LocalCurrency>{(foreignCurrency*1).toLocaleString()}원</s.LocalCurrency>
-            case "유럽":
-              return <s.LocalCurrency>{(foreignCurrency*2).toLocaleString()}원</s.LocalCurrency>
-            case "일본":
-              return <s.LocalCurrency>{(foreignCurrency*3).toLocaleString()}원</s.LocalCurrency>
-            case "중국":
-              return <s.LocalCurrency>{(foreignCurrency*4).toLocaleString()}원</s.LocalCurrency>
-            case "영국":
-              return <s.LocalCurrency>{(foreignCurrency*5).toLocaleString()}원</s.LocalCurrency>
-            case "스위스":
-              return <s.LocalCurrency>{(foreignCurrency*6).toLocaleString()}원</s.LocalCurrency>
-            case "캐나다":
-              return <s.LocalCurrency>{(foreignCurrency*7).toLocaleString()}원</s.LocalCurrency>
-          }
-        }) ()}
-      </s.CurrencyArea>
+        </s.CurrencyArea>
+        <s.ExchangeButton $isExchange={isExchange}>충전</s.ExchangeButton>
+      </s.ButtonArea>
     </s.Containter>
     </>
   );

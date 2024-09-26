@@ -138,30 +138,37 @@ const PayPage = () => {
 						<GlobalAccount
 							nation='미국'
 							foreignCurrency={1000}
+							isExchange={false}
 						/>
 						<GlobalAccount
 							nation='유럽'
 							foreignCurrency={1000}
+							isExchange={false}
 						/>
 						<GlobalAccount
 							nation='일본'
 							foreignCurrency={1000}
+							isExchange={false}
 						/>
 						<GlobalAccount
 							nation='중국'
 							foreignCurrency={1000}
+							isExchange={false}
 						/>
 						<GlobalAccount
 							nation='영국'
 							foreignCurrency={1000}
+							isExchange={false}
 						/>
 						<GlobalAccount
 							nation='스위스'
 							foreignCurrency={1000}
+							isExchange={false}
 						/>
 						<GlobalAccount
 							nation='캐나다'
 							foreignCurrency={1000}
+							isExchange={false}
 						/>
 					</s.CurrencyArea>
 				</s.MyCard>
