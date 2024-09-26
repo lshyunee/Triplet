@@ -144,6 +144,7 @@ public class TravelService {
     public void postTravel(Long userId, TravelShareRequest request) {
         Travel travel = travelRepository.findById(request.getTravelId())
                 .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
         if (!travel.isStatus()) {
             throw new CustomException("T0012", "종료된 여행이 아닙니다.");
         }
@@ -158,12 +159,15 @@ public class TravelService {
             travel.setShared(true);
             if (request.getShareStatus() == 1) {
                 travel.setShareStatus(true);
+                travelWallet.setShare(true);
             } else {
                 travel.setShareStatus(false);
+                travelWallet.setShare(false);
             }
         } else {
             travel.setShared(false);
             travel.setShareStatus(false);
+            travelWallet.setShare(false);
         }
         travelRepository.save(travel);
     }

@@ -7,6 +7,7 @@ import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.travel.dto.request.TravelWalletRechargeRequest;
 import com.ssafy.triplet.travel.dto.response.TransactionListResponse;
+import com.ssafy.triplet.travel.dto.response.TravelWalletResponse;
 import com.ssafy.triplet.travel.entity.*;
 import com.ssafy.triplet.travel.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -96,6 +97,7 @@ public class TravelWalletService {
     }
 
 
+    @Transactional
     public TransactionListResponse addRechargeForTransactionList(Travel travel, int categoryId, double balanceTravelWallet, TravelWalletRechargeRequest request) {
         TravelTransactionList list = new TravelTransactionList();
         list.setTravel(travel);
@@ -121,6 +123,7 @@ public class TravelWalletService {
         return transactionListResponseList;
     }
 
+    @Transactional
     public TransactionListResponse modifyTransaction(Long transactionId, int categoryId) {
         if (!transactionListRepository.existsById(transactionId)) {
             throw new CustomException("A0004", "거래 고유 번호가 유효하지 않습니다.");
@@ -133,6 +136,14 @@ public class TravelWalletService {
         return convertToTransactionListResponse(updatedTransaction);
     }
 
+    public TravelWalletResponse getTravelWallet(Long travelId) {
+        Travel travel = findTravelById(travelId);
+        TravelWalletResponse response = new TravelWalletResponse();
+        response.setCurrency(travel.getCountry().getCurrency());
+        response.setShare(travel.isShareStatus());
+        response.setBalance(travelWalletRepository.findBalanceByTravel(travelId));
+        return response;
+    }
 
 
     // 여행 지출 내역
