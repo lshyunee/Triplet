@@ -191,19 +191,20 @@ const SignupPage = () => {
     const { data: phoneData, error: phoneError, loading: phoneLoading,
         status: phoneStatus, refetch: phoneRefetch }
         = useAxios('/sms/send','POST',{phoneNumber : phoneNum});
-
+    
     const certificateSend = () => {
-        console.log("전화번호"+phoneNum);
         phoneRefetch();
         if(phoneStatus===200){
             console.log(phoneData);
         }
         if(phoneStatus===400){
             console.log(phoneData);
+            console.log(phoneStatus);
             setErrorMsg(phoneData.message);
             isErrorOpen();
         }
     };
+
 
     const { data : smsData, error: smsError, loading: smsLoading,
         status: smsStatus, refetch: smsRefetch}
