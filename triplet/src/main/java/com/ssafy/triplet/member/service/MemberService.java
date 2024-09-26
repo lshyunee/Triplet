@@ -169,8 +169,21 @@ public class MemberService {
         String refresh = jwtUtil.createJwt("refresh", memberId, "ROLE_USER", 14400000L);
 
         // 쿠키에 토큰 정보 담기
-        response.addCookie(createCookie("Authorization", access));
-        response.addCookie(createCookie("Authorization-Refresh", refresh));
+        Cookie authorization = createCookie("Authorization", access);
+        response.addHeader("Set-Cookie", authorization.getName() + "=" + authorization.getValue()
+                + "; Path=" + authorization.getPath()
+                + "; Max-Age=" + authorization.getMaxAge()
+                + "; HttpOnly"
+                + (authorization.getSecure() ? "; Secure" : "")
+                + "; SameSite=None");
+
+        Cookie authorizationRefresh = createCookie("Authorization-Refresh", refresh);
+        response.addHeader("Set-Cookie", authorizationRefresh.getName() + "=" + authorizationRefresh.getValue()
+                + "; Path=" + authorizationRefresh.getPath()
+                + "; Max-Age=" + authorizationRefresh.getMaxAge()
+                + "; HttpOnly"
+                + (authorizationRefresh.getSecure() ? "; Secure" : "")
+                + "; SameSite=None");
     }
 
     private Cookie createCookie(String key, String value) {

@@ -60,8 +60,23 @@ public class ReissueController {
         // 새 access, refresh 토큰 발급
         String newAccess = jwtUtil.createJwt("access", username, role, 1200000L);
         String newRefresh = jwtUtil.createJwt("refresh", username, role, 14400000L);
-        response.addCookie(createCookie("Authorization", newAccess));
-        response.addCookie(createCookie("Authorization-Refresh", newRefresh));
+
+        // 쿠키에 토큰 정보 담기
+        Cookie authorization = createCookie("Authorization", newAccess);
+        response.addHeader("Set-Cookie", authorization.getName() + "=" + authorization.getValue()
+                + "; Path=" + authorization.getPath()
+                + "; Max-Age=" + authorization.getMaxAge()
+                + "; HttpOnly"
+                + (authorization.getSecure() ? "; Secure" : "")
+                + "; SameSite=None");
+
+        Cookie authorizationRefresh = createCookie("Authorization-Refresh", newRefresh);
+        response.addHeader("Set-Cookie", authorizationRefresh.getName() + "=" + authorizationRefresh.getValue()
+                + "; Path=" + authorizationRefresh.getPath()
+                + "; Max-Age=" + authorizationRefresh.getMaxAge()
+                + "; HttpOnly"
+                + (authorizationRefresh.getSecure() ? "; Secure" : "")
+                + "; SameSite=None");
 
         return new ResponseEntity<>(new ApiResponse <Void>("200", "access 재발급 성공"), HttpStatus.OK);
     }
