@@ -87,18 +87,16 @@ public class TravelService {
 
     @Transactional
     public void deleteTravel(Long travelId, Long userId) {
-        // 여행 지갑에 잔액 있는지 확인하는 로직 추가해야함
-
-        if (travelRepository.existsById(travelId)) {
-            Long creatorId = travelRepository.findCreatorIdByTravelId(travelId);
-            if (!userId.equals(creatorId)) {
-                throw new CustomException("T0011", "여행 생성자가 아닙니다.");
-            } else {
-                travelRepository.deleteById(travelId);
-            }
-        } else {
-            throw new CustomException("T0004", "여행이 존재하지 않습니다.");
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
+        if (travelWallet.getBalance() > 0) {
+            throw new CustomException("T0018", "여행 지갑에 잔액이 있습니다.");
         }
+        if (!userId.equals(travel.getCreatorId())) {
+            throw new CustomException("T0011", "여행 생성자가 아닙니다.");
+        }
+        travelRepository.deleteById(travelId);
     }
 
     public TravelListResponse getTravelOngoingList(Long userId) {
