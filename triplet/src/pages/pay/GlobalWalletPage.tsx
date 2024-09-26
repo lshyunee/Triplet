@@ -5,6 +5,7 @@ import { pageMove } from '../../features/navigation/naviSlice';
 import BackHeader from '../../components/header/BackHeader';
 import Header from '../../components/header/Header';
 import ExchangeRate from '../../components/pay/ExchangeRate';
+import GlobalAccount from '../../components/pay/GlobalAccount';
 
 
 
@@ -38,6 +39,17 @@ const s = {
 		margin: 0 20px;
 		padding-top: 20px;
 	`,
+	GlobalAccountCard: styled.div`
+		background-color: #FFFFFF;
+		border-radius: 20px;
+		padding: 10px 0;
+		margin-bottom: 12px;
+	`,
+	TitleText: styled.div`
+		font-size: 16px;
+		font-weight: 600;
+		margin: 12px 4px;
+	`
 }
 
 
@@ -53,55 +65,105 @@ const GlobalWalletPage = () => {
     <>
     <Header/>
     <s.Container>
-    <s.Card>
-					<s.CardTitleArea>
-						<s.CardTitle>실시간 환율</s.CardTitle>
-					</s.CardTitleArea>
-					<s.CurrencyArea>
-						<ExchangeRate
-							nation='미국'
-							foreignCurrency={1344.71}
-							isRise={true}
-							rate={0.20}
-						/>
-						<ExchangeRate
-							nation='유럽'
-							foreignCurrency={1344.71}
-							isRise={true}
-							rate={0.20}
-						/>
-						<ExchangeRate
-							nation='일본'
-							foreignCurrency={1344.71}
-							isRise={false}
-							rate={0.20}
-						/>
-						<ExchangeRate
-							nation='중국'
-							foreignCurrency={1344.71}
-							isRise={true}
-							rate={0.20}
-						/>
-						<ExchangeRate
-							nation='영국'
-							foreignCurrency={1344.71}
-							isRise={true}
-							rate={0.20}
-						/>
-						<ExchangeRate
-							nation='스위스'
-							foreignCurrency={1344.71}
-							isRise={true}
-							rate={0.20}
-						/>
-						<ExchangeRate
-							nation='캐나다'
-							foreignCurrency={1344.71}
-							isRise={false}
-							rate={0.20}
-						/>
-					</s.CurrencyArea>
-				</s.Card>
+			<s.TitleText>내 외화 지갑</s.TitleText>
+			<s.GlobalAccountCard>
+				<GlobalAccount
+					nation='미국'
+					foreignCurrency={1000}
+					isExchange={true}
+				/>
+			</s.GlobalAccountCard>
+			<s.GlobalAccountCard>
+				<GlobalAccount
+					nation='유럽'
+					foreignCurrency={1000}
+					isExchange={true}
+				/>
+			</s.GlobalAccountCard>
+			<s.GlobalAccountCard>
+				<GlobalAccount
+					nation='일본'
+					foreignCurrency={1000}
+					isExchange={true}
+				/>
+			</s.GlobalAccountCard>
+			<s.GlobalAccountCard>
+				<GlobalAccount
+					nation='중국'
+					foreignCurrency={1000}
+					isExchange={true}
+				/>
+			</s.GlobalAccountCard>
+			<s.GlobalAccountCard>
+				<GlobalAccount
+					nation='영국'
+					foreignCurrency={1000}
+					isExchange={true}
+				/>
+			</s.GlobalAccountCard>
+			<s.GlobalAccountCard>
+				<GlobalAccount
+					nation='스위스'
+					foreignCurrency={1000}
+					isExchange={true}
+				/>
+			</s.GlobalAccountCard>
+			<s.GlobalAccountCard>
+				<GlobalAccount
+					nation='캐나다'
+					foreignCurrency={1000}
+					isExchange={true}
+				/>
+			</s.GlobalAccountCard>
+			<s.Card>
+				<s.CardTitleArea>
+					<s.CardTitle>실시간 환율</s.CardTitle>
+				</s.CardTitleArea>
+				<s.CurrencyArea>
+					<ExchangeRate
+						nation='미국'
+						foreignCurrency={1344.71}
+						isRise={true}
+						rate={0.20}
+					/>
+					<ExchangeRate
+						nation='유럽'
+						foreignCurrency={1344.71}
+						isRise={true}
+						rate={0.20}
+					/>
+					<ExchangeRate
+						nation='일본'
+						foreignCurrency={1344.71}
+						isRise={false}
+						rate={0.20}
+					/>
+					<ExchangeRate
+						nation='중국'
+						foreignCurrency={1344.71}
+						isRise={true}
+						rate={0.20}
+					/>
+					<ExchangeRate
+						nation='영국'
+						foreignCurrency={1344.71}
+						isRise={true}
+						rate={0.20}
+					/>
+					<ExchangeRate
+						nation='스위스'
+						foreignCurrency={1344.71}
+						isRise={true}
+						rate={0.20}
+					/>
+					<ExchangeRate
+						nation='캐나다'
+						foreignCurrency={1344.71}
+						isRise={false}
+						rate={0.20}
+					/>
+				</s.CurrencyArea>
+			</s.Card>
     </s.Container>
     </>
   );
