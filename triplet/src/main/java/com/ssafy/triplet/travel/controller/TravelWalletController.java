@@ -6,6 +6,7 @@ import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.response.ApiResponse;
 import com.ssafy.triplet.travel.dto.request.TravelWalletRechargeRequest;
 import com.ssafy.triplet.travel.dto.response.TransactionListResponse;
+import com.ssafy.triplet.travel.dto.response.TravelWalletResponse;
 import com.ssafy.triplet.travel.service.TravelWalletService;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Transaction;
@@ -66,6 +67,15 @@ public class TravelWalletController {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             TransactionListResponse response = travelWalletService.returnTravelWallet(userId, request, 8);
             return ResponseEntity.ok(new ApiResponse<>("200", "반환이 완료되었습니다.", response));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
+
+    @GetMapping("/{travelId}")
+    public ResponseEntity<ApiResponse<TravelWalletResponse>> getTravelWallet(@PathVariable Long travelId) {
+        try {
+            return ResponseEntity.ok(new ApiResponse<>("200", "조회가 완료되었습니다.", travelWalletService.getTravelWallet(travelId)));
         } catch (Exception e) {
             return handleException(e);
         }
