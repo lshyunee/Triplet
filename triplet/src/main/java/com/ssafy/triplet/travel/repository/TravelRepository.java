@@ -26,8 +26,8 @@ public interface TravelRepository extends JpaRepository<Travel, Long>, JpaSpecif
     @Query("SELECT t FROM Travel t JOIN t.travelMembers tm WHERE tm.member.id = :userId AND (t.startDate > :today) ORDER BY t.startDate ASC")
     List<Travel> findUpcomingTravelsByUserId(@Param("userId") Long userId, @Param("today") LocalDate today);
 
-    @Query("SELECT t.id FROM Travel t WHERE t.inviteCode = :inviteCode")
-    Long findTravelIdByInviteCode(@Param("inviteCode") String inviteCode);
+    @Query("SELECT t FROM Travel t WHERE t.inviteCode = :inviteCode")
+    Travel findTravelIdByInviteCode(@Param("inviteCode") String inviteCode);
 
     @Modifying
     @Query("UPDATE Travel t SET t.status = :status WHERE t.id = :travelId")

@@ -19,4 +19,6 @@ public interface TravelMemberRepository extends JpaRepository<TravelMember, Long
     @Modifying
     @Transactional
     void deleteByMemberIdAndTravelId(Long memberId, Long travelId);
+
+    int countByTravelId(Long travelId);
 }
