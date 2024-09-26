@@ -6,6 +6,8 @@ import useAxios from '../../../hooks/useAxios';
 import useInput from '../../../hooks/useInput';
 import BackHeader from '../../../components/header/BackHeader';
 import ErrorModal from '../../../components/modal/ErrorModal';
+import CompleteModal from '../../../components/modal/CompleteModal';
+
 
 const HowP = styled.p`
     font-size : 12px;
@@ -306,6 +308,18 @@ const SignupPage = () => {
         setIsError(false);
     }
 
+    // 완료 모달
+    const [ isModel, setIsModel ] = useState(false);
+    const [ msg, setMsg ] = useState('');
+
+    const isModalOpen = () => {
+        setIsModel(true);
+    }
+
+    const isModelClose = () => {
+        setIsModel(false);
+    }
+
     return(
         <div>
             <BackHeader title={title}/>
@@ -355,6 +369,7 @@ const SignupPage = () => {
                     </ConfirmDiv>
             </InputDiv>
             <ErrorModal isOpen={isError} onClose={closeError} msg={errorMsg}></ErrorModal>
+            <CompleteModal isOpen={isModel} onClose={isModelClose} msg={msg} ></CompleteModal>
         </div>
     )
 }
