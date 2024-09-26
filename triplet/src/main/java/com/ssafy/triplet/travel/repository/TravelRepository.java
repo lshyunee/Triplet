@@ -32,4 +32,7 @@ public interface TravelRepository extends JpaRepository<Travel, Long>, JpaSpecif
     @Modifying
     @Query("UPDATE Travel t SET t.status = :status WHERE t.id = :travelId")
     void updateStatusByTravelId(@Param("travelId") Long travelId, @Param("status") boolean status);
+
+    @Query("SELECT t.id FROM Travel t WHERE t.endDate = :today")
+    List<Long> findTravelIdByEndDate(LocalDate today);
 }
