@@ -1,5 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import useAxios from '../../hooks/useAxios';
+import { useDispatch } from 'react-redux';
+
+import { ongoingTravelDataInsert } from '../../features/travel/ongoingTravelSlice';
+
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
 
 const PositionDiv = styled.div`
@@ -128,6 +133,41 @@ const PriceInfoP = styled.p`
 
 const TravelCard = () => {
 
+    const dispatch = useDispatch();
+
+    const { data : infoData, error : infoError, loading : infoLoading,
+        status : infoStatus, refetch : infoRefetch
+    } = useAxios("/travels/ongoing","GET");
+
+    useEffect(()=>{
+        infoRefetch();
+    },[])
+
+    useEffect(() => {
+        if (infoData !== null) {
+            dispatch(ongoingTravelDataInsert({
+                travelId: infoData.travelId,
+                title: infoData.title,
+                startDate: new Date(infoData.startDate),
+                endDate: new Date(infoData.endDate),
+                image: infoData.image,
+                countryName: infoData.countryName,
+                countryId: infoData.countryId,
+                currency: infoData.currency,
+                memberCount: infoData.memberCount,
+                totalBudget: infoData.totalBudget,
+                status: infoData.status,
+                shareStatus: infoData.shareStatus,
+                shared: infoData.shared
+            }));
+        }
+    
+        if (infoError !== null) {
+            console.error("Error fetching travel data:", infoError);
+        }
+
+        
+    }, [infoData, infoError]);
 
     return (
         <PositionDiv>
