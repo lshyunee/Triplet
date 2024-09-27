@@ -20,6 +20,8 @@ import AccountDetailPage from '../pages/pay/AccountDetailPage';
 import GlobalWalletPage from '../pages/pay/GlobalWalletPage';
 import ExchangePage from '../pages/pay/ExchangePage';
 import QRPage from '../pages/pay/QRPage';
+import QRPayPage from '../pages/pay/QRPayPage';
+import QRCompletePage from '../pages/pay/QRCompletePage';
 
 
 const AppRoutes: React.FC = () => (
@@ -37,6 +39,8 @@ const AppRoutes: React.FC = () => (
             <Route path="/simple-password/setConfirm" element={<SimplePasswordSetConfirmPage/>}/>            
             <Route path="/pay" element={<Pay/>}/>
             <Route path="/pay/qr" element={<QRPage/>}/>
+            <Route path="/pay/qr/payment" element={<QRPayPage/>}/>
+            <Route path="/pay/qr/complete" element={<QRCompletePage/>}/>
             <Route path="/pay/account-detail" element={<AccountDetailPage/>}/>
             <Route path="/pay/global-wallet" element={<GlobalWalletPage/>}/>
             <Route path="/pay/exchange" element={<ExchangePage/>}/>
