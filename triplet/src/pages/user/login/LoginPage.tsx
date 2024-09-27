@@ -144,7 +144,7 @@ const LoginPage = () => {
 
     // 네이버 로그인 버튼 핸들러
     const handleNaverLogin = () => {
-        window.location.href = '/oauth2/authorization/naver';
+        window.location.href = '/api/v1/oauth2/authorization/naver';
     };
 
     // 로그인 상태 변경 시 처리
