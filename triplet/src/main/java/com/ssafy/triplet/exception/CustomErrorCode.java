@@ -17,11 +17,12 @@ public enum CustomErrorCode {
     INVALID_START_DATE("A0014", "조회 시작일자가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
     INVALID_END_DATE("A0015", "조회 종료일자가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
     DATE_EXCEEDS_TODAY("A0028", "오늘 이후의 날짜는 선택할 수 없습니다.", HttpStatus.BAD_REQUEST),
-
     MEMBER_NOT_FOUND("M0010", "존재하지 않는 회원입니다.", HttpStatus.NOT_FOUND),
     WITHDRAWAL_ACCOUNT_NOT_FOUND("A0024", "출금 계좌가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     DEPOSIT_ACCOUNT_NOT_FOUND("A0007", "입금계좌가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
-    ACCOUNT_NOT_FOUND("A0023", "계좌가 존재하지 않습니다.", HttpStatus.NOT_FOUND);
+    ACCOUNT_NOT_FOUND("A0023", "계좌가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    STRING_TO_JSON_FAIL("E0000","서버에서 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
+
 
     private final String code;
     private final String message;
