@@ -13,13 +13,15 @@ import QrScanner from 'react-qr-scanner';
 
 const s = {
 	Container: styled.div`
+        z-index: -1;
         position: relative;
         background-color: white;
         margin-top: 56px;
-        height: auto;
+        height: calc(100vh);
         display: flex;
         align-items: center; 
         justify-content: center;
+        width: 100%;
 	`,
     QrScannerOverlayText: styled.div`
         position: absolute;
@@ -64,10 +66,11 @@ const QRPage = () => {
                 <QrScanner
                     delay={300}
                     style={{
-                        width: 'auto',
+                        width: '100%',
                         height: '100%',
                         position: 'relative',
-                        zIndex: 5,  
+                        zIndex: 5,
+                        objectFit: 'cover'
                       }}
                     onError={handleError}
                     onScan={handleScan}

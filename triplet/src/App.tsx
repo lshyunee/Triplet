@@ -45,7 +45,7 @@ const App: React.FC = () => {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
   useEffect(() => {
-    const offPages = ["/login", "/signup", "/simple-password/set","/simple-password/setConfirm" ,"/simple-password/confirm"];
+    const offPages = ["/login", "/signup", "/simple-password/set","/simple-password/setConfirm" ,"/simple-password/confirm", "/pay/qr"];
     if (offPages.includes(location.pathname)) {
       setIsActive(false);
     } else {
@@ -83,7 +83,7 @@ const App: React.FC = () => {
       <GlobalStyle />
       {/* {isLoading && <SplashScreen />} */}
       <AppRoutes/>
-      {isActive && <Navbar />}  {/* isActive가 true일 때만 Navbar 렌더링 */}
+      {isActive && <Navbar />}
     </Div>
   );
 };

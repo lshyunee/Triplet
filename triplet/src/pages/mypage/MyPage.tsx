@@ -13,7 +13,7 @@ import Logout from '../user/logout/LogoutModal';
 const PageDiv = styled.div`
     background-color : #F3F4F6;
     width: 100%;
-    height: 100%;
+    height: 100vh;
     padding-top : 56px;
     
     > *{

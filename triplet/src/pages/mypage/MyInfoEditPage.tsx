@@ -45,6 +45,7 @@ const StyledInput = styled.input`
     border-radius : 10px;
     border : 1px solid #F0F0F0;
     text-align:center;
+    text-indent: 10px; 
 `;
 
 const StyledInputFront = styled.input`
@@ -75,7 +76,7 @@ const InputDistanceDiv = styled.div`
 
     ${StyledInput}{
         text-align: left;
-        padding-left : 10px;
+        text-indent: 10px; 
     }
 `
 
