@@ -26,6 +26,7 @@ const HomeDiv = styled.div`
     display: flex;
     flex-direction: column;
     padding-top: 68px; /* Header의 높이만큼 패딩을 추가 */
+    padding-bottom : 56px;
     margin : 0 16px;
 `;
 

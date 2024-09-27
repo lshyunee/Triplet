@@ -14,7 +14,7 @@ const s = {
 		background-color: #F3F4F6;
 		/* height: 100%; */
 		padding-top: 68px;
-		padding-bottom: 16px;
+		padding-bottom: 72px;
 	`,
 	Card: styled.div`
 		background-color: #ffffff;
