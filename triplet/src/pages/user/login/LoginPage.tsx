@@ -119,10 +119,6 @@ const LoginPage = () => {
         , status: loginStatus, refetch: loginRefetch } 
         = useAxios('/login', 'POST', formData);
 
-    const { data: naverData, error: naverError, loading: naverLoading,
-        status: naverStatus, refetch: naverRefetch }
-        = useAxios('/oauth2/authorization/naver', 'GET');
-
 
     // 로그인 버튼 핸들러
     const handleLogin = () => {
@@ -148,7 +144,7 @@ const LoginPage = () => {
 
     // 네이버 로그인 버튼 핸들러
     const handleNaverLogin = () => {
-        naverRefetch(); // 클릭 시 요청 재시도
+        window.location.href = '/oauth2/authorization/naver';
     };
 
     // 로그인 상태 변경 시 처리
