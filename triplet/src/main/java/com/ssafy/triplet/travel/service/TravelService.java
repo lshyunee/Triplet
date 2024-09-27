@@ -47,7 +47,7 @@ public class TravelService {
 
     @Transactional
     public TravelResponse createTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
-        validateTravelRequest(request);
+        validateTravelRequest(request, userId, 0L);
         String inviteCode = InviteCodeGenerator.generateInviteCode();
         Travel travel = buildTravel(userId, request, image, inviteCode);
         Travel savedTravel = travelRepository.save(travel);
@@ -60,7 +60,7 @@ public class TravelService {
 
     @Transactional
     public TravelResponse updateTravel(Long travelId, TravelRequest request, MultipartFile image, Long userId) throws IOException {
-        validateTravelRequest(request);
+        validateTravelRequest(request, userId, travelId);
         Travel travel = travelRepository.findById(travelId)
                 .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
         Long creatorId = travelRepository.findCreatorIdByTravelId(travelId);
@@ -214,7 +214,6 @@ public class TravelService {
     }
 
 
-
     public Page<TravelListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                      Integer month, Integer minDays, Integer maxDays, int page, int size) {
         Specification<Travel> spec = Specification.where(TravelSpecification.excludeCreator(userId))
@@ -325,7 +324,7 @@ public class TravelService {
 
     /* 중복 메서드 */
     // 필수 값 및 날짜 검증 메서드 (여행 생성, 여행 수정)
-    private void validateTravelRequest(TravelRequest request) {
+    private void validateTravelRequest(TravelRequest request, Long userId, Long travelId) {
         if (request.getTitle() == null || request.getTitle().isEmpty() ||
                 request.getStartDate() == null || request.getEndDate() == null ||
                 request.getMemberCount() <= 0 || request.getTotalBudget() <= 0 ||
@@ -337,6 +336,20 @@ public class TravelService {
         if (request.getStartDate().isBefore(currentDate)) {
             throw new CustomException("T0003", "시작일은 현재 날짜보다 이후여야 합니다.");
         }
+
+        List<Travel> travelList = travelRepository.findAllTravelByUserId(userId);
+        for (Travel travel : travelList) {
+            if (!Objects.equals(travel.getId(), travelId)) {
+                if ((request.getStartDate().isEqual(travel.getStartDate()) || request.getStartDate().isAfter(travel.getStartDate())) &&
+                        (request.getStartDate().isBefore(travel.getEndDate()) || request.getStartDate().isEqual(travel.getEndDate())) ||
+                        (request.getEndDate().isEqual(travel.getStartDate()) || request.getEndDate().isAfter(travel.getStartDate())) &&
+                                (request.getEndDate().isBefore(travel.getEndDate()) || request.getEndDate().isEqual(travel.getEndDate())) ||
+                        (request.getStartDate().isBefore(travel.getStartDate()) && request.getEndDate().isAfter(travel.getEndDate()))) {
+                    throw new CustomException("T0010", "여행 일정이 기존 여행과 겹칩니다.");
+                }
+            }
+        }
+
         if (request.getEndDate().isBefore(request.getStartDate())) {
             throw new CustomException("T0009", "종료일은 시작일보다 이후여야 합니다.");
         }
