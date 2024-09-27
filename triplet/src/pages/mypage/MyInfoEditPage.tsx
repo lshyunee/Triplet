@@ -17,6 +17,7 @@ const HowP = styled.p`
 `;
 
 const EntireDiv = styled.div`
+    min-height : 600px;
     margin : 0px 16px 0;
     height : calc(100vh - 112px);
     padding-top : 56px;
@@ -111,6 +112,7 @@ const CheckDiv = styled.div`
 `;
 
 const ConfirmBtn = styled.button`
+    width: 100%;
     height : 44px;
     background-color : #008DE7;
     color : #FFFFFF;
@@ -118,13 +120,8 @@ const ConfirmBtn = styled.button`
     font-weight: 600;
     font-size : 14px;
     border : none;
+    margin-top : 66px;
     margin-bottom : 28px;
-    position: fixed;
-    bottom: 56px;
-    left: 0;
-    right: 0;
-    margin-right: 16px;
-    margin-left: 16px;
 `;
 
 

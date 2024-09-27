@@ -56,6 +56,7 @@ const NewConfirmDiv = styled.div`
 `;
 
 const ConfirmBtn = styled.button`
+    width : 100%;
     height : 44px;
     background-color : #008DE7;
     color : #FFFFFF;
@@ -64,12 +65,6 @@ const ConfirmBtn = styled.button`
     font-size : 14px;
     border : none;
     margin-bottom : 28px;
-    position: fixed;
-    bottom: 56px;
-    left: 0;
-    right: 0;
-    margin-right: 16px;
-    margin-left: 16px;
 `;
 
 const PasswordEditPage = () => {

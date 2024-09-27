@@ -81,10 +81,6 @@ const BottomButtons = styled.div`
 `;
 
 const ButtonDiv = styled.div`
-    position : fixed;
-    bottom : 55px;
-    left : 0;
-    right : 0;
     margin-left : 55px;
     margin-right : 55px; 
 `
@@ -93,7 +89,6 @@ const IconButton = styled.button`
     background-color: transparent;
     border: none;
     cursor: pointer;
-    display: flex;
     justify-content: center;
     align-items: center;
     margin : 20px 44px;

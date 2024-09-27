@@ -86,10 +86,6 @@ const BottomButtons = styled.div`
 `;
 
 const ButtonDiv = styled.div`
-    position : fixed;
-    bottom : 55px;
-    left : 0;
-    right : 0;
     margin-left : 55px;
     margin-right : 55px; 
 `
@@ -98,13 +94,11 @@ const IconButton = styled.button`
     background-color: transparent;
     border: none;
     cursor: pointer;
-    display: flex;
     justify-content: center;
     align-items: center;
     margin : 20px 44px;
     padding : 0px;
 `;
-
 const SimplePasswordSetConfirmPage: React.FC = () => {
     const [numbers, setNumbers] = useState<number[]>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
     const [password, setPassword] = useState<number[]>([]);
