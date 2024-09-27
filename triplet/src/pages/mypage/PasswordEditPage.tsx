@@ -33,6 +33,7 @@ const StyledInput = styled.input`
     border-radius : 10px;
     border : 1px solid #F0F0F0;
     box-sizing: border-box;
+    text-indent : 10px
 `;
 
 const PasswordDiv = styled.div`
