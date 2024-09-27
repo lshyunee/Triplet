@@ -121,7 +121,7 @@ const LoginPage = () => {
 
     const { data: naverData, error: naverError, loading: naverLoading,
         status: naverStatus, refetch: naverRefetch }
-        = useAxios('/oauth2/authorization/naver', 'POST');
+        = useAxios('/oauth2/authorization/naver', 'GET');
 
 
     // 로그인 버튼 핸들러
