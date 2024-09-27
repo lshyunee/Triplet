@@ -16,8 +16,7 @@ const shuffleArray = (array: number[]) => {
 };
 
 const PasswordDiv = styled.div`
-    height : calc(100vh - 112px);
-    margin : 0 78px 0;
+    height : 100vh;
     padding-top : 56px;
 `
 
@@ -37,7 +36,7 @@ const Title = styled.p`
 
 const Description = styled.p`
     height : 34px;
-    font-size:14px;
+    font-size: 14px;
     margin : 0 0;
     font-weight: 500;
     color: #333;
@@ -130,7 +129,7 @@ const SimplePasswordSetPage: React.FC = () => {
     };
 
     return (
-        <div>
+        <>
             <BackHeader title={"간편비밀번호 설정"} />
             <PasswordDiv>
                 <TitleDiv>
@@ -173,7 +172,7 @@ const SimplePasswordSetPage: React.FC = () => {
                     </BottomButtons>
                 </ButtonDiv>
             </PasswordDiv>
-        </div>
+        </>
     );
 };
 
