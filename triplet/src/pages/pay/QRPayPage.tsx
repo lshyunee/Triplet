@@ -12,7 +12,7 @@ import BackHeader from '../../components/header/BackHeader';
 
 const s = {
 	Container: styled.div`
-    margin-top: 56px;
+    // margin-top: 56px;
     height: calc(100vh - 112px);
     padding: 0 16px;
     // padding-bottom: 56px;
