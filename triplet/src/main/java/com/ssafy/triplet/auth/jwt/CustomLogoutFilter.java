@@ -1,5 +1,6 @@
 package com.ssafy.triplet.auth.jwt;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,9 +11,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.GenericFilterBean;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -83,5 +87,20 @@ public class CustomLogoutFilter extends GenericFilterBean {
         response.addCookie(refreshCookie);
         response.addCookie(accessCookie);
         response.setStatus(HttpServletResponse.SC_OK);
+
+        // JSON 응답 만들기
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        Map<String, Object> responseBody = new HashMap<>();
+        responseBody.put("code", "200");
+        responseBody.put("message", "로그아웃 성공");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String jsonResponse = objectMapper.writeValueAsString(responseBody);
+
+        // JSON 응답 쓰기
+        response.getWriter().write(jsonResponse);
+        response.setStatus(HttpStatus.OK.value());
     }
 }

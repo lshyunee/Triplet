@@ -7,8 +7,8 @@ import lombok.Getter;
 @Getter
 public class MemberIdRequest {
 
-    @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9]{5,16}$")
+    @NotNull(message = "아이디는 5~16자의 영문, 숫자입니다.")
+    @Pattern(regexp = "^[a-zA-Z0-9]{5,16}$", message = "아이디는 5~16자의 영문, 숫자입니다.")
     private String memberId;
 
 }

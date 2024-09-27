@@ -39,27 +39,44 @@ public class ReissueController {
 
         // 토큰 검증
         if (refresh == null) {
-            return new ResponseEntity<>("refresh token null", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new ApiResponse<Void>("M0011", "토큰이 비어있습니다."), HttpStatus.UNAUTHORIZED);
         }
 
         // 토큰 만료 체크
         try {
             jwtUtil.isExpired(refresh);
         } catch (ExpiredJwtException e) {
-            return new ResponseEntity<>("refresh token expired", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new ApiResponse<Void>("M0012", "토큰이 만료되었습니다."), HttpStatus.UNAUTHORIZED);
         }
 
         // 토큰이 refresh 인지 확인
         String category = jwtUtil.getCategory(refresh);
         if (!"refresh".equals(category)) {
-            return new ResponseEntity<>("invalid refresh token", HttpStatus.UNAUTHORIZED);
+            return new ResponseEntity<>(new ApiResponse<Void>("M0018", "토큰이 유효하지 않습니다."), HttpStatus.UNAUTHORIZED);
         }
 
         String username = jwtUtil.getUsername(refresh);
         String role = jwtUtil.getRole(refresh);
-        // 새 access 토큰 발급
-        String newAccess = jwtUtil.createJwt("access", username, role, 600000L);
-        response.addCookie(createCookie("Authorization", newAccess));
+        // 새 access, refresh 토큰 발급
+        String newAccess = jwtUtil.createJwt("access", username, role, 1200000L);
+        String newRefresh = jwtUtil.createJwt("refresh", username, role, 14400000L);
+
+        // 쿠키에 토큰 정보 담기
+        Cookie authorization = createCookie("Authorization", newAccess);
+        response.addHeader("Set-Cookie", authorization.getName() + "=" + authorization.getValue()
+                + "; Path=" + authorization.getPath()
+                + "; Max-Age=" + authorization.getMaxAge()
+                + "; HttpOnly"
+                + (authorization.getSecure() ? "; Secure" : "")
+                + "; SameSite=None");
+
+        Cookie authorizationRefresh = createCookie("Authorization-Refresh", newRefresh);
+        response.addHeader("Set-Cookie", authorizationRefresh.getName() + "=" + authorizationRefresh.getValue()
+                + "; Path=" + authorizationRefresh.getPath()
+                + "; Max-Age=" + authorizationRefresh.getMaxAge()
+                + "; HttpOnly"
+                + (authorizationRefresh.getSecure() ? "; Secure" : "")
+                + "; SameSite=None");
 
         return new ResponseEntity<>(new ApiResponse <Void>("200", "access 재발급 성공"), HttpStatus.OK);
     }

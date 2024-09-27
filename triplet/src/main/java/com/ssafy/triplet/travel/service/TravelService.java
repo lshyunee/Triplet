@@ -1,5 +1,8 @@
 package com.ssafy.triplet.travel.service;
 
+import com.ssafy.triplet.account.dto.response.AccountRechargeResponse;
+import com.ssafy.triplet.account.repository.AccountRepository;
+import com.ssafy.triplet.account.service.AccountService;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
@@ -19,6 +22,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
@@ -34,26 +38,29 @@ public class TravelService {
     private final TravelBudgetRepository travelBudgetRepository;
     private final CategoryRepository categoryRepository;
     private final CountryRepository countryRepository;
-    private final TravelTransactionListRepository transactionListRepository;
-    private final MerchantRepository merchantRepository;
+    private final GroupAccountStakeRepostory groupAccountStakeRepostory;
+    private final TravelWalletRepository travelWalletRepository;
+    private final AccountRepository accountRepository;
     private final TravelWalletService travelWalletService;
+    private final AccountService accountService;
     private final S3Service s3Service;
 
     @Transactional
     public TravelResponse createTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
-        validateTravelRequest(request);
+        validateTravelRequest(request, userId, 0L);
         String inviteCode = InviteCodeGenerator.generateInviteCode();
         Travel travel = buildTravel(userId, request, image, inviteCode);
         Travel savedTravel = travelRepository.save(travel);
         insertTravelMembers(userId, travel.getId());
         saveTravelBudgets(request, savedTravel);
         travelWalletService.makeTravelWallet(savedTravel, userId);
+        insertGroupAccountStake(userId, savedTravel);
         return buildTravelResponse(savedTravel, inviteCode);
     }
 
     @Transactional
     public TravelResponse updateTravel(Long travelId, TravelRequest request, MultipartFile image, Long userId) throws IOException {
-        validateTravelRequest(request);
+        validateTravelRequest(request, userId, travelId);
         Travel travel = travelRepository.findById(travelId)
                 .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
         Long creatorId = travelRepository.findCreatorIdByTravelId(travelId);
@@ -65,6 +72,7 @@ public class TravelService {
         travel.setTitle(request.getTitle());
         travel.setMemberCount(request.getMemberCount());
         travel.setTotalBudget(request.getTotalBudget());
+        travel.setAirportCost(request.getAirportCost());
         if (image != null && !image.isEmpty()) {
             String fileUrl = s3Service.uploadFile(image);
             travel.setImage(fileUrl);
@@ -79,18 +87,16 @@ public class TravelService {
 
     @Transactional
     public void deleteTravel(Long travelId, Long userId) {
-        // 여행 지갑에 잔액 있는지 확인하는 로직 추가해야함
-
-        if (travelRepository.existsById(travelId)) {
-            Long creatorId = travelRepository.findCreatorIdByTravelId(travelId);
-            if (!userId.equals(creatorId)) {
-                throw new CustomException("T0011", "여행 생성자가 아닙니다.");
-            } else {
-                travelRepository.deleteById(travelId);
-            }
-        } else {
-            throw new CustomException("T0004", "여행이 존재하지 않습니다.");
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
+        if (travelWallet.getBalance() > 0) {
+            throw new CustomException("T0018", "여행 지갑에 잔액이 있습니다.");
         }
+        if (!userId.equals(travel.getCreatorId())) {
+            throw new CustomException("T0011", "여행 생성자가 아닙니다.");
+        }
+        travelRepository.deleteById(travelId);
     }
 
     public TravelListResponse getTravelOngoingList(Long userId) {
@@ -136,6 +142,7 @@ public class TravelService {
     public void postTravel(Long userId, TravelShareRequest request) {
         Travel travel = travelRepository.findById(request.getTravelId())
                 .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
         if (!travel.isStatus()) {
             throw new CustomException("T0012", "종료된 여행이 아닙니다.");
         }
@@ -150,28 +157,34 @@ public class TravelService {
             travel.setShared(true);
             if (request.getShareStatus() == 1) {
                 travel.setShareStatus(true);
+                travelWallet.setShare(true);
             } else {
                 travel.setShareStatus(false);
+                travelWallet.setShare(false);
             }
         } else {
             travel.setShared(false);
             travel.setShareStatus(false);
+            travelWallet.setShare(false);
         }
         travelRepository.save(travel);
     }
 
     @Transactional
     public TravelResponse inviteTravel(String inviteCode, Long userId) {
-        Long travelId = travelRepository.findTravelIdByInviteCode(inviteCode);
-        if (travelId == null) {
+        Travel travel = travelRepository.findTravelIdByInviteCode(inviteCode);
+        if (travel == null) {
             throw new CustomException("T0001", "초대코드가 유효하지 않습니다.");
         }
-        Optional<TravelMember> travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId);
+        Optional<TravelMember> travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travel.getId());
         if (travelMember.isPresent()) {
             throw new CustomException("T0015", "해당 유저는 이미 이 여행에 속해 있습니다.");
         }
-        insertTravelMembers(userId, travelId);
-        Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        if (travel.getMemberCount() <= travelMemberRepository.countByTravelId(travel.getId())) {
+            throw new CustomException("T0017", "여행 인원이 초과되었습니다.");
+        }
+        insertTravelMembers(userId, travel.getId());
+        insertGroupAccountStake(userId, travel);
         return buildTravelResponse(travel, travel.getInviteCode());
     }
 
@@ -179,50 +192,36 @@ public class TravelService {
         return countryRepository.getAllCountries();
     }
 
-    public List<TransactionListResponse> getTransactionList(Long travelId) {
-        if (!travelRepository.existsById(travelId)) {
-            throw new CustomException("T0004", "여행이 존재하지 않습니다.");
-        }
-        List<TravelTransactionList> trList = transactionListRepository.findByTravelIdOrderByTransactionDateDesc(travelId);
-        List<TransactionListResponse> transactionListResponseList = new ArrayList<>();
-        for (TravelTransactionList travelTransactionList : trList) {
-            transactionListResponseList.add(convertToTransactionListResponse(travelTransactionList));
-        }
-        return transactionListResponseList;
-    }
-
-    public TransactionListResponse modifyTransaction(Long transactionId, int categoryId) {
-        if (!transactionListRepository.existsById(transactionId)) {
-            throw new CustomException("A0004", "거래 고유 번호가 유효하지 않습니다.");
-        }
-        TravelTransactionList transaction = transactionListRepository.getTransactionListById(transactionId);
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new CustomException("A0009", "카테고리 ID가 유효하지 않습니다."));
-        transaction.setCategory(category);
-        TravelTransactionList updatedTransaction = transactionListRepository.save(transaction);
-        return convertToTransactionListResponse(updatedTransaction);
-    }
-
     public List<CategoryResponse> getCategoryList() {
         return categoryRepository.getAllCategories();
     }
 
-    public List<TravelBudgetResponse> getTravelBudgetList(Long travelId) {
+    public Map<String, Object> getTravelBudgetList(Long travelId) {
         Travel travel = travelRepository.findById(travelId)
                 .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
-        return travelBudgetRepository.findBudgetResponseByTravel(travel);
+        boolean isComplete = travel.isStatus();
+        List<?> budgetList;
+
+        if (!isComplete) {
+            budgetList = travelBudgetRepository.findBudgetResponseByTravel(travel);
+        } else {
+            budgetList = travelBudgetRepository.findCompleteBudgetResponseByTravel(travel);
+        }
+        Map<String, Object> resultMap = new LinkedHashMap<>();
+        resultMap.put("isComplete", isComplete);
+        resultMap.put("budgetList", budgetList);
+        return resultMap;
     }
+
 
     public Page<TravelListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                      Integer month, Integer minDays, Integer maxDays, int page, int size) {
-
         Specification<Travel> spec = Specification.where(TravelSpecification.excludeCreator(userId))
                 .and(countryName != null ? TravelSpecification.countryNameContains(countryName) : null)
                 .and(memberCount != null ? TravelSpecification.memberCountEquals(memberCount) : null)
                 .and(minBudget != null && maxBudget != null ? TravelSpecification.totalBudgetWonBetween(minBudget, maxBudget) : null)
                 .and(month != null ? TravelSpecification.travelMonth(month) : null)
                 .and(minDays != null && maxDays != null ? TravelSpecification.travelDurationBetween(minDays, maxDays) : null);
-
         Pageable pageable = PageRequest.of(page, size);
         return travelRepository.findAll(spec, pageable)
                 .map(this::convertToTravelListResponse);
@@ -239,13 +238,93 @@ public class TravelService {
         return response;
     }
 
+    @Transactional
+    public void finishTravel(Long travelId) {
+        Travel travel = travelRepository.findById(travelId)
+                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        double balance = travelWalletRepository.findBalanceByTravel(travelId);
+        if (balance != 0) {
+            if (travel.getMemberCount() == 1) {
+                handleSingleMemberTravel(balance, travel);
+            } else {
+                handleMultiMemberTravel(balance, travelId, travel);
+            }
+        }
+        travelRepository.updateStatusByTravelId(travelId, true);
+        travelWalletRepository.deleteByTravelId(travelId);
+    }
 
+    private void handleSingleMemberTravel(double balance, Travel travel) {
+        AccountRechargeResponse response = accountRepository.findAccountNumberByMemberIdAndCurrency(
+                travel.getCreatorId(), travel.getCountry().getCurrency());
+        double updatedAccountBalance = response.getAccountBalance() + balance;
+        accountService.rechargeForTravelAccount(response.getAccountNumber(), updatedAccountBalance);
+    }
 
+    private void handleMultiMemberTravel(double balance, Long travelId, Travel travel) {
+        Long travelWalletId = travelWalletRepository.findTravelWalletIdByTravel(travelId);
+        List<Object[]> memberAndMoneyList = groupAccountStakeRepostory.findMemberAndTotalMoneyByTravelId(travelWalletId);
+        double totalMoney = calculateTotalMoney(memberAndMoneyList);
+        double distributedBalance = distributeBalanceToMembers(memberAndMoneyList, balance, totalMoney, travel);
+        distributeRemainingBalance(balance, distributedBalance, travelId, travel);
+    }
+
+    private double calculateTotalMoney(List<Object[]> memberAndMoneyList) {
+        return memberAndMoneyList.stream()
+                .mapToDouble(row -> (Double) row[1])
+                .sum();
+    }
+
+    private double distributeBalanceToMembers(List<Object[]> memberAndMoneyList, double balance, double totalMoney, Travel travel) {
+        double distributedBalance = 0;
+        for (Object[] row : memberAndMoneyList) {
+            Long memberId = (Long) row[0];
+            Double memberMoney = (Double) row[1];
+            if (memberMoney != 0) {
+                double contributionPercentage = memberMoney / totalMoney;
+                double amountToDistribute = Math.floor(balance * contributionPercentage);
+                distributedBalance += amountToDistribute;
+                distributeToMemberAccount(memberId, amountToDistribute, travel.getCountry().getCurrency(), travel.getId());
+            }
+        }
+        return distributedBalance;
+    }
+
+    private void distributeRemainingBalance(double balance, double distributedBalance, Long travelId, Travel travel) {
+        double remainingBalance = balance - distributedBalance;
+        Long creatorId = travelRepository.findCreatorIdByTravelId(travelId);
+        distributeToMemberAccount(creatorId, remainingBalance, travel.getCountry().getCurrency(), travelId);
+    }
+
+    private void distributeToMemberAccount(Long memberId, double amount, String currency, Long travelId) {
+        AccountRechargeResponse response = accountRepository.findAccountNumberByMemberIdAndCurrency(memberId, currency);
+        double updatedAccountBalance = response.getAccountBalance() + amount;
+        accountService.rechargeForTravelAccount(response.getAccountNumber(), updatedAccountBalance);
+        updateTravelWalletBalance(travelId, amount);
+    }
+
+    private void updateTravelWalletBalance(Long travelId, double amount) {
+        double balanceTravelWallet = travelWalletRepository.findBalanceByTravel(travelId);
+        double updatedWalletBalance = balanceTravelWallet - amount;
+        travelWalletRepository.rechargeTravelWallet(travelId, updatedWalletBalance);
+    }
+
+    @Transactional
+    public void leaveTravel(Long userId, Long travelId) {
+        Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        Optional<TravelMember> travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId);
+        if (travelMember.isEmpty()) {
+            throw new CustomException("T0016", "해당 유저는 이미 이 여행에 속해 있지 않습니다.");
+        }
+        TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
+        groupAccountStakeRepostory.deleteGroupAccountStake(travelWallet, userId);
+        travelMemberRepository.deleteByMemberIdAndTravelId(userId, travelId);
+    }
 
 
     /* 중복 메서드 */
     // 필수 값 및 날짜 검증 메서드 (여행 생성, 여행 수정)
-    private void validateTravelRequest(TravelRequest request) {
+    private void validateTravelRequest(TravelRequest request, Long userId, Long travelId) {
         if (request.getTitle() == null || request.getTitle().isEmpty() ||
                 request.getStartDate() == null || request.getEndDate() == null ||
                 request.getMemberCount() <= 0 || request.getTotalBudget() <= 0 ||
@@ -257,6 +336,20 @@ public class TravelService {
         if (request.getStartDate().isBefore(currentDate)) {
             throw new CustomException("T0003", "시작일은 현재 날짜보다 이후여야 합니다.");
         }
+
+        List<Travel> travelList = travelRepository.findAllTravelByUserId(userId);
+        for (Travel travel : travelList) {
+            if (!Objects.equals(travel.getId(), travelId)) {
+                if ((request.getStartDate().isEqual(travel.getStartDate()) || request.getStartDate().isAfter(travel.getStartDate())) &&
+                        (request.getStartDate().isBefore(travel.getEndDate()) || request.getStartDate().isEqual(travel.getEndDate())) ||
+                        (request.getEndDate().isEqual(travel.getStartDate()) || request.getEndDate().isAfter(travel.getStartDate())) &&
+                                (request.getEndDate().isBefore(travel.getEndDate()) || request.getEndDate().isEqual(travel.getEndDate())) ||
+                        (request.getStartDate().isBefore(travel.getStartDate()) && request.getEndDate().isAfter(travel.getEndDate()))) {
+                    throw new CustomException("T0010", "여행 일정이 기존 여행과 겹칩니다.");
+                }
+            }
+        }
+
         if (request.getEndDate().isBefore(request.getStartDate())) {
             throw new CustomException("T0009", "종료일은 시작일보다 이후여야 합니다.");
         }
@@ -272,6 +365,7 @@ public class TravelService {
         travel.setMemberCount(request.getMemberCount());
         travel.setTotalBudget(request.getTotalBudget());
         travel.setCreatorId(userId);
+        travel.setAirportCost(request.getAirportCost());
 
         if (image != null && !image.isEmpty()) {
             String fileUrl = s3Service.uploadFile(image);
@@ -294,8 +388,8 @@ public class TravelService {
             travelBudget.setCategoryBudget(budgetDTO.getBudget());
             travelBudget.setBudgetWon(budgetDTO.getBudgetWon());
             travelBudget.setTravel(travel);
-            travelBudget.setFiftyBudget((budgetDTO.getBudget()/2));
-            travelBudget.setEightyBudget((budgetDTO.getBudget()*0.8));
+            travelBudget.setFiftyBudget((budgetDTO.getBudget() / 2));
+            travelBudget.setEightyBudget((budgetDTO.getBudget() * 0.8));
             travelBudgetRepository.save(travelBudget);
         }
     }
@@ -318,6 +412,7 @@ public class TravelService {
         response.setStatus(travel.isStatus());
         response.setShared(travel.isShared());
         response.setShareStatus(travel.isShareStatus());
+        response.setAirportCost(travel.getAirportCost());
 
         List<TravelBudget> savedBudgets = travelBudgetRepository.findByTravel(travel);
         response.setBudgets(
@@ -336,7 +431,6 @@ public class TravelService {
     // 여행 예산 테이블 수정
     private void updateTravelBudgets(TravelRequest request, Travel travel) {
         List<TravelBudget> existingBudgets = travelBudgetRepository.findByTravel(travel);
-
         for (TravelRequest.BudgetDTO budgetDTO : request.getBudgets()) {
             TravelBudget existingBudget = existingBudgets.stream()
                     .filter(budget -> budget.getCategory() != null &&
@@ -346,8 +440,8 @@ public class TravelService {
 
             existingBudget.setCategoryBudget(budgetDTO.getBudget());
             existingBudget.setBudgetWon(budgetDTO.getBudgetWon());
-            existingBudget.setFiftyBudget((budgetDTO.getBudget()/2));
-            existingBudget.setEightyBudget((budgetDTO.getBudget()*0.8));
+            existingBudget.setFiftyBudget((budgetDTO.getBudget() / 2));
+            existingBudget.setEightyBudget((budgetDTO.getBudget() * 0.8));
 
             travelBudgetRepository.save(existingBudget);
         }
@@ -381,18 +475,14 @@ public class TravelService {
         return response;
     }
 
-    // 여행 지출 내역
-    private TransactionListResponse convertToTransactionListResponse(TravelTransactionList travelTransactionList) {
-        TransactionListResponse response = new TransactionListResponse();
-        response.setTransactionId(travelTransactionList.getId());
-        response.setPrice(travelTransactionList.getPrice());
-        response.setTransactionDate(travelTransactionList.getTransactionDate().toInstant().atZone(java.time.ZoneId.systemDefault()).toLocalDateTime());
-        response.setCategoryName(categoryRepository.findCategoryNameByCategoryId(travelTransactionList.getCategory().getCategoryId()));
-        response.setCategoryId(travelTransactionList.getCategory().getCategoryId());
-        response.setMerchantName(merchantRepository.findMerchantNameById(travelTransactionList.getMerchantId()));
-        response.setTravelId(travelTransactionList.getTravel().getId());
-        response.setBalance(travelTransactionList.getBalance());
-        response.setTransactionType(travelTransactionList.getTransactionType());
-        return response;
+    public void insertGroupAccountStake(Long userId, Travel travel) {
+        Member member = memberRepository.findById(userId)
+                .orElseThrow(() -> new CustomException("M0010", "존재하지 않는 회원입니다."));
+        TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
+        GroupAccountStake groupAccountStake = new GroupAccountStake();
+        groupAccountStake.setMember(member);
+        groupAccountStake.setTravelWallet(travelWallet);
+        groupAccountStake.setTotalMoney(0d);
+        groupAccountStakeRepostory.save(groupAccountStake);
     }
 }

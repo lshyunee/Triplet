@@ -9,9 +9,11 @@ import com.ssafy.triplet.member.dto.response.MemberIdResponse;
 import com.ssafy.triplet.member.service.MemberService;
 import com.ssafy.triplet.response.ApiResponse;
 import com.ssafy.triplet.exception.CustomErrorCode;
+import com.ssafy.triplet.validation.CustomValidator;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -22,7 +24,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -30,74 +34,46 @@ import java.util.List;
 public class SignupController {
 
     private final MemberService memberService;
+    private final CustomValidator customValidator;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@Valid @RequestBody SignupRequest request, BindingResult bindingResult, HttpServletResponse response) {
-        if (bindingResult.hasErrors()) {
-            return handleFieldErrors(bindingResult);
-        }
+        ResponseEntity<?> errorResponse = customValidator.validateField(bindingResult);
+        if (errorResponse != null) return errorResponse;
+
         memberService.signUp(request, response);
         return ResponseEntity.ok().body(new ApiResponse<>("200", "회원가입 성공"));
+    }
+
+    @PostMapping("/signup/is-duplicated")
+    public ResponseEntity<?> isDuplicated(@Valid @RequestBody MemberIdRequest request, BindingResult bindingResult) {
+        ResponseEntity<?> errorResponse = customValidator.validateField(bindingResult);
+        if (errorResponse != null) return errorResponse;
+
+        boolean isDuplicated = memberService.isDuplicated(request);
+        MemberIdResponse memberIdResponse = new MemberIdResponse(isDuplicated);
+        return ResponseEntity.ok().body(new ApiResponse<>("200", "아이디 중복확인 성공", memberIdResponse));
     }
 
     @PostMapping("/simple-password")
     public ResponseEntity<?> simplePassword(@Valid @RequestBody SimplePasswordRequest request, BindingResult bindingResult,
                                             @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
-        if (bindingResult.hasErrors()) {
-            return handleFieldErrors(bindingResult);
-        }
-        if (!memberService.createSimplePassword(request, customUserPrincipal.getMemberId())) {
-            return ResponseEntity.badRequest().body(ApiResponse.isError(CustomErrorCode.SIMPLE_PASSWORD_MISMATCH));
-        }
+        ResponseEntity<?> errorResponse = customValidator.validateField(bindingResult);
+        if (errorResponse != null) return errorResponse;
+        memberService.createSimplePassword(request, customUserPrincipal.getMemberId());
         return ResponseEntity.ok().body(new ApiResponse<Void>("200", "간편비밀번호 설정 성공"));
     }
 
     @PostMapping("/simple-password-confirm")
     public ResponseEntity<?> simplePasswordConfirm(@Valid @RequestBody SimplePasswordConfirmRequest request, BindingResult bindingResult,
                                                    @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
-        if (bindingResult.hasErrors()) {
-            return handleFieldErrors(bindingResult);
-        }
+        ResponseEntity<?> errorResponse = customValidator.validateField(bindingResult);
+        if (errorResponse != null) return errorResponse;
+
         if (!memberService.confirmSimplePassword(request, customUserPrincipal.getMemberId())) {
             return ResponseEntity.badRequest().body(ApiResponse.isError(CustomErrorCode.SIMPLE_PASSWORD_MISMATCH));
         }
         return ResponseEntity.ok().body(new ApiResponse<Void>("200", "간편비밀번호 인증 성공"));
-    }
-
-    @PostMapping("/signup/is-duplicated")
-    public ResponseEntity<?> isDuplicated(@Valid @RequestBody MemberIdRequest request, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return handleFieldErrors(bindingResult);
-        }
-        boolean isDuplicated = memberService.isDuplicated(request);
-        MemberIdResponse memberIdResponse = new MemberIdResponse(isDuplicated);
-        return ResponseEntity.ok().body(new ApiResponse<>("200", "아이디 중복확인 성공", memberIdResponse));
-    }
-
-    // 회원가입 필드별 유효성검사 실패응답
-    private ResponseEntity<?> handleFieldErrors(BindingResult bindingResult) {
-        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
-        ResponseEntity<?> response = null;
-        
-        for (FieldError error : fieldErrors) {
-            String fieldName = error.getField();
-
-            switch (fieldName) {
-                case "memberId" ->
-                        response = new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.INVALID_ID), HttpStatus.BAD_REQUEST);
-                case "password" ->
-                        response = new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.INVALID_PASSWORD), HttpStatus.BAD_REQUEST);
-                case "phoneNumber" ->
-                        response = new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.INVALID_PHONE_NUMBER), HttpStatus.BAD_REQUEST);
-                case "name" ->
-                        response = new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.EMPTY_NAME), HttpStatus.BAD_REQUEST);
-                case "newSimplePassword" ->
-                        response = new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.INVALID_SIMPLE_PASSWORD), HttpStatus.BAD_REQUEST);
-                default ->
-                        response = new ResponseEntity<>(ApiResponse.isError(CustomErrorCode.INVALID_IDENTIFICATION_NUMBER), HttpStatus.BAD_REQUEST);
-            };
-        }
-        return response;
     }
 
 }

@@ -68,19 +68,24 @@ public class MemberService {
         autoLogin(request.getMemberId(), response);
     }
 
-    public boolean createSimplePassword(SimplePasswordRequest request, String memberId) {
+    public void createSimplePassword(SimplePasswordRequest request, String memberId) {
         Member member = memberRepository.findByMemberId(memberId);
+        if (member == null) {
+            throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
+        }
         // 간편비밀번호랑 간편비밀번호확인 검증
-        if (!request.getNewSimplePassword().equals(request.getNewSimplePasswordConfirm())) {
-            return false;
+        if (request.getNewSimplePasswordConfirm() == null || !request.getNewSimplePassword().equals(request.getNewSimplePasswordConfirm())) {
+            throw new CustomException(CustomErrorCode.PASSWORD_MISMATCH);
         }
         member.setSimplePassword(request.getNewSimplePassword());
-        return true;
     }
 
     public boolean confirmSimplePassword(SimplePasswordConfirmRequest request, String memberId) {
         // 간편비밀번호 확인: true -> 확인 성공
         Member member = memberRepository.findByMemberId(memberId);
+        if (member == null) {
+            throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
+        }
         return request.getSimplePassword().equals(member.getSimplePassword());
     }
 
@@ -109,22 +114,29 @@ public class MemberService {
             throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
         }
         // 주민번호에서 생일, 성별 꺼내기
-        String identificationNumber = request.getIdentificationNumber();
-        String birth = identificationNumber.substring(0, 6);
-        String lastNum = identificationNumber.substring(6);
-        boolean gender = "1".equals(lastNum) || "3".equals(lastNum); // 1: 남, 0: 여
-        // 업데이트
-        member.setGender(gender);
-        member.setBirth(birth);
-        member.setName(request.getName());
-        member.setPhoneNumber(request.getPhoneNumber());
+        if (request.getIdentificationNumber() != null) {
+            String identificationNumber = request.getIdentificationNumber();
+            String birth = identificationNumber.substring(0, 6);
+            String lastNum = identificationNumber.substring(6);
+            boolean gender = "1".equals(lastNum) || "3".equals(lastNum); // 1: 남, 0: 여
+            // 업데이트
+            member.setGender(gender);
+            member.setBirth(birth);
+        }
+        if (request.getName() != null) {
+            member.setName(request.getName());
+        }
+        if (request.getPhoneNumber() != null) {
+            member.setPhoneNumber(request.getPhoneNumber());
+        }
+        Member updatedMember = memberRepository.save(member);
         // 변경된 정보 반환
         return MemberResponse.builder()
-                .memberId(member.getMemberId())
-                .name(request.getName())
-                .phoneNumber(request.getPhoneNumber())
-                .birth(birth)
-                .gender(gender).build();
+                .memberId(updatedMember.getMemberId())
+                .name(updatedMember.getName())
+                .phoneNumber(updatedMember.getPhoneNumber())
+                .birth(updatedMember.getBirth())
+                .gender(updatedMember.getGender()).build();
     }
 
     public void updatePassword(PasswordUpdateRequest request, String memberId) {
@@ -133,11 +145,11 @@ public class MemberService {
             throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
         }
         // 입력한 기존 비밀번호랑 실제 내 비밀번호 일치하는지 확인
-        if (!passwordEncoder.matches(request.getPassword(), member.getPassword())) {
+        if (request.getPassword() == null || !passwordEncoder.matches(request.getPassword(), member.getPassword())) {
             throw new CustomException(CustomErrorCode.INCORRECT_PASSWORD);
         }
         // 새 비밀번호랑 새 비밀번호 확인이 일치하는지 확인
-        if (!request.getNewPassword().equals(request.getNewPasswordConfirm())) {
+        if (request.getNewPasswordConfirm() == null || !request.getNewPassword().equals(request.getNewPasswordConfirm())) {
             throw new CustomException(CustomErrorCode.PASSWORD_MISMATCH);
         }
         member.setPassword(request.getNewPassword());
@@ -153,12 +165,25 @@ public class MemberService {
 
     private void autoLogin(String memberId, HttpServletResponse response) {
         // access, refresh 토큰 발급
-        String access = jwtUtil.createJwt("access", memberId, "ROLE_USER", 600000L);
-        String refresh = jwtUtil.createJwt("refresh", memberId, "ROLE_USER", 86400000L);
+        String access = jwtUtil.createJwt("access", memberId, "ROLE_USER", 1200000L);
+        String refresh = jwtUtil.createJwt("refresh", memberId, "ROLE_USER", 14400000L);
 
         // 쿠키에 토큰 정보 담기
-        response.addCookie(createCookie("Authorization", access));
-        response.addCookie(createCookie("Authorization-Refresh", refresh));
+        Cookie authorization = createCookie("Authorization", access);
+        response.addHeader("Set-Cookie", authorization.getName() + "=" + authorization.getValue()
+                + "; Path=" + authorization.getPath()
+                + "; Max-Age=" + authorization.getMaxAge()
+                + "; HttpOnly"
+                + (authorization.getSecure() ? "; Secure" : "")
+                + "; SameSite=None");
+
+        Cookie authorizationRefresh = createCookie("Authorization-Refresh", refresh);
+        response.addHeader("Set-Cookie", authorizationRefresh.getName() + "=" + authorizationRefresh.getValue()
+                + "; Path=" + authorizationRefresh.getPath()
+                + "; Max-Age=" + authorizationRefresh.getMaxAge()
+                + "; HttpOnly"
+                + (authorizationRefresh.getSecure() ? "; Secure" : "")
+                + "; SameSite=None");
     }
 
     private Cookie createCookie(String key, String value) {
@@ -167,6 +192,7 @@ public class MemberService {
         cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
+
         return cookie;
     }
 

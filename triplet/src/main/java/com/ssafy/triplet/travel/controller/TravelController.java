@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/travels")
@@ -164,30 +166,6 @@ public class TravelController {
         }
     }
 
-    @GetMapping("/transaction/{travelId}")
-    public ResponseEntity<ApiResponse<List<TransactionListResponse>>> getTransactions(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
-                                                                                      @PathVariable Long travelId) {
-        try {
-            List<TransactionListResponse> list = travelService.getTransactionList(travelId);
-            if (list.isEmpty()) {
-                ResponseEntity.ok(new ApiResponse<>("200", "거래 내역이 없습니다."));
-            }
-            return ResponseEntity.ok(new ApiResponse<>("200", "거래 내역이 조회되었습니다.", list));
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
-
-    @PutMapping("/transaction/{transactionId}/{categoryId}")
-    public ResponseEntity<ApiResponse<TransactionListResponse>> updateTransaction(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
-                                                                                  @PathVariable Long transactionId, @PathVariable int categoryId) {
-        try {
-            return ResponseEntity.ok(new ApiResponse<>("200", "거래 내역이 수정되었습니다.", travelService.modifyTransaction(transactionId, categoryId)));
-        } catch (Exception e) {
-            return handleException(e);
-        }
-    }
-
     @GetMapping("/categories")
     public ResponseEntity<ApiResponse<List<CategoryResponse>>> getCategories() {
         try {
@@ -199,10 +177,10 @@ public class TravelController {
     }
 
     @GetMapping("/expenditure-expenses/{travelId}")
-    public ResponseEntity<ApiResponse<List<TravelBudgetResponse>>> getExpenditureExpenses(@PathVariable Long travelId) {
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getExpenditureExpenses(@PathVariable Long travelId) {
         try {
-            List<TravelBudgetResponse> list = travelService.getTravelBudgetList(travelId);
-            return ResponseEntity.ok(new ApiResponse<>("200", "카테고리별 지출현황이 조회되었습니다.", list));
+            Map<String, Object> response = travelService.getTravelBudgetList(travelId);
+            return ResponseEntity.ok(new ApiResponse<>("200", "카테고리별 지출현황이 조회되었습니다.", response));
         } catch (Exception e) {
             return handleException(e);
         }
@@ -231,7 +209,29 @@ public class TravelController {
         }
     }
 
+    @PostMapping("/leave/{travelId}")
+    public ResponseEntity<ApiResponse<TravelResponse>> leaveTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+                                                                   @PathVariable Long travelId) {
+        try {
+            Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
+            travelService.leaveTravel(userId, travelId);
+            return ResponseEntity.ok(new ApiResponse<>("200", "유저가 여행에서 떠났습니다."));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
 
+
+    // 테스트용 메서드
+    @PostMapping("/finish/{travelId}")
+    public ResponseEntity<ApiResponse<TravelResponse>> finishTravel(@PathVariable Long travelId) {
+        try {
+            travelService.finishTravel(travelId);
+            return ResponseEntity.ok(new ApiResponse<>("200", "여행이 종료되었습니다."));
+        } catch (Exception e) {
+            return handleException(e);
+        }
+    }
 
 
     // 예외처리 메서드
