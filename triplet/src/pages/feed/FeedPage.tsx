@@ -7,10 +7,14 @@ import styled from 'styled-components';
 import useInput from '../../hooks/useInput';
 import { ReactComponent as Search } from '../../assets/common/search.svg';
 
+import TravelCardMini from '../../components/travel/TravelCardMini';
+
 const FeedDiv = styled.div`
     background-color : #F3F4F6;
-    min-height: calc(100vh - 112px);
-    padding : 56px 16px 0;
+    min-height: 100%;
+    padding : 0 16px 0;
+    margin : 56px 0 56px 0;
+    padding-bottom : 24px;
 `;
 
 const TitleDiv = styled.div`
@@ -49,6 +53,36 @@ const SearchInput = styled.input`
     }
 `
 
+const FilterDiv = styled.div`
+    margin-top : 12px;
+    display : flex;
+    justify-content : space-between;
+`;
+
+const FilterP = styled.p`
+    font-size : 14px;
+    font-weight : 500;
+    color : #008DE7;
+`;
+
+const FilterBtn = styled.button`
+    width: 86px;
+    height : 37px;
+    background-color : #E6F2FF;
+    color : #008DE7;
+    border : none;
+    border-radius : 50px;
+
+`;
+
+const TravelDiv = styled.div`
+    margin-top : 12px;
+    display : flex;
+    flex-direction : row;
+    justify-content : center;
+    gap: 16px; /* 카드 사이에 16px의 간격 추가 */
+`;
+
 const FeedPAge = () => {
 
     const dispatch = useDispatch();
@@ -75,6 +109,22 @@ const FeedPAge = () => {
                 <SearchDiv>
                     <SearchInput placeholder='여행지를 입력하세요.'></SearchInput>
                 </SearchDiv>
+                <FilterDiv>
+                    <FilterP>추천순</FilterP>
+                    <FilterBtn>상세검색</FilterBtn>
+                </FilterDiv>
+                <TravelDiv>
+                    <TravelCardMini></TravelCardMini>
+                    <TravelCardMini></TravelCardMini>
+                </TravelDiv>
+                <TravelDiv>
+                    <TravelCardMini></TravelCardMini>
+                    <TravelCardMini></TravelCardMini>
+                </TravelDiv>
+                <TravelDiv>
+                    <TravelCardMini></TravelCardMini>
+                    <TravelCardMini></TravelCardMini>
+                </TravelDiv>
             </FeedDiv>
         </>
     );
