@@ -4,17 +4,19 @@ import { useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
 import styled from 'styled-components';
 
+import useAxios from '../../hooks/useAxios';
 import useInput from '../../hooks/useInput';
 import { ReactComponent as Search } from '../../assets/common/search.svg';
+import { ReactComponent as ArrowDown } from '../../assets/common/arrowDown.svg';
+import { ReactComponent as Filter } from '../../assets/common/filter.svg';
 
 import TravelCardMini from '../../components/travel/TravelCardMini';
 
 const FeedDiv = styled.div`
     background-color : #F3F4F6;
-    min-height: 100%;
+    min-height: calc(100vh - 112px);
     padding : 0 16px 0;
     margin : 56px 0 56px 0;
-    padding-bottom : 24px;
 `;
 
 const TitleDiv = styled.div`
@@ -36,7 +38,24 @@ const TitleExplainP = styled.p`
 
 const SearchDiv = styled.p`
     margin-top:40px;
+    position: relative;
+    display: flex;
+    align-items: center;
+`
 
+const SearchWrapper = styled.div`
+    position: absolute;
+    left: 10px;
+    display: flex;
+    align-items: center;
+    height: 100%;
+`
+
+const FilterWrapper = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 4px; /* 텍스트와 아이콘 사이에 간격 */
 `
 
 const SearchInput = styled.input`
@@ -46,7 +65,7 @@ const SearchInput = styled.input`
     color : black;
     border : 1px solid #F0F0F0;
     border-radius : 50px;
-    text-indent : 10px;
+    text-indent : 30px;
 
     &::placeholder {
     color : #AEAEAE; 
@@ -59,6 +78,14 @@ const FilterDiv = styled.div`
     justify-content : space-between;
 `;
 
+const FilterDownDiv = styled.div`
+    display : flex;
+    flex-direction : row;
+    text-align : center;
+    align-items : center;
+    gap : 4px;
+`
+
 const FilterP = styled.p`
     font-size : 14px;
     font-weight : 500;
@@ -66,21 +93,29 @@ const FilterP = styled.p`
 `;
 
 const FilterBtn = styled.button`
+    display: flex;
+    align-items: center;
     width: 86px;
     height : 37px;
     background-color : #E6F2FF;
     color : #008DE7;
     border : none;
     border-radius : 50px;
+    padding : 12px;
+    font-size : 12px;
+    font-weight : 500;
 
+    &:hover {
+        background-color: #D0E8FF;
+    }
 `;
 
 const TravelDiv = styled.div`
-    margin-top : 12px;
-    display : flex;
-    flex-direction : row;
-    justify-content : center;
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(156px, 1fr));
     gap: 16px; /* 카드 사이에 16px의 간격 추가 */
+    justify-content: center;
 `;
 
 const FeedPAge = () => {
@@ -107,21 +142,29 @@ const FeedPAge = () => {
                     <TitleExplainP>가고 싶은 여행지를 찾아보세요.</TitleExplainP>
                 </TitleDiv>
                 <SearchDiv>
+                    <SearchWrapper>
+                        <Search/>                        
+                    </SearchWrapper>
                     <SearchInput placeholder='여행지를 입력하세요.'></SearchInput>
                 </SearchDiv>
                 <FilterDiv>
-                    <FilterP>추천순</FilterP>
-                    <FilterBtn>상세검색</FilterBtn>
+                    <FilterDownDiv>
+                        <FilterP>추천순</FilterP>
+                        <ArrowDown/>
+                    </FilterDownDiv>
+                    <FilterDownDiv>
+                        <FilterBtn>
+                        <FilterWrapper>
+                            <Filter width={16} height={16}/>
+                        </FilterWrapper>
+                        상세검색</FilterBtn>
+                    </FilterDownDiv>
                 </FilterDiv>
                 <TravelDiv>
                     <TravelCardMini></TravelCardMini>
                     <TravelCardMini></TravelCardMini>
-                </TravelDiv>
-                <TravelDiv>
                     <TravelCardMini></TravelCardMini>
                     <TravelCardMini></TravelCardMini>
-                </TravelDiv>
-                <TravelDiv>
                     <TravelCardMini></TravelCardMini>
                     <TravelCardMini></TravelCardMini>
                 </TravelDiv>
