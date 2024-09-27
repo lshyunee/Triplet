@@ -13,19 +13,30 @@ import QrScanner from 'react-qr-scanner';
 
 const s = {
 	Container: styled.div`
-		background-color: #F3F4F6;
-		/* height: 100%; */
-		padding-top: 68px;
-		padding-bottom: 16px;
+        z-index: -1;
+        position: relative;
+        background-color: white;
+        margin-top: 56px;
+        height: calc(100vh);
+        display: flex;
+        align-items: center; 
+        justify-content: center;
+        width: 100%;
 	`,
-	Card: styled.div`
-		background-color: #ffffff;
-		border-radius: 20px;
-		margin: 0 16px;
-		margin-bottom: 12px;
-		display: flex;
-		flex-direction: column;
-	`,
+    QrScannerOverlayText: styled.div`
+        position: absolute;
+        color: white;
+        font-size: 14px;
+        top: 10%; 
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10; 
+    `,
+    Caption: styled.span`
+    font-size: 12px;
+    font-weight: 400;
+    color: #666666;
+  `,
 }
 
 
@@ -36,7 +47,7 @@ const QRPage = () => {
 		dispatch(pageMove("pay"));
 	}, []);
 
-    const [qrData, setQrData] = useState<string | null>(null);
+    const [qrData, setQrData] = useState<string | null>(null); // qr 데이터
 
     const handleScan = (data: string | null) => {
         if (data) {
@@ -48,30 +59,23 @@ const QRPage = () => {
         console.error(err);
     };
 
-    const previewStyle = {
-        height: 240,
-        width: 320,
-    };
-
 	return (
 		<>
 			<BackHeader title='결제'/>
 			<s.Container>
-			<h1>QR 코드 스캔</h1>
                 <QrScanner
                     delay={300}
-                    style={previewStyle}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        position: 'relative',
+                        zIndex: 5,
+                        objectFit: 'cover'
+                      }}
                     onError={handleError}
                     onScan={handleScan}
                 />
-                {qrData ? (
-                    <div>
-                    <h3>스캔한 데이터:</h3>
-                    <p>{qrData}</p>
-                    </div>
-                ) : (
-                    <p>QR 코드를 스캔하세요</p>
-                )}
+                <s.QrScannerOverlayText>결제 QR코드를 스캔하세요</s.QrScannerOverlayText>
 			</s.Container>
 		</>
 	);
