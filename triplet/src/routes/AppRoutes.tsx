@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 // router import
 import Home from '../pages/home/HomePage';
-import Board from '../pages/board/BoardPage';
+import FeedPAge from '../pages/feed/FeedPage';
 import MyPage from '../pages/mypage/MyPage';
 import Pay from '../pages/pay/PayPage';
 import Travels from '../pages/travels/TravelsPage';
@@ -28,7 +28,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/login" element={<Login/>}/>
             <Route path="/signup" element={<Signup/>}/>
             <Route path="/home" element={<Home/>}/>
-            <Route path="/feed" element={<Board/>}/>
+            <Route path="/feed" element={<FeedPAge/>}/>
             <Route path="/mypage" element={<MyPage/>} />
             <Route path="/mypage/info-edit" element={<MyInfoEditPage/>} />
             <Route path="/mypage/password-edit" element={<PasswordEditPage/>} />
