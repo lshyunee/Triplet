@@ -10,6 +10,8 @@ import useInput from '../../../hooks/useInput';
 import ErrorModal from '../../../components/modal/ErrorModal';
 import CompleteModal from '../../../components/modal/CompleteModal';
 
+import { ReactComponent as NaverLogo } from '../../../assets/login/naver.svg';
+
 const TitleP = styled.p`
     font-size : 32px;
     font-weight : 800;
@@ -23,6 +25,7 @@ const TitleDiv = styled.div`
 `
 
 const BigDiv = styled.div`
+    padding : 0 16px;
     display:flex;
     justify-content : center;
     align-items : center;
@@ -41,7 +44,7 @@ const StyledLink = styled(Link)`
 `;
 
 const LoginInput = styled.input`
-    width:328px;
+    width:100%;
     height:44px;
     border-radius : 10px;
     background-color : #F9FAFC;
@@ -52,7 +55,7 @@ const LoginInput = styled.input`
 `;
 
 const LoginBtn = styled.button`
-    width:328px;
+    width:100%;
     height:44px;
     color : white;
     background-color : #008DE7;
@@ -64,15 +67,20 @@ const LoginBtn = styled.button`
 `;
 
 const NaverLoginBtn = styled.button`
-    width:328px;
+    width:100%;
     height:44px;
-    color : white;
-    background-color : green;
+    color : #767678;
+    background-color : #FFFFFF;
     border-radius : 10px;
-    border : none;
+    border : 1px solid #E6E6EA;
     box-sizing: border-box;
     margin-bottom : 20px;
     padding : 14px;
+    display : flex;
+    justify-content : center;
+    align-items : center;
+    font-size : 14px;
+    font-weight : 600;
 `;
 
 const SignupDiv = styled.div`
@@ -183,7 +191,7 @@ const LoginPage = () => {
             <LoginInput type="text" placeholder='아이디' {...id} />
             <LoginInput type="password" placeholder='비밀번호' {...pw} />
             <LoginBtn onClick={handleLogin}>로그인</LoginBtn>
-            <NaverLoginBtn onClick={handleNaverLogin}>네이버 계정 로그인</NaverLoginBtn>
+            <NaverLoginBtn onClick={handleNaverLogin}><NaverLogo/>네이버 로그인</NaverLoginBtn>
             <SignupDiv>
                 <SignupP>아직 회원이 아니신가요?</SignupP>
                 <StyledLink to="/signup">
