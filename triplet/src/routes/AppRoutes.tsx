@@ -22,6 +22,7 @@ import ExchangePage from '../pages/pay/ExchangePage';
 import QRPage from '../pages/pay/QRPage';
 import QRPayPage from '../pages/pay/QRPayPage';
 import QRCompletePage from '../pages/pay/QRCompletePage';
+import CreateTravelPage from '../pages/travels/CreateTravelPage';
 
 
 const AppRoutes: React.FC = () => (
@@ -45,6 +46,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/pay/global-wallet" element={<GlobalWalletPage/>}/>
             <Route path="/pay/exchange" element={<ExchangePage/>}/>
             <Route path="/travels" element={<Travels/>}/>
+            <Route path="/travels/create" element={<CreateTravelPage/>}/>
             <Route path="/alarm" element={<Alarm/>}/>
         </Routes>
 );
