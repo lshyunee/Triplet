@@ -21,8 +21,8 @@ public enum CustomErrorCode {
     WITHDRAWAL_ACCOUNT_NOT_FOUND("A0024", "출금 계좌가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     DEPOSIT_ACCOUNT_NOT_FOUND("A0007", "입금계좌가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     ACCOUNT_NOT_FOUND("A0023", "계좌가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
-    STRING_TO_JSON_FAIL("E0000","서버에서 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR);
-
+    STRING_TO_JSON_FAIL("E0000","서버에서 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_CURRENCY_CODE("C0001","통화 코드가 유효하지 않습니다.",HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;
