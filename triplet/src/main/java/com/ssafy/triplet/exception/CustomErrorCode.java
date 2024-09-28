@@ -22,6 +22,7 @@ public enum CustomErrorCode {
     DEPOSIT_ACCOUNT_NOT_FOUND("A0007", "입금계좌가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     ACCOUNT_NOT_FOUND("A0023", "계좌가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     STRING_TO_JSON_FAIL("E0000","서버에서 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
+    INVALID_CURRENCY_CODE("C0001","통화 코드가 유효하지 않습니다.",HttpStatus.BAD_REQUEST),
     TRAVEL_NOT_FOUND("T0004", "여행이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     NOT_TRAVEL_CREATOR("T0011", "여행 생성자가 아닙니다.", HttpStatus.FORBIDDEN),
     TRAVEL_NOT_COMPLETED("T0012", "여행이 종료되지 않았습니다.", HttpStatus.BAD_REQUEST),

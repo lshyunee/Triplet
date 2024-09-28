@@ -47,7 +47,7 @@ public class ExchangeRateRepository {
 
     private final EntityParser entityParser = new EntityParser();
 
-    private final Header header = new Header(); ;
+    private final Header header = new Header();
 
     private final ObjectMapper objectMapper;
 
@@ -73,7 +73,7 @@ public class ExchangeRateRepository {
         this.objectMapper = objectMapper;
         this.hashOperations =  redisTemplate.opsForHash();
     }
-
+//    private final ObjectMapper objectMapper = new ObjectMapper();
 //            .activateDefaultTyping(
 //            BasicPolymorphicTypeValidator.builder().allowIfBaseType(ExchangeRates.class).build(),
 //            ObjectMapper.DefaultTyping.NON_FINAL,
@@ -185,6 +185,14 @@ public class ExchangeRateRepository {
                 for (ExchangeRates exchangeRate : newExchangeRates) {
                     // 역직렬화 할때 ExchangeRates 로 하기위해 클래스를 같이 저장
                     String className = exchangeRate.getClass().getName();
+                    exchangeRate.setExchangeRate(exchangeRate.getExchangeRate().replace(",",""));
+                    if(exchangeRate.getCurrency().equals("JPY")){
+                        exchangeRate.setExchangeMin(100);
+                    }else if(exchangeRate.getCurrency().equals("CNY")){
+                        exchangeRate.setExchangeMin(5);
+                    }else{
+                        exchangeRate.setExchangeMin(1);
+                    }
                     Object[] arrayFormat = {className, exchangeRate};
                     //  objectMapper 를통해 Json 으로 변환
                     String json = objectMapper.writeValueAsString(arrayFormat);
@@ -218,7 +226,6 @@ public class ExchangeRateRepository {
     }
 
     // 환율 전체 조회
-
     public Map<String, ExchangeRates> findAll(String key){
 
         // Redis에서 이전, 현재 환률을 불러옴
@@ -226,6 +233,8 @@ public class ExchangeRateRepository {
 
         return ExchangeRatesMap;
     }
+
+
 
 }
 

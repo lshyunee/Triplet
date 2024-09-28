@@ -18,7 +18,7 @@ public class ExchangeRateResponse {
 
     String created;
 
-    String exchangeMin;
+    int exchangeMin;
 
     // 환율 변화율
     String changePercentage;
