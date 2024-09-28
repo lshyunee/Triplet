@@ -473,6 +473,9 @@ public class TravelService {
     // 여행 리스트
     private TravelListResponse convertToTravelListResponse(Travel travel) {
         TravelListResponse response = new TravelListResponse();
+        double usedBudgets = travelBudgetRepository.findTotalUsedBudgetByTravel(travel.getId());
+        response.setUsedBudget(usedBudgets);
+        response.setTotalBudget(travel.getTotalBudget());
         response.setTravelId(travel.getId());
         response.setTitle(travel.getTitle());
         response.setStartDate(travel.getStartDate());
@@ -482,7 +485,6 @@ public class TravelService {
         response.setCountryName(travel.getCountry().getName());
         response.setMemberCount(travel.getMemberCount());
         response.setCurrency(travel.getCountry().getCurrency());
-        response.setTotalBudget(travel.getTotalBudget());
         return response;
     }
 

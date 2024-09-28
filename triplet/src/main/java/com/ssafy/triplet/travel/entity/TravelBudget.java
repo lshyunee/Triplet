@@ -19,7 +19,7 @@ public class TravelBudget {
     private double categoryBudget;
 
     @Column(name = "used_budget", nullable = false)
-    private double usedBudget;
+    private double usedBudget = 0.0;
 
     @Column(name = "fifty_budget")
     private Double fiftyBudget;
