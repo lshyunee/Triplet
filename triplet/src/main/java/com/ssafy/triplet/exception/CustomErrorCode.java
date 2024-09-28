@@ -22,7 +22,22 @@ public enum CustomErrorCode {
     DEPOSIT_ACCOUNT_NOT_FOUND("A0007", "입금계좌가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     ACCOUNT_NOT_FOUND("A0023", "계좌가 존재하지 않습니다.", HttpStatus.NOT_FOUND),
     STRING_TO_JSON_FAIL("E0000","서버에서 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
-    INVALID_CURRENCY_CODE("C0001","통화 코드가 유효하지 않습니다.",HttpStatus.BAD_REQUEST);
+    INVALID_CURRENCY_CODE("C0001","통화 코드가 유효하지 않습니다.",HttpStatus.BAD_REQUEST),
+    TRAVEL_NOT_FOUND("T0004", "여행이 존재하지 않습니다.", HttpStatus.NOT_FOUND),
+    NOT_TRAVEL_CREATOR("T0011", "여행 생성자가 아닙니다.", HttpStatus.FORBIDDEN),
+    TRAVEL_NOT_COMPLETED("T0012", "여행이 종료되지 않았습니다.", HttpStatus.BAD_REQUEST),
+    COUNTRY_NOT_FOUND("T0006", "국가를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    CATEGORY_NOT_FOUND("T0008", "카테고리를 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    INVALID_INVITE_CODE("T0001", "초대코드가 유효하지 않습니다.", HttpStatus.BAD_REQUEST),
+    REQUIRED_VALUE_MISSING("T0002", "필수 입력 값이 비어있습니다.", HttpStatus.BAD_REQUEST),
+    INVALID_TRAVEL_START_DATE("T0003", "시작일은 현재 날짜보다 이후여야 합니다.", HttpStatus.BAD_REQUEST),
+    TRAVEL_SCHEDULE_CONFLICT("T0010", "여행 일정이 기존 여행과 겹칩니다.", HttpStatus.CONFLICT),
+    INVALID_TRAVEL_END_DATE("T0009", "종료일은 시작일보다 이후여야 합니다.", HttpStatus.BAD_REQUEST),
+    INVALID_STATUS_VALUE("T0007", "0이나 1의 상태만 보낼 수 있습니다.", HttpStatus.BAD_REQUEST),
+    USER_ALREADY_IN_TRAVEL("T0015", "해당 유저는 이미 이 여행에 속해 있습니다.", HttpStatus.CONFLICT),
+    TRAVEL_MEMBER_LIMIT_EXCEEDED("T0017", "여행 인원이 초과되었습니다.", HttpStatus.BAD_REQUEST),
+    USER_NOT_IN_TRAVEL("T0016", "해당 유저는 이미 이 여행에 속해 있지 않습니다.", HttpStatus.BAD_REQUEST),
+    TRAVEL_WALLET_HAS_BALANCE("T0018", "여행 지갑에 잔액이 있습니다.", HttpStatus.BAD_REQUEST);
 
     private final String code;
     private final String message;
