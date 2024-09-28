@@ -3,6 +3,7 @@ package com.ssafy.triplet.travel.service;
 import com.ssafy.triplet.account.dto.response.AccountRechargeResponse;
 import com.ssafy.triplet.account.repository.AccountRepository;
 import com.ssafy.triplet.account.service.AccountService;
+import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
@@ -15,6 +16,7 @@ import com.ssafy.triplet.travel.specification.TravelSpecification;
 import com.ssafy.triplet.travel.util.InviteCodeGenerator;
 import com.ssafy.triplet.travel.util.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -44,11 +46,14 @@ public class TravelService {
     private final TravelWalletService travelWalletService;
     private final AccountService accountService;
     private final S3Service s3Service;
+    private final InviteCodeGenerator inviteCodeGenerator;
+
+
 
     @Transactional
     public TravelResponse createTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
         validateTravelRequest(request, userId, 0L);
-        String inviteCode = InviteCodeGenerator.generateInviteCode();
+        String inviteCode = inviteCodeGenerator.generateInviteCode(request.getEndDate());
         Travel travel = buildTravel(userId, request, image, inviteCode);
         Travel savedTravel = travelRepository.save(travel);
         insertTravelMembers(userId, travel.getId());
@@ -59,13 +64,17 @@ public class TravelService {
     }
 
     @Transactional
-    public TravelResponse updateTravel(Long travelId, TravelRequest request, MultipartFile image, Long userId) throws IOException {
-        validateTravelRequest(request, userId, travelId);
-        Travel travel = travelRepository.findById(travelId)
-                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
-        Long creatorId = travelRepository.findCreatorIdByTravelId(travelId);
+    public TravelResponse updateTravel(TravelRequest request, MultipartFile image, Long userId) throws IOException {
+        validateTravelRequest(request, userId, request.getTravelId());
+        Travel travel = travelRepository.findById(request.getTravelId())
+                .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
+        Long creatorId = travelRepository.findCreatorIdByTravelId(request.getTravelId());
         if (!userId.equals(creatorId)) {
-            throw new CustomException("T0011", "여행 생성자가 아닙니다.");
+            throw new CustomException(CustomErrorCode.NOT_TRAVEL_CREATOR);
+        }
+        if (!request.getEndDate().equals(travel.getEndDate())) {
+            travel.setEndDate(request.getEndDate());
+            inviteCodeGenerator.updateInviteCodeExpiry(travel.getInviteCode(), request.getEndDate());
         }
         travel.setStartDate(request.getStartDate());
         travel.setEndDate(request.getEndDate());
@@ -78,7 +87,7 @@ public class TravelService {
             travel.setImage(fileUrl);
         }
         Country country = countryRepository.findById(request.getCountry())
-                .orElseThrow(() -> new CustomException("T0006", "국가를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.COUNTRY_NOT_FOUND));
         travel.setCountry(country);
         Travel updatedTravel = travelRepository.save(travel);
         updateTravelBudgets(request, updatedTravel);
@@ -88,13 +97,13 @@ public class TravelService {
     @Transactional
     public void deleteTravel(Long travelId, Long userId) {
         Travel travel = travelRepository.findById(travelId)
-                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
         TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
         if (travelWallet.getBalance() > 0) {
-            throw new CustomException("T0018", "여행 지갑에 잔액이 있습니다.");
+            throw new CustomException(CustomErrorCode.TRAVEL_WALLET_HAS_BALANCE);
         }
         if (!userId.equals(travel.getCreatorId())) {
-            throw new CustomException("T0011", "여행 생성자가 아닙니다.");
+            throw new CustomException(CustomErrorCode.NOT_TRAVEL_CREATOR);
         }
         travelRepository.deleteById(travelId);
     }
@@ -130,7 +139,7 @@ public class TravelService {
 
     public TravelResponse getTravel(Long travelId, Long userId) {
         Travel travel = travelRepository.findById(travelId)
-                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
         TravelResponse travelResponse = buildTravelResponse(travel, travel.getInviteCode());
         if (Objects.equals(userId, travel.getCreatorId())) {
             travelResponse.setMyTravel(true);
@@ -141,17 +150,17 @@ public class TravelService {
     @Transactional
     public void postTravel(Long userId, TravelShareRequest request) {
         Travel travel = travelRepository.findById(request.getTravelId())
-                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
         TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
         if (!travel.isStatus()) {
-            throw new CustomException("T0012", "종료된 여행이 아닙니다.");
+            throw new CustomException(CustomErrorCode.TRAVEL_NOT_COMPLETED);
         }
         if (!userId.equals(travel.getCreatorId())) {
-            throw new CustomException("T0011", "여행 생성자가 아닙니다.");
+            throw new CustomException(CustomErrorCode.NOT_TRAVEL_CREATOR);
         }
         if (request.getShareStatus() != 1 && request.getShareStatus() != 0 &&
                 request.getIsShared() != 1 && request.getShareStatus() != 0) {
-            throw new CustomException("T0007", "0이나 1의 상태만 보낼 수 있습니다.");
+            throw new CustomException(CustomErrorCode.INVALID_STATUS_VALUE);
         }
         if (request.getIsShared() == 1) {
             travel.setShared(true);
@@ -174,31 +183,33 @@ public class TravelService {
     public TravelResponse inviteTravel(String inviteCode, Long userId) {
         Travel travel = travelRepository.findTravelIdByInviteCode(inviteCode);
         if (travel == null) {
-            throw new CustomException("T0001", "초대코드가 유효하지 않습니다.");
+            throw new CustomException(CustomErrorCode.INVALID_INVITE_CODE);
         }
         Optional<TravelMember> travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travel.getId());
         if (travelMember.isPresent()) {
-            throw new CustomException("T0015", "해당 유저는 이미 이 여행에 속해 있습니다.");
+            throw new CustomException(CustomErrorCode.USER_ALREADY_IN_TRAVEL);
         }
         if (travel.getMemberCount() <= travelMemberRepository.countByTravelId(travel.getId())) {
-            throw new CustomException("T0017", "여행 인원이 초과되었습니다.");
+            throw new CustomException(CustomErrorCode.TRAVEL_MEMBER_LIMIT_EXCEEDED);
         }
         insertTravelMembers(userId, travel.getId());
         insertGroupAccountStake(userId, travel);
         return buildTravelResponse(travel, travel.getInviteCode());
     }
 
+    @Cacheable(value = "countryList")
     public List<CountryResponse> countryList() {
         return countryRepository.getAllCountries();
     }
 
+    @Cacheable(value = "categoryList")
     public List<CategoryResponse> getCategoryList() {
         return categoryRepository.getAllCategories();
     }
 
     public Map<String, Object> getTravelBudgetList(Long travelId) {
         Travel travel = travelRepository.findById(travelId)
-                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
         boolean isComplete = travel.isStatus();
         List<?> budgetList;
 
@@ -241,7 +252,7 @@ public class TravelService {
     @Transactional
     public void finishTravel(Long travelId) {
         Travel travel = travelRepository.findById(travelId)
-                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
         double balance = travelWalletRepository.findBalanceByTravel(travelId);
         if (balance != 0) {
             if (travel.getMemberCount() == 1) {
@@ -311,10 +322,10 @@ public class TravelService {
 
     @Transactional
     public void leaveTravel(Long userId, Long travelId) {
-        Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+        Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
         Optional<TravelMember> travelMember = travelMemberRepository.findByMemberIdAndTravelId(userId, travelId);
         if (travelMember.isEmpty()) {
-            throw new CustomException("T0016", "해당 유저는 이미 이 여행에 속해 있지 않습니다.");
+            throw new CustomException(CustomErrorCode.USER_NOT_IN_TRAVEL);
         }
         TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
         groupAccountStakeRepostory.deleteGroupAccountStake(travelWallet, userId);
@@ -329,12 +340,12 @@ public class TravelService {
                 request.getStartDate() == null || request.getEndDate() == null ||
                 request.getMemberCount() <= 0 || request.getTotalBudget() <= 0 ||
                 request.getCountry() <= 0 || request.getBudgets() == null || request.getBudgets().isEmpty()) {
-            throw new CustomException("T0002", "필수 입력 값이 비어있습니다.");
+            throw new CustomException(CustomErrorCode.REQUIRED_VALUE_MISSING);
         }
 
         LocalDate currentDate = LocalDate.now();
         if (request.getStartDate().isBefore(currentDate)) {
-            throw new CustomException("T0003", "시작일은 현재 날짜보다 이후여야 합니다.");
+            throw new CustomException(CustomErrorCode.INVALID_TRAVEL_START_DATE);
         }
 
         List<Travel> travelList = travelRepository.findAllTravelByUserId(userId);
@@ -345,13 +356,13 @@ public class TravelService {
                         (request.getEndDate().isEqual(travel.getStartDate()) || request.getEndDate().isAfter(travel.getStartDate())) &&
                                 (request.getEndDate().isBefore(travel.getEndDate()) || request.getEndDate().isEqual(travel.getEndDate())) ||
                         (request.getStartDate().isBefore(travel.getStartDate()) && request.getEndDate().isAfter(travel.getEndDate()))) {
-                    throw new CustomException("T0010", "여행 일정이 기존 여행과 겹칩니다.");
+                    throw new CustomException(CustomErrorCode.TRAVEL_SCHEDULE_CONFLICT);
                 }
             }
         }
 
         if (request.getEndDate().isBefore(request.getStartDate())) {
-            throw new CustomException("T0009", "종료일은 시작일보다 이후여야 합니다.");
+            throw new CustomException(CustomErrorCode.INVALID_TRAVEL_END_DATE);
         }
     }
 
@@ -373,7 +384,7 @@ public class TravelService {
         }
 
         Country country = countryRepository.findById(request.getCountry())
-                .orElseThrow(() -> new CustomException("T0006", "국가를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.COUNTRY_NOT_FOUND));
         travel.setCountry(country);
 
         return travel;
@@ -384,7 +395,7 @@ public class TravelService {
         for (TravelRequest.BudgetDTO budgetDTO : request.getBudgets()) {
             TravelBudget travelBudget = new TravelBudget();
             travelBudget.setCategory(categoryRepository.findById(budgetDTO.getCategoryId())
-                    .orElseThrow(() -> new CustomException("T0008", "카테고리를 찾을 수 없습니다.")));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.CATEGORY_NOT_FOUND)));
             travelBudget.setCategoryBudget(budgetDTO.getBudget());
             travelBudget.setBudgetWon(budgetDTO.getBudgetWon());
             travelBudget.setTravel(travel);
@@ -436,7 +447,7 @@ public class TravelService {
                     .filter(budget -> budget.getCategory() != null &&
                             budget.getCategory().getCategoryId() == budgetDTO.getCategoryId())
                     .findFirst()
-                    .orElseThrow(() -> new CustomException("T0010", "해당 카테고리 예산을 찾을 수 없습니다."));
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_SCHEDULE_CONFLICT));
 
             existingBudget.setCategoryBudget(budgetDTO.getBudget());
             existingBudget.setBudgetWon(budgetDTO.getBudgetWon());
@@ -450,9 +461,9 @@ public class TravelService {
     // 여행 멤버 테이블에 추가
     private void insertTravelMembers(Long userId, Long travelId) {
         Travel travel = travelRepository.findById(travelId)
-                .orElseThrow(() -> new CustomException("T0004", "여행이 존재하지 않습니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
         Member member = memberRepository.findById(userId)
-                .orElseThrow(() -> new CustomException("M0010", "존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.MEMBER_NOT_FOUND));
         TravelMember travelMember = new TravelMember();
         travelMember.setTravel(travel);
         travelMember.setMember(member);
@@ -477,7 +488,7 @@ public class TravelService {
 
     public void insertGroupAccountStake(Long userId, Travel travel) {
         Member member = memberRepository.findById(userId)
-                .orElseThrow(() -> new CustomException("M0010", "존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(CustomErrorCode.MEMBER_NOT_FOUND));
         TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
         GroupAccountStake groupAccountStake = new GroupAccountStake();
         groupAccountStake.setMember(member);
