@@ -116,9 +116,20 @@ const TravelDiv = styled.div`
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(156px, 1fr));
     gap: 16px; /* 카드 사이에 16px의 간격 추가 */
-    justify-content: center;
-    margin-bottom : 26px;
+    place-items: center; /* 가로, 세로축 모두 중앙 정렬 */
+    justify-content: start; /* 왼쪽에서부터 아이템을 정렬 */
+    margin-bottom: 26px;
+
+    /* 그리드가 최소 2개의 열을 유지하도록 설정 */
+    @media (min-width: 320px) {
+        grid-template-columns: repeat(2, minmax(156px, 1fr));
+    }
+
+    @media (min-width: 768px) {
+        grid-template-columns: repeat(auto-fit, minmax(156px, 1fr));
+    }
 `;
+
 
 const FeedPAge = () => {
 
