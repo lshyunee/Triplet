@@ -45,15 +45,14 @@ public class TravelController {
         }
     }
 
-    @PutMapping("/update/{travelId}")
+    @PutMapping("/update")
     public ResponseEntity<ApiResponse<TravelResponse>> updateTravel(
             @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
-            @PathVariable Long travelId,
             @RequestPart("data") TravelRequest requestDTO,
             @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
         try {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
-            TravelResponse responseDTO = travelService.updateTravel(travelId, requestDTO, image, userId);
+            TravelResponse responseDTO = travelService.updateTravel(requestDTO, image, userId);
             return ResponseEntity.ok(new ApiResponse<>("200", "여행이 수정되었습니다.", responseDTO));
         } catch (Exception e) {
             return handleException(e);
