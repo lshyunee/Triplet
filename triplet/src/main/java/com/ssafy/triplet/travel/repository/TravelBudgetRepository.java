@@ -15,6 +15,9 @@ import java.util.List;
 public interface TravelBudgetRepository extends JpaRepository<TravelBudget, Long> {
     List<TravelBudget> findByTravel(Travel travel);
 
+    @Query("SELECT SUM(tb.usedBudget) FROM TravelBudget tb WHERE tb.travel.id = :travelId")
+    Double findTotalUsedBudgetByTravel(Long travelId);
+
     @Query("SELECT new com.ssafy.triplet.travel.dto.response.TravelBudgetResponse(tb.category.categoryId, tb.category.categoryName, tb.categoryBudget, tb.usedBudget, tb.fiftyBudget, tb.eightyBudget, tb.budgetWon) " +
             "FROM TravelBudget tb WHERE tb.travel = :travel")
     List<TravelBudgetResponse> findBudgetResponseByTravel(Travel travel);

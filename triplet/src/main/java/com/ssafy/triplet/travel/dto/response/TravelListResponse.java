@@ -18,6 +18,7 @@ public class TravelListResponse {
     private String currency;
     private int memberCount;
     private double totalBudget;
+    private double usedBudget;
     private boolean status;
     private boolean isShared;
     private boolean shareStatus;
