@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import Header from '../../components/header/Header';
 import { useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
@@ -11,6 +11,7 @@ import { ReactComponent as ArrowDown } from '../../assets/common/arrowDown.svg';
 import { ReactComponent as Filter } from '../../assets/common/filter.svg';
 
 import TravelCardMini from '../../components/travel/TravelCardMini';
+import DetailSearchBottomSheet from '../../components/travel/DetailSearchBottomSheet';
 
 const FeedDiv = styled.div`
     background-color : #F3F4F6;
@@ -116,6 +117,7 @@ const TravelDiv = styled.div`
     grid-template-columns: repeat(auto-fit, minmax(156px, 1fr));
     gap: 16px; /* 카드 사이에 16px의 간격 추가 */
     justify-content: center;
+    margin-bottom : 26px;
 `;
 
 const FeedPAge = () => {
@@ -132,6 +134,8 @@ const FeedPAge = () => {
     }
 
     const country = useInput(valid);
+
+    const [ isBottomSheetOpen, setIsBottomSheetOpen ] = useState(false);
 
     return (
         <>
@@ -153,7 +157,7 @@ const FeedPAge = () => {
                         <ArrowDown/>
                     </FilterDownDiv>
                     <FilterDownDiv>
-                        <FilterBtn>
+                        <FilterBtn onClick={() => setIsBottomSheetOpen(true)}>
                         <FilterWrapper>
                             <Filter width={16} height={16}/>
                         </FilterWrapper>
@@ -168,6 +172,8 @@ const FeedPAge = () => {
                     <TravelCardMini></TravelCardMini>
                     <TravelCardMini></TravelCardMini>
                 </TravelDiv>
+                <DetailSearchBottomSheet isOpen={isBottomSheetOpen} 
+            onClose={() => setIsBottomSheetOpen(false)}></DetailSearchBottomSheet>
             </FeedDiv>
         </>
     );
