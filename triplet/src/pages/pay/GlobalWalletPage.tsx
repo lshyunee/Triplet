@@ -14,6 +14,7 @@ const s = {
     background-color: #F3F4F6;
     min-height: calc(100vh - 112px);
     margin-top: 56px;
+	margin-bottom : 56px;
     padding: 0 16px 0;
   `,
   Card: styled.div`
