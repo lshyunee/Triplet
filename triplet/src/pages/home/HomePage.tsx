@@ -5,7 +5,7 @@ import Header from '../../components/header/Header';
 import { useSelector, useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
 import { ongoingTravelDataInsert } from '../../features/travel/ongoingTravelSlice';
-import { Link } from 'react-router-dom';
+import { Link as RouterLink} from 'react-router-dom';
 
 import { ReactComponent as SimplePay} from '../../assets/main/simplePay.svg';
 import { ReactComponent as TravelPlan} from '../../assets/main/travelPlan.svg';
@@ -40,6 +40,13 @@ const TitleP = styled.p`
     font-weight : 600;
 `
 
+const Link = styled(RouterLink)`
+    display: block;  /* Link를 블록 요소로 변환 */
+    width: 100%;
+    text-decoration : none;
+    color : inherit;
+`;
+
 const LittleTitleDiv = styled.div`
     display:flex;
     flex-direction:row;
@@ -62,6 +69,12 @@ const LittleDiv = styled.div`
     ${TitleP}{
         margin-left: 12px;
     }
+
+  &:hover {
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    border-radius: 10px;
+    transition: box-shadow 0.3s ease; /* 부드러운 전환 효과 */
+  }
 `
 
 const TitleDiv = styled.div`
@@ -69,12 +82,6 @@ const TitleDiv = styled.div`
     display: flex;
     align-items: center;
     justify-content: space-between;
-`;
-
-const DetailP = styled.p`
-    font-size: 14px;
-    font-weight : 400;
-    color : #666666;
 `;
 
 const LargeDiv = styled.div`
@@ -85,6 +92,12 @@ const LargeDiv = styled.div`
     flex-direction: column;
     padding : 20px;
     margin-bottom : 32px;
+
+    &:hover {
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    border-radius: 10px;
+    transition: box-shadow 0.3s ease; /* 부드러운 전환 효과 */
+  }
 `;
 
 const Card = styled.div`
@@ -95,6 +108,12 @@ const Card = styled.div`
     display: flex;
     flex-direction: column;
     margin-top : 12px;
+
+    &:hover {
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    border-radius: 10px;
+    transition: box-shadow 0.3s ease; /* 부드러운 전환 효과 */
+  }
 `;
 
 const CardTitle = styled.span`
@@ -198,37 +217,45 @@ const HomePage = () => {
                     // travelData가 없으면 OngoingTravelCard를 비활성화하고, UpcomingTravelCard 렌더링
                     <UpcomingTravelHomeCard />
                 )}
-                <LittleDiv>
-                    <LittleTitleDiv>
-                        <SimplePay/>
-                        <TitleP>간편결제</TitleP>
-                    </LittleTitleDiv>
-                    <RightArrow/>
-                </LittleDiv>
-                <LittleDiv>
-                    <LittleTitleDiv>
-                        <TravelPlan/>
-                        <TitleP>여행 계획 만들기</TitleP>
-                    </LittleTitleDiv>
-                    <RightArrow/>
-                </LittleDiv>
-                <Card>
-                    <CardTitleArea>
-                        <CardTitle>내 통장</CardTitle>
+                <Link to="/pay/qr">
+                    <LittleDiv>
+                        <LittleTitleDiv>    
+                            <SimplePay/>
+                            <TitleP>간편결제</TitleP>
+                        </LittleTitleDiv>
                         <RightArrow/>
-                    </CardTitleArea>
-                    <CardCaption>은행 312-9446-0093</CardCaption>
-                    <ButtonArea>
-                        <CardContent>20,000,000원</CardContent>
-                        <CardButton>송금</CardButton>
-                    </ButtonArea>
-                </Card>
-                <LargeDiv>
-                    <TitleDiv>
-                        <TitleP>내 외화 지갑</TitleP>
+                    </LittleDiv>
+                </Link>
+                <Link to="/travels/create">
+                    <LittleDiv>
+                        <LittleTitleDiv>
+                            <TravelPlan/>
+                            <TitleP>여행 계획 만들기</TitleP>
+                        </LittleTitleDiv>
                         <RightArrow/>
-                    </TitleDiv>
-                </LargeDiv>
+                    </LittleDiv>
+                </Link>
+                <Link to="/pay/account-detail">
+                    <Card>
+                        <CardTitleArea>
+                            <CardTitle>내 통장</CardTitle>
+                            <RightArrow/>
+                        </CardTitleArea>
+                        <CardCaption>은행 312-9446-0093</CardCaption>
+                        <ButtonArea>
+                            <CardContent>20,000,000원</CardContent>
+                            <CardButton>송금</CardButton>
+                        </ButtonArea>
+                    </Card>
+                </Link>
+                <Link to="/pay/global-wallet">
+                    <LargeDiv>
+                        <TitleDiv>
+                            <TitleP>내 외화 지갑</TitleP>
+                            <RightArrow/>
+                        </TitleDiv>
+                    </LargeDiv>
+                </Link>
             </HomeDiv>
         </MainDiv>
     );
