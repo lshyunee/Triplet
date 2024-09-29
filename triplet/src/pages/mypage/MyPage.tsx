@@ -9,6 +9,7 @@ import useAxios from '../../hooks/useAxios';
 import { ReactComponent as RightArrow} from '../../assets/common/rightArrow.svg';
 
 import Logout from '../user/logout/LogoutModal';
+import WithdrawalModal from '../user/withdrawal/WithdrawalModal';
 
 const PageDiv = styled.div`
     background-color : #F3F4F6;
@@ -137,6 +138,12 @@ const MyPage = () => {
         setIsLogOutOpen(false);
     } 
 
+    const [ isWithdrawal, setIsWithdrawal ] = useState(false);
+    
+    const withdrawal = () => {
+        setIsWithdrawal(true);
+    }
+
     return (
         <>
             <BackHeader title={title}/>
@@ -180,12 +187,13 @@ const MyPage = () => {
                         <CategoryP>로그아웃</CategoryP>
                         <RightArrow/>
                     </ConfigDiv>
-                    <ConfigDiv>
+                    <ConfigDiv onClick={withdrawal}>
                         <CategoryP>회원탈퇴</CategoryP>
                         <RightArrow/>
                     </ConfigDiv>
                 </MyInfoConfigDiv>
                 <Logout isOpen={isLogOutOpen} onClose={closeLogout}></Logout>
+                <WithdrawalModal isOpen={isWithdrawal} onClose={()=>{setIsWithdrawal(false)}}/>
             </PageDiv>
         </>
     );
