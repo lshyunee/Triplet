@@ -131,7 +131,7 @@ const PriceInfoP = styled.p`
     font-weight : 400;
 `;
 
-const TravelCard = () => {
+const OngoingTravelCard = () => {
 
     const dispatch = useDispatch();
 
@@ -187,4 +187,4 @@ const TravelCard = () => {
     );
 };
 
-export default TravelCard;
+export default OngoingTravelCard;

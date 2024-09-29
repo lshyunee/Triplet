@@ -5,7 +5,7 @@ import { pageMove } from '../../features/navigation/naviSlice';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
-import TravelCard from '../../components/travel/TravelCard';
+import OngoingTravelCard from '../../components/travel/OngoingTravelCard';
 import UpcomingTravelCard from '../../components/travel/UpcomingTravelCard';
 import CompleteTravelCard from '../../components/travel/CompleteTravelCard';
 
@@ -88,7 +88,7 @@ const TravelsPage = () => {
                     <CategoryP>
                         진행중인 여행
                     </CategoryP>
-                    <TravelCard></TravelCard>
+                    <OngoingTravelCard></OngoingTravelCard>
                 </OngoingTravelDiv>
                 <UpcomingTravelDiv>
                     <CategoryP>

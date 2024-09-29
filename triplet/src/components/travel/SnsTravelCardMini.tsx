@@ -94,7 +94,7 @@ const CountryP = styled.p`
     margin: 0;
 `
 
-const TravelCardMini = () => {
+const SnsTravelCardMini = () => {
   return (
     <CardDiv>
       <TravelImg src={SampleImg} alt="Travel" />
@@ -112,4 +112,4 @@ const TravelCardMini = () => {
   );
 };
 
-export default TravelCardMini;
+export default SnsTravelCardMini;

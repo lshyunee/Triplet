@@ -10,7 +10,7 @@ import { ReactComponent as Search } from '../../assets/common/search.svg';
 import { ReactComponent as ArrowDown } from '../../assets/common/arrowDown.svg';
 import { ReactComponent as Filter } from '../../assets/common/filter.svg';
 
-import TravelCardMini from '../../components/travel/TravelCardMini';
+import SnsTravelCardMini from '../../components/travel/SnsTravelCardMini';
 import DetailSearchBottomSheet from '../../components/travel/DetailSearchBottomSheet';
 
 const FeedDiv = styled.div`
@@ -176,12 +176,12 @@ const FeedPAge = () => {
                     </FilterDownDiv>
                 </FilterDiv>
                 <TravelDiv>
-                    <TravelCardMini></TravelCardMini>
-                    <TravelCardMini></TravelCardMini>
-                    <TravelCardMini></TravelCardMini>
-                    <TravelCardMini></TravelCardMini>
-                    <TravelCardMini></TravelCardMini>
-                    <TravelCardMini></TravelCardMini>
+                    <SnsTravelCardMini></SnsTravelCardMini>
+                    <SnsTravelCardMini></SnsTravelCardMini>
+                    <SnsTravelCardMini></SnsTravelCardMini>
+                    <SnsTravelCardMini></SnsTravelCardMini>
+                    <SnsTravelCardMini></SnsTravelCardMini>
+                    <SnsTravelCardMini></SnsTravelCardMini>
                 </TravelDiv>
                 <DetailSearchBottomSheet isOpen={isBottomSheetOpen} 
             onClose={() => setIsBottomSheetOpen(false)}></DetailSearchBottomSheet>

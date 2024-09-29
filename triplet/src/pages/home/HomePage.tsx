@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import TravelCard from '../../components/travel/TravelCard';
+import OngoingTravelCard from '../../components/travel/OngoingTravelCard';
 import Header from '../../components/header/Header';
 import { useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
@@ -144,7 +144,7 @@ const HomePage = () => {
         <MainDiv>
             <Header/>
             <HomeDiv>
-                <TravelCard/>
+                <OngoingTravelCard/>
                 <LittleDiv>
                     <LittleTitleDiv>
                         <SimplePay/>

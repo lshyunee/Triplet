@@ -11,6 +11,7 @@ interface TravelState {
   currency: string;
   memberCount: number;
   totalBudget: number;
+  usedBudget : number;
   status: boolean;
   shareStatus: boolean;
   shared: boolean;
@@ -27,6 +28,7 @@ const initialState: TravelState = {
   currency: "",
   memberCount: 0,
   totalBudget: 0,
+  usedBudget : 0,
   status: false,
   shareStatus: false,
   shared: false,
@@ -48,6 +50,7 @@ const ongoingTravelSlice = createSlice({
         currency,
         memberCount,
         totalBudget,
+        usedBudget,
         status,
         shareStatus,
         shared,
@@ -63,6 +66,7 @@ const ongoingTravelSlice = createSlice({
       if (currency !== undefined) state.currency = currency;
       if (memberCount !== undefined) state.memberCount = memberCount;
       if (totalBudget !== undefined) state.totalBudget = totalBudget;
+      if (usedBudget !== undefined) state.usedBudget = usedBudget;
       if (status !== undefined) state.status = status;
       if (shareStatus !== undefined) state.shareStatus = shareStatus;
       if (shared !== undefined) state.shared = shared;
