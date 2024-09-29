@@ -88,7 +88,9 @@ const TravelsPage = () => {
                     <CategoryP>
                         진행중인 여행
                     </CategoryP>
-                    <OngoingTravelCard></OngoingTravelCard>
+                    <Link to="/travels/ongoing/detail">                    
+                       <OngoingTravelCard></OngoingTravelCard>
+                    </Link>
                 </OngoingTravelDiv>
                 <UpcomingTravelDiv>
                     <CategoryP>
