@@ -7,6 +7,7 @@ import Header from '../../components/header/Header';
 import { useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
 import { Navigate, useNavigate } from 'react-router-dom';
+import useAxios from '../../hooks/useAxios';
 
 
 const s = {
@@ -95,8 +96,39 @@ const s = {
 const PayPage = () => {
 	const dispatch = useDispatch();
 
+	const { data: accountData, 
+		error: accountError, 
+		loading: accountLoading, 
+		status: accountStatus, 
+		refetch: accountRefetch } = useAxios('/account', 'GET');
+
+	const { data: foreignAccountData, 
+		error: foreignAccountError, 
+		loading: foreignAccountLoading, 
+		status: foreignAccountStatus, 
+		refetch: foreignAccountRefetch } = useAxios('/foreign-account', 'GET');
+	
+	const { data: exchangeRateData, 
+		error: exchangeRateError, 
+		loading: exchangeRateLoading, 
+		status: exchangeRateStatus, 
+		refetch: exchangeRateRefetch } = useAxios('/exchange-rate-list', 'GET');
+
 	useEffect(() => {
+		const fetchData = async () => {
+			try {
+			await Promise.all([
+				accountRefetch(),     // 원화계좌 API 요청
+				foreignAccountRefetch(),  // 외화계좌 API 요청
+				exchangeRateRefetch()  // 전체 환율 API 요청
+			]);
+			} catch (error) {
+			console.error('Error fetching data:', error);
+			}
+		};
+		
 		dispatch(pageMove("pay"));
+		fetchData();
 	}, []);
 
 	const navigate = useNavigate();
@@ -120,12 +152,12 @@ const PayPage = () => {
 			<s.Container>
 				<s.MyCard onClick={accountOnClick}>
 					<s.CardTitleArea>
-						<s.CardTitle>내 통장</s.CardTitle>
+						<s.CardTitle>{accountData?.data?.accountName}</s.CardTitle>
 						<RightArrow/>
 					</s.CardTitleArea>
-					<s.CardCaption>은행 312-9446-0093</s.CardCaption>
+					<s.CardCaption>{accountData?.data?.bankName} {accountData?.data?.accountNumber}</s.CardCaption>
 					<s.ButtonArea>
-						<s.CardContent>20,000,000원</s.CardContent>
+						<s.CardContent>{accountData?.data?.accountBalance} 원</s.CardContent>
 						<s.CardButton onClick={onclick}>송금</s.CardButton>
 					</s.ButtonArea>
 				</s.MyCard>
@@ -137,37 +169,37 @@ const PayPage = () => {
 					<s.CurrencyArea>
 						<GlobalAccount
 							nation='미국'
-							foreignCurrency={1000}
+							foreignCurrency={foreignAccountData?.data[6]?.accountBalance || 1000}
 							isExchange={false}
 						/>
 						<GlobalAccount
 							nation='유럽'
-							foreignCurrency={1000}
+							foreignCurrency={foreignAccountData?.data[3]?.accountBalance || 1000}
 							isExchange={false}
 						/>
 						<GlobalAccount
 							nation='일본'
-							foreignCurrency={1000}
+							foreignCurrency={foreignAccountData?.data[5]?.accountBalance || 1000}
 							isExchange={false}
 						/>
 						<GlobalAccount
 							nation='중국'
-							foreignCurrency={1000}
+							foreignCurrency={foreignAccountData?.data[2]?.accountBalance || 1000}
 							isExchange={false}
 						/>
 						<GlobalAccount
 							nation='영국'
-							foreignCurrency={1000}
+							foreignCurrency={foreignAccountData?.data[4]?.accountBalance || 1000}
 							isExchange={false}
 						/>
 						<GlobalAccount
 							nation='스위스'
-							foreignCurrency={1000}
+							foreignCurrency={foreignAccountData?.data[1]?.accountBalance || 1000}
 							isExchange={false}
 						/>
 						<GlobalAccount
 							nation='캐나다'
-							foreignCurrency={1000}
+							foreignCurrency={foreignAccountData?.data[0]?.accountBalance || 1000}
 							isExchange={false}
 						/>
 					</s.CurrencyArea>
@@ -179,45 +211,45 @@ const PayPage = () => {
 					<s.CurrencyArea>
 						<ExchangeRate
 							nation='미국'
-							foreignCurrency={1344.71}
+							foreignCurrency={exchangeRateData?.data[5]?.exchangeRate || 1344.71}
 							isRise={true}
-							rate={0.20}
+							rate={exchangeRateData?.data[5]?.changePercentage || 0.20}
 						/>
 						<ExchangeRate
 							nation='유럽'
-							foreignCurrency={1344.71}
+							foreignCurrency={exchangeRateData?.data[3]?.exchangeRate || 1344.71}
 							isRise={true}
-							rate={0.20}
+							rate={exchangeRateData?.data[3]?.changePercentage || 0.20}
 						/>
 						<ExchangeRate
 							nation='일본'
-							foreignCurrency={1344.71}
+							foreignCurrency={exchangeRateData?.data[6]?.exchangeRate || 1344.71}
 							isRise={false}
-							rate={0.20}
+							rate={exchangeRateData?.data[6]?.changePercentage || 0.20}
 						/>
 						<ExchangeRate
 							nation='중국'
-							foreignCurrency={1344.71}
+							foreignCurrency={exchangeRateData?.data[2]?.exchangeRate || 1344.71}
 							isRise={true}
-							rate={0.20}
+							rate={exchangeRateData?.data[2]?.changePercentage || 0.20}
 						/>
 						<ExchangeRate
 							nation='영국'
-							foreignCurrency={1344.71}
+							foreignCurrency={exchangeRateData?.data[0]?.exchangeRate || 1344.71}
 							isRise={true}
-							rate={0.20}
+							rate={exchangeRateData?.data[0]?.changePercentage || 0.20}
 						/>
 						<ExchangeRate
 							nation='스위스'
-							foreignCurrency={1344.71}
+							foreignCurrency={exchangeRateData?.data[4]?.exchangeRate || 1344.71}
 							isRise={true}
-							rate={0.20}
+							rate={exchangeRateData?.data[4]?.changePercentage || 0.20}
 						/>
 						<ExchangeRate
 							nation='캐나다'
-							foreignCurrency={1344.71}
+							foreignCurrency={exchangeRateData?.data[1]?.exchangeRate || 1344.71}
 							isRise={false}
-							rate={0.20}
+							rate={exchangeRateData?.data[1]?.changePercentage || 0.20}
 						/>
 					</s.CurrencyArea>
 				</s.Card>
