@@ -45,23 +45,23 @@ const BottomOverlay = styled.div`
   justify-content: space-between;
 `;
 
-const Badge = styled.div`
-  width: 70px;
-  height: 30px;
-  background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 50px;
-  border: 1px solid white;
-  font-size: 12px;
-  font-weight: 500;
-  color: white;
-  display: flex; /* Flexbox 사용 */
-  justify-content: center; /* 수평 중앙 정렬 */
-  align-items: center; /* 수직 중앙 정렬 */
-  z-index: 4;
-  position: absolute;
-  top: 10px;
-  right: 10px;
-`;
+// const Badge = styled.div`
+//   width: 70px;
+//   height: 30px;
+//   background-color: rgba(0, 0, 0, 0.5);
+//   border-radius: 50px;
+//   border: 1px solid white;
+//   font-size: 12px;
+//   font-weight: 500;
+//   color: white;
+//   display: flex; /* Flexbox 사용 */
+//   justify-content: center; /* 수평 중앙 정렬 */
+//   align-items: center; /* 수직 중앙 정렬 */
+//   z-index: 4;
+//   position: absolute;
+//   top: 10px;
+//   right: 10px;
+// `;
 
 const ContentTitleDiv = styled.div`
     display : flex;
@@ -99,7 +99,6 @@ const UpcomingTravelCard = () => {
     <CardDiv>
       <TravelImg src={SampleImg} alt="Travel" />
       <Overlay />
-      <Badge>맛집 투어</Badge>
       <BottomOverlay>
         <ContentDiv>
             <ContentTitleDiv>

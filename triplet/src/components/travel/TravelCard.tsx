@@ -67,23 +67,23 @@ const InfoP = styled.p`
     color: #D9D9D9;
 `;
 
-const Badge = styled.div`
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    width : 70px;
-    height : 30px;
-    z-index: 2;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50px;
-    border : 1px solid white;
-    font-size: 12px;
-    font-weight: 500;
-    color : white;
-    display: flex; /* Flexbox 사용 */
-    justify-content: center; /* 수평 중앙 정렬 */
-    align-items: center; /* 수직 중앙 정렬 */
-`;
+// const Badge = styled.div`
+//     position: absolute;
+//     top: 20px;
+//     right: 20px;
+//     width : 70px;
+//     height : 30px;
+//     z-index: 2;
+//     background-color: rgba(0, 0, 0, 0.5);
+//     border-radius: 50px;
+//     border : 1px solid white;
+//     font-size: 12px;
+//     font-weight: 500;
+//     color : white;
+//     display: flex; /* Flexbox 사용 */
+//     justify-content: center; /* 수평 중앙 정렬 */
+//     align-items: center; /* 수직 중앙 정렬 */
+// `;
 
 const ProgressContainer = styled.div`
     position: absolute;
@@ -175,7 +175,6 @@ const TravelCard = () => {
                 <TravelImg src={SampleImg} alt="Travel" />
                 <Overlay />
                 <BottomOverlay /> {/* 하단 반투명 오버레이 추가 */}
-                <Badge>맛집 투어</Badge> {/* 우측 상단 배지 */}
                 <TitleP>고래상어보러가자</TitleP>
                 <InfoP>2024년 9월 3일 ~ 9월 7일<br />일본 · 2명</InfoP>
                 <ProgressText>30%</ProgressText> {/* 진행률 텍스트 추가 */}
