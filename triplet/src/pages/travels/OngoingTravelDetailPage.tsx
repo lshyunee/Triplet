@@ -15,8 +15,8 @@ const DetailDiv = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
-  height : calc( 100vh - 112px );
-  padding: 56px 0;
+  height : calc( 100vh - 80px );
+  padding: 56px 0 0;
   position: relative; /* position 설정 */
   background-color : #F3F4F6;   
 `;
@@ -32,7 +32,6 @@ const ContentDiv = styled.div`
     display : flex;
     flex-direction : column;
     gap : 12px;
-    margin-bottom : 28px;
 `;
 
 const TravelCardDiv = styled.div`
@@ -56,7 +55,15 @@ const CategoryBudgetDiv = styled.div`
     height : 64px;
     background-color : white;
     border-radius : 20px;
-`
+`;
+
+const CategoryShareDiv = styled.div`
+    width : 100%;
+    height : 64px;
+    background-color : white;
+    border-radius : 20px;
+    margin-bottom : 28px;
+`;
 
 const CategoryTitleDiv = styled.div`
     display : flex;
@@ -106,7 +113,7 @@ const OngoingTravelDetailPage = () => {
                     <RightArrow/>
                 </CategoryTitleDiv>
             </CategoryBudgetDiv>
-            <CategoryBudgetDiv>
+            <CategoryShareDiv>
                 <CategoryTitleDiv>
                     <CategoryTitleFontDiv>
                         <ShareIcon/>
@@ -114,7 +121,7 @@ const OngoingTravelDetailPage = () => {
                     </CategoryTitleFontDiv>
                     <RightArrow/>
                 </CategoryTitleDiv>
-            </CategoryBudgetDiv>
+            </CategoryShareDiv>
         </ContentDiv>
       </DetailDiv>
     </>

@@ -3,8 +3,6 @@ import styled from 'styled-components';
 import useAxios from '../../hooks/useAxios';
 import { useSelector, useDispatch } from 'react-redux';
 
-import { ongoingTravelDataInsert } from '../../features/travel/ongoingTravelSlice';
-
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
 import ErrorModal from '../modal/ErrorModal';
 
@@ -132,10 +130,9 @@ const PriceInfoP = styled.p`
     font-weight : 400;
 `;
 
-const OngoingTravelCard = () => {
+const UpcomingTravelHomeCard = () => {
 
     const dispatch = useDispatch();
-
     const travelData = useSelector((state:any) => state.ongoingTravel);
 
     return (
@@ -156,4 +153,4 @@ const OngoingTravelCard = () => {
     );
 };
 
-export default OngoingTravelCard;
+export default UpcomingTravelHomeCard;

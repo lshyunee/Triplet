@@ -2,8 +2,9 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import OngoingTravelCard from '../../components/travel/OngoingTravelCard';
 import Header from '../../components/header/Header';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
+import { ongoingTravelDataInsert } from '../../features/travel/ongoingTravelSlice';
 import { Link } from 'react-router-dom';
 
 import { ReactComponent as SimplePay} from '../../assets/main/simplePay.svg';
@@ -17,6 +18,9 @@ import { ReactComponent as CHFlag } from '../../assets/pay/ch.svg';
 import { ReactComponent as UKFlag } from '../../assets/pay/uk.svg';
 import { ReactComponent as SWFlag } from '../../assets/pay/sw.svg';
 import { ReactComponent as CAFlag } from '../../assets/pay/ca.svg';
+import UpcomingTravelCard from '../../components/travel/UpcomingTravelCard';
+import useAxios from '../../hooks/useAxios';
+import UpcomingTravelHomeCard from '../../components/travel/UpcomingTravelHomeCard';
 
 const MainDiv = styled.div`
     background-color: #F3F4F6;
@@ -141,13 +145,59 @@ const HomePage = () => {
         dispatch(pageMove("home"));
     }, [])
 
+    // Redux 스토어에서 데이터를 가져옴
+    const travelData = useSelector((state:any) => state.ongoingTravel);
+    
+    // useAxios 훅으로 데이터 요청
+    const { data: infoData, error: infoError, refetch: infoRefetch } = useAxios("/travels/ongoing", "GET");
+
+    // 컴포넌트가 처음 렌더링될 때, 데이터가 없으면 Axios 요청을 트리거
+    useEffect(() => {
+        if (!travelData.travelId) {
+            infoRefetch();
+        }
+    }, [travelData.travelId]);
+
+    // Axios 요청 결과를 Redux 스토어에 저장
+    useEffect(() => {
+        if (infoData !== null) {
+            dispatch(ongoingTravelDataInsert({
+                travelId: infoData.travelId,
+                title: infoData.title,
+                startDate: new Date(infoData.startDate),
+                endDate: new Date(infoData.endDate),
+                image: infoData.image,
+                countryName: infoData.countryName,
+                countryId: infoData.countryId,
+                currency: infoData.currency,
+                memberCount: infoData.memberCount,
+                totalBudget: infoData.totalBudget,
+                status: infoData.status,
+                shareStatus: infoData.shareStatus,
+                shared: infoData.shared,
+            }));
+        }
+
+        if (infoError !== null) {
+            if(infoError.response.data.message){
+                console.log(infoError.response.data.message);
+            }
+        }
+    }, [infoData, infoError]);
+
+
     return (
         <MainDiv>
             <Header/>
             <HomeDiv>
-                <Link to="/travels/ongoing/detail">
-                    <OngoingTravelCard/>
-                </Link>
+                {travelData.travelId ? (
+                    <Link to="/travels/ongoing/detail">
+                        <OngoingTravelCard />
+                    </Link>
+                ) : (
+                    // travelData가 없으면 OngoingTravelCard를 비활성화하고, UpcomingTravelCard 렌더링
+                    <UpcomingTravelHomeCard />
+                )}
                 <LittleDiv>
                     <LittleTitleDiv>
                         <SimplePay/>
