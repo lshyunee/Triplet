@@ -23,6 +23,7 @@ import QRPage from '../pages/pay/QRPage';
 import QRPayPage from '../pages/pay/QRPayPage';
 import QRCompletePage from '../pages/pay/QRCompletePage';
 import CreateTravelPage from '../pages/travels/CreateTravelPage';
+import OngoingTravelDetailPage from '../pages/travels/OngoingTravelDetailPage';
 
 
 const AppRoutes: React.FC = () => (
@@ -47,6 +48,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/pay/exchange" element={<ExchangePage/>}/>
             <Route path="/travels" element={<Travels/>}/>
             <Route path="/travels/create" element={<CreateTravelPage/>}/>
+            <Route path="/travels/ongoing/detail" element={<OngoingTravelDetailPage/>}/>
             <Route path="/alarm" element={<Alarm/>}/>
         </Routes>
 );

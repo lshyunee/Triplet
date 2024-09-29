@@ -4,6 +4,7 @@ import OngoingTravelCard from '../../components/travel/OngoingTravelCard';
 import Header from '../../components/header/Header';
 import { useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
+import { Link } from 'react-router-dom';
 
 import { ReactComponent as SimplePay} from '../../assets/main/simplePay.svg';
 import { ReactComponent as TravelPlan} from '../../assets/main/travelPlan.svg';
@@ -144,7 +145,9 @@ const HomePage = () => {
         <MainDiv>
             <Header/>
             <HomeDiv>
-                <OngoingTravelCard/>
+                <Link to="/travels/ongoing/detail">
+                    <OngoingTravelCard/>
+                </Link>
                 <LittleDiv>
                     <LittleTitleDiv>
                         <SimplePay/>
