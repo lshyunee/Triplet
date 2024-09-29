@@ -121,7 +121,7 @@ const TravelDiv = styled.div`
     margin-bottom: 26px;
 
     /* 그리드가 최소 2개의 열을 유지하도록 설정 */
-    @media (min-width: 320px) {
+    @media (min-width: 360px) {
         grid-template-columns: repeat(2, minmax(156px, 1fr));
     }
 
