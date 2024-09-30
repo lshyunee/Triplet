@@ -22,8 +22,9 @@ axiosInstance.interceptors.response.use(
         if (error.response && error.response.status === 401 && !originalRequest._retry){
             originalRequest._retry = true;
             try {
+                await axiosInstance.post('/reissue');
                 return axiosInstance(originalRequest);
-            }catch (err){
+            } catch (err) {
                 return Promise.reject(err);
             }
         }
