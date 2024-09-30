@@ -16,13 +16,13 @@ import { selectTravelByTitleId } from '../../features/travel/upcomingTravelSlice
 import { RootState } from '../../store';
 
 const DetailDiv = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  height : 100vh;
-  padding: 56px 0 0;
-  position: relative; /* position 설정 */
-  background-color : #F3F4F6;   
+    padding : 56px 0 0 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height : calc ( 100vh - 112px );
+    position: relative; /* position 설정 */
+    background-color : #F3F4F6;   
 `;
 
 const Img = styled.img`
@@ -36,7 +36,7 @@ const ContentDiv = styled.div`
     display : flex;
     flex-direction : column;
     gap : 12px;
-    margin-bottom : 28px;
+    margin-bottom : 56px;
 `;
 
 const TravelCardDiv = styled.div`
@@ -90,6 +90,175 @@ const TitleP = styled.p`
     align-items : center;
 `;
 
+const MoneyDiv = styled.div`
+    border-radius : 20px;
+    background-color : white;
+    display : flex;
+    flex-direction : column;
+    padding : 20px;
+`
+
+const MoneyCategoryDiv = styled.div`
+    display : flex;
+    flex-direction : row;
+    justify-content : space-between;
+`
+
+const MoneyCategoryProgressDiv = styled.div`
+    display : flex;
+    flex-direction : row;
+    justify-content : space-between;
+    margin : 24px 0 8px 0;
+`
+
+interface MonyeProgressProps {
+    paid : string;
+}
+
+const MoneyEatDiv = styled.div`
+    width: 100%;
+    background-color: rgba(0,213,255,0.5);
+    border-radius: 50px;
+    overflow: hidden;
+    height: 20px;
+`;
+
+const MoneyEatBarDiv = styled.div<MonyeProgressProps>`
+    height : 100%;
+    background-color : rgba(0,213,255);
+    width : ${props => props.paid || '50%'};
+    border-radius : 50px;
+`
+
+const MoneyRideDiv = styled.div`
+    width: 100%;
+    background-color: rgba(0,200,251,0.5);
+    border-radius: 50px;
+    overflow: hidden;
+    height: 20px;
+`;
+
+const MoneyRideBarDiv = styled.div<MonyeProgressProps>`
+    height : 100%;
+    background-color : rgba(0,200,251);
+    width : ${props => props.paid || '50%'};
+    border-radius : 50px;
+`
+
+const MoneyTourDiv = styled.div`
+    width: 100%;
+    background-color: rgba(0,184,245,0.5);
+    border-radius: 50px;
+    overflow: hidden;
+    height: 20px;
+`;
+
+const MoneyTourBarDiv = styled.div<MonyeProgressProps>`
+    height : 100%;
+    background-color : rgba(0, 184, 245);
+    width : ${props => props.paid || '50%'};
+    border-radius : 50px;
+`
+
+const MoneyShopDiv = styled.div`
+    width: 100%;
+    background-color: rgba(0,172,241,0.5);
+    border-radius: 50px;
+    overflow: hidden;
+    height: 20px;
+`;
+
+const MoneyShopBarDiv = styled.div<MonyeProgressProps>`
+    height : 100%;
+    background-color : rgba(0, 172, 241);
+    width : ${props => props.paid || '50%'};
+    border-radius : 50px;
+`
+
+const MoneyStayDiv = styled.div`
+    width: 100%;
+    background-color: rgba(0,155,235,0.5);
+    border-radius: 50px;
+    overflow: hidden;
+    height: 20px;
+`;
+
+const MoneyStayBarDiv = styled.div<MonyeProgressProps>`
+    height : 100%;
+    background-color : rgba(0, 155, 235);
+    width : ${props => props.paid || '50%'};
+    border-radius : 50px;
+`
+
+const MoneyEtcDiv = styled.div`
+    width: 100%;
+    background-color: rgba(0,141,231,0.5);
+    border-radius: 50px;
+    overflow: hidden;
+    height: 20px;
+`;
+
+const MoneyEtcBarDiv = styled.div<MonyeProgressProps>`
+    height : 100%;
+    background-color : rgba(0, 141, 231);
+    width : ${props => props.paid || '50%'};
+    border-radius : 50px;
+`
+
+const MoneyCategoryP = styled.p`
+    color : #666666;
+    font-size : 16px;
+    font-weight : 600;
+    margin : 0;
+    margin-left : 2px;
+`
+
+const MoneyP = styled.p`
+    color : #666666;
+    font-size : 16px;
+    font-wegiht : 500;
+    margin : 0
+    margin-right : 2px;
+`
+
+const MoneyTitleDiv = styled.div`
+    display : flex;
+    flex-direction: row;
+`
+
+interface MoneyCategoryProps {
+    color : string;
+}
+
+const MoneyComsumpP = styled.p<MoneyCategoryProps>`
+    font-size : 16px;
+    font-weight : 700;
+    color : ${props => props.color || "#666666"};
+    margin : 0px;
+    margin-left : 8px;
+`
+
+const BudgetDiv = styled.div`
+    display : flex;
+    flex-direction: row;
+    margin-right : 2px;
+`
+
+const MoneyBudgetP = styled.p<MoneyCategoryProps>`
+    margin : 0px;
+    font-size : 14px;
+    font-weight : 500;
+    color : ${props => props.color || "#666666"}
+`;
+
+const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
+    margin : 0px;
+    font-size : 14px;
+    font-weight : 600;
+    margin-right : 4px;
+    color : ${props => props.color || "#666666"}
+`;
+
 
 const UpcomingTravelDetailPage = () => {
   const dispatch = useDispatch();
@@ -105,36 +274,120 @@ const UpcomingTravelDetailPage = () => {
 
   return (
     <>
-      <BackHeader title="고래상어보러가자"></BackHeader>
-      <DetailDiv>
-        <Img src={SampleImg}></Img>
-        <Overlay />
-        <ContentDiv>
-            <TravelCardDiv>
-            <OngoingTravelDetailCard />
-            </TravelCardDiv>
-            <TravelDetailPay/>
-            <CategoryBudgetDiv>
-                <CategoryTitleDiv>
-                    <CategoryTitleFontDiv>
-                        <PayIcon/>
-                        <TitleP>카테고리별 예산</TitleP>
-                    </CategoryTitleFontDiv>
-                    <RightArrow/>
-                </CategoryTitleDiv>
-            </CategoryBudgetDiv>
-            <CategoryShareDiv>
-                <CategoryTitleDiv>
-                    <CategoryTitleFontDiv>
-                        <ShareIcon/>
-                        <TitleP>여행 공유 옵션</TitleP>
-                    </CategoryTitleFontDiv>
-                    <RightArrow/>
-                </CategoryTitleDiv>
-            </CategoryShareDiv>
-        </ContentDiv>
-      </DetailDiv>
-    </>
+    <BackHeader title="고래상어보러가자"></BackHeader>
+    <DetailDiv>
+      <Img src={SampleImg}></Img>
+      <Overlay />
+      <ContentDiv>
+          <TravelCardDiv>
+          <OngoingTravelDetailCard />
+          </TravelCardDiv>
+          <TravelDetailPay/>
+          <CategoryBudgetDiv>
+              <CategoryTitleDiv>
+                  <CategoryTitleFontDiv>
+                      <PayIcon/>
+                      <TitleP>여행 지출 내역</TitleP>
+                  </CategoryTitleFontDiv>
+                  <RightArrow/>
+              </CategoryTitleDiv>
+          </CategoryBudgetDiv>
+            <MoneyDiv>
+                <MoneyCategoryDiv>
+                    <MoneyCategoryP>항공</MoneyCategoryP>
+                    <MoneyCategoryP>600,000원</MoneyCategoryP>
+                </MoneyCategoryDiv>
+                <MoneyCategoryProgressDiv>
+                    <MoneyTitleDiv>
+                        <MoneyCategoryP>식사</MoneyCategoryP>
+                        <MoneyComsumpP color="#00D5FF">30%</MoneyComsumpP>
+                    </MoneyTitleDiv>
+                    <BudgetDiv>
+                        <MoneyBudgetComsumpP color='#00D5FF'>600,000</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                    </BudgetDiv>
+                </MoneyCategoryProgressDiv>
+                <MoneyEatDiv>
+                    <MoneyEatBarDiv paid="80%"/>
+                </MoneyEatDiv>
+                <MoneyCategoryProgressDiv>
+                    <MoneyTitleDiv>
+                        <MoneyCategoryP>교통</MoneyCategoryP>
+                        <MoneyComsumpP color="#00C8FB">30%</MoneyComsumpP>
+                    </MoneyTitleDiv>
+                    <BudgetDiv>
+                        <MoneyBudgetComsumpP color='#00C8FB'>600,000</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                    </BudgetDiv>
+                </MoneyCategoryProgressDiv>
+                <MoneyRideDiv>
+                    <MoneyRideBarDiv paid="30%"/>
+                </MoneyRideDiv>
+                <MoneyCategoryProgressDiv>
+                    <MoneyTitleDiv>
+                        <MoneyCategoryP>관광</MoneyCategoryP>
+                        <MoneyComsumpP color="#00B8F5">30%</MoneyComsumpP>
+                    </MoneyTitleDiv>
+                    <BudgetDiv>
+                        <MoneyBudgetComsumpP color='#00B8F5'>600,000</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                    </BudgetDiv>
+                </MoneyCategoryProgressDiv>
+                <MoneyTourDiv>
+                    <MoneyTourBarDiv paid="30%"/>
+                </MoneyTourDiv>
+                <MoneyCategoryProgressDiv>
+                    <MoneyTitleDiv>
+                        <MoneyCategoryP>쇼핑</MoneyCategoryP>
+                        <MoneyComsumpP color="#00ACF1">30%</MoneyComsumpP>
+                    </MoneyTitleDiv>
+                    <BudgetDiv>
+                        <MoneyBudgetComsumpP color='#00ACF1'>600,000</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                    </BudgetDiv>
+                </MoneyCategoryProgressDiv>
+                <MoneyShopDiv>
+                    <MoneyShopBarDiv paid="30%"/>
+                </MoneyShopDiv>
+                <MoneyCategoryProgressDiv>
+                    <MoneyTitleDiv>
+                        <MoneyCategoryP>숙박</MoneyCategoryP>
+                        <MoneyComsumpP color="#009BEB">30%</MoneyComsumpP>
+                    </MoneyTitleDiv>
+                    <BudgetDiv>
+                        <MoneyBudgetComsumpP color='#009BEB'>600,000</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                    </BudgetDiv>
+                </MoneyCategoryProgressDiv>
+                <MoneyStayDiv>
+                    <MoneyStayBarDiv paid="30%"/>
+                </MoneyStayDiv>
+                <MoneyCategoryProgressDiv>
+                    <MoneyTitleDiv>
+                        <MoneyCategoryP>기타</MoneyCategoryP>
+                        <MoneyComsumpP color="#008DE7">30%</MoneyComsumpP>
+                    </MoneyTitleDiv>
+                    <BudgetDiv>
+                        <MoneyBudgetComsumpP color='#008DE7'>600,000</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                    </BudgetDiv>
+                </MoneyCategoryProgressDiv>
+                <MoneyEtcDiv>
+                    <MoneyEtcBarDiv paid="30%"/>
+                </MoneyEtcDiv>
+            </MoneyDiv>
+          <CategoryShareDiv>
+              <CategoryTitleDiv>
+                  <CategoryTitleFontDiv>
+                      <ShareIcon/>
+                      <TitleP>여행 공유 옵션</TitleP>
+                  </CategoryTitleFontDiv>
+                  <RightArrow/>
+              </CategoryTitleDiv>
+          </CategoryShareDiv>
+      </ContentDiv>
+    </DetailDiv>
+  </>
   );
 }
 
