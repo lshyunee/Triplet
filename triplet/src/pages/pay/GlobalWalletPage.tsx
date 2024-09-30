@@ -124,43 +124,43 @@ const GlobalWalletPage = () => {
 					<ExchangeRate
 						nation='미국'
 						foreignCurrency={1344.71}
-						isRise={true}
+						isRise={1}
 						rate={0.20}
 					/>
 					<ExchangeRate
 						nation='유럽'
 						foreignCurrency={1344.71}
-						isRise={true}
+						isRise={1}
 						rate={0.20}
 					/>
 					<ExchangeRate
 						nation='일본'
 						foreignCurrency={1344.71}
-						isRise={false}
+						isRise={-1}
 						rate={0.20}
 					/>
 					<ExchangeRate
 						nation='중국'
 						foreignCurrency={1344.71}
-						isRise={true}
+						isRise={1}
 						rate={0.20}
 					/>
 					<ExchangeRate
 						nation='영국'
 						foreignCurrency={1344.71}
-						isRise={true}
+						isRise={1}
 						rate={0.20}
 					/>
 					<ExchangeRate
 						nation='스위스'
 						foreignCurrency={1344.71}
-						isRise={true}
+						isRise={1}
 						rate={0.20}
 					/>
 					<ExchangeRate
 						nation='캐나다'
 						foreignCurrency={1344.71}
-						isRise={false}
+						isRise={-1}
 						rate={0.20}
 					/>
 				</s.CurrencyArea>
