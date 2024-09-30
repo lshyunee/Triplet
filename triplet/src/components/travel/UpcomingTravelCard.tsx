@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
+
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
 
 const CardDiv = styled.div`
@@ -10,7 +12,7 @@ const CardDiv = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* 아래쪽에 텍스트 배치 */
+  justify-content: flex-end;
 `;
 
 const TravelImg = styled.img`
@@ -105,22 +107,33 @@ const CountryP = styled.p`
     color : white;
     margin: 0;
 
-`
+`;
+
+const StyledLink = styled(Link)`
+    display: block;
+    width: 100%;
+    text-decoration: none !important;  /* 밑줄 강제로 제거 */
+    color: inherit !important;         /* 링크 색상 기본값 제거 */
+`;
+
+
 const UpcomingTravelCard = () => {
   return (
-    <CardDiv>
-      <TravelImg src={SampleImg} alt="Travel" />
-      <Overlay />
-      <BottomOverlay>
-        <ContentDiv>
-            <ContentTitleDiv>
-                <CountryP>집에가고싶다</CountryP>
-                <PriceInfoP>대한민국</PriceInfoP>
-            </ContentTitleDiv>
-            <DayInfoP>24.09.28 ~ 24.10.01</DayInfoP>
-        </ContentDiv>
-      </BottomOverlay>
-    </CardDiv>
+    <StyledLink to="/travels/upcoming/1/detail"> 
+      <CardDiv>
+        <TravelImg src={SampleImg} alt="Travel" />
+        <Overlay />
+        <BottomOverlay>
+          <ContentDiv>
+              <ContentTitleDiv>
+                  <CountryP>집에가고싶다</CountryP>
+                  <PriceInfoP>대한민국</PriceInfoP>
+              </ContentTitleDiv>
+              <DayInfoP>24.09.28 ~ 24.10.01</DayInfoP>
+          </ContentDiv>
+        </BottomOverlay>
+      </CardDiv>
+    </StyledLink>
   );
 };
 

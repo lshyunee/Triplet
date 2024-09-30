@@ -96,9 +96,7 @@ const TravelsPage = () => {
                         다가오는 여행
                     </CategoryP>
                     <TravelCardDiv>
-                        <StyledLink to="/travels/upcoming/1/detail">   
-                            <UpcomingTravelCard></UpcomingTravelCard>
-                        </StyledLink>
+                        <UpcomingTravelCard/>
                     </TravelCardDiv>
                 </UpcomingTravelDiv>
                 <CompleteTravelDiv>

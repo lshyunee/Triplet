@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
+import { Link } from 'react-router-dom';
 
 const CardDiv = styled.div`
   width: 100%;
@@ -107,6 +108,13 @@ const CountryP = styled.p`
 
 `
 
+const StyledLink = styled(Link)`
+    display: block; 
+    width: 100%; 
+    text-decoration: none;
+    color: inherit;        
+`
+
 interface CompleteTravelCardProps {
   travelId : number;
 }
@@ -114,21 +122,24 @@ interface CompleteTravelCardProps {
 const CompleteTravelCard: React.FC<CompleteTravelCardProps> = ({travelId}) => {
 
   const travel:number = travelId;
+  
 
   return (
-    <CardDiv>
-      <TravelImg src={SampleImg} alt="Travel" />
-      <Overlay />
-      <BottomOverlay>
-        <ContentDiv>
-            <ContentTitleDiv>
-                <CountryP>집에가고싶다</CountryP>
-                <PriceInfoP>대한민국</PriceInfoP>
-            </ContentTitleDiv>
-            <DayInfoP>24.09.28 ~ 24.10.01</DayInfoP>
-        </ContentDiv>
-      </BottomOverlay>
-    </CardDiv>
+    <StyledLink to="/travels/completed/1/detail"> 
+      <CardDiv>
+        <TravelImg src={SampleImg} alt="Travel" />
+        <Overlay />
+        <BottomOverlay>
+          <ContentDiv>
+              <ContentTitleDiv>
+                  <CountryP>집에가고싶다</CountryP>
+                  <PriceInfoP>대한민국</PriceInfoP>
+              </ContentTitleDiv>
+              <DayInfoP>24.09.28 ~ 24.10.01</DayInfoP>
+          </ContentDiv>
+        </BottomOverlay>
+      </CardDiv>
+    </StyledLink>
   );
 };
 

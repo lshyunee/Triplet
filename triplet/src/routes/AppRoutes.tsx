@@ -25,7 +25,7 @@ import QRCompletePage from '../pages/pay/QRCompletePage';
 import CreateTravelPage from '../pages/travels/CreateTravelPage';
 import UpcomingTravelDetailPage from '../pages/travels/UpcomingTravelDetailPage';
 import OngoingTravelDetailPage from '../pages/travels/OngoingTravelDetailPage';
-
+import CompletedTravelDetailPage from '../pages/travels/CompletedTravelDetailPage';
 
 const AppRoutes: React.FC = () => (
         <Routes>
@@ -51,6 +51,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/travels/create" element={<CreateTravelPage/>}/>
             <Route path="/travels/ongoing/detail" element={<OngoingTravelDetailPage/>}/>
             <Route path="/travels/upcoming/:id/detail" element={<UpcomingTravelDetailPage/>}/>
+            <Route path="/travels/completed/:id/detail" element={<CompletedTravelDetailPage/>}/>
             <Route path="/alarm" element={<Alarm/>}/>
         </Routes>
 );
