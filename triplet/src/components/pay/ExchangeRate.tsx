@@ -55,7 +55,7 @@ const s = {
 interface GlobalAccountProps {
   nation: String;
   foreignCurrency: number;
-  isRise: boolean;
+  isRise: number;
   rate: number;
 };
 
@@ -86,16 +86,16 @@ const ExchangeRate = (props: GlobalAccountProps): JSX.Element => {
       }) ()}
 
       <s.RightArea>
-        <s.ForeignCurrency>{(foreignCurrency.toLocaleString(undefined, {minimumFractionDigits: 2}))}원</s.ForeignCurrency>
-        {isRise === true ? (
+        <s.ForeignCurrency>{(foreignCurrency)}원</s.ForeignCurrency>
+        {isRise === 1 ? (
         <s.RateArea>
           <UpperArrow/>
-          <s.RedRate>{rate.toFixed(2)}%</s.RedRate>
+          {/* <s.RedRate>{rate.toFixed(2)}%</s.RedRate> */}
         </s.RateArea>
         ) : (
         <s.RateArea>
           <LowerArrow/>
-          <s.BlueRate>{rate.toFixed(2)}%</s.BlueRate>
+          {/* <s.BlueRate>{rate.toFixed(2)}%</s.BlueRate> */}
         </s.RateArea>
         )}
         

@@ -96,7 +96,7 @@ const GlobalAccount = (props: GlobalAccountProps): JSX.Element => {
       <s.ButtonArea>
         <s.CurrencyArea>
           <div>
-            <s.ForeignCurrency>{foreignCurrency.toLocaleString()}</s.ForeignCurrency>
+            <s.ForeignCurrency>{foreignCurrency}</s.ForeignCurrency>
             {(() => {
               switch (nation) {
                 case "미국":
