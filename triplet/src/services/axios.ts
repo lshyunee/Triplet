@@ -18,11 +18,26 @@ axiosInstance.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
+        
+
         // 401 에러 처리: 토큰이 만료되었을 가능성
         if (error.response && error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;  // 재시도를 방지하는 플래그
+
+            if(originalRequest.url.includes('/reissue')){
+                return Promise.reject(error);
+            }
+
             try {
                 // 토큰 재발급 요청
+                const response = await axiosInstance.post('/reissue');
+
+                console.log(response);
+
+                if (response.status === 401) {
+                    throw new Error('Token reissue failed');
+                }
+
                 // 원래의 요청을 재시도
                 return axiosInstance(originalRequest);
             } catch (reissueError) {
@@ -32,7 +47,7 @@ axiosInstance.interceptors.response.use(
             }
         }
         
-        // 다른 에러는 그대로 처리 .
+        // 다른 에러는 그대로 처리
         return Promise.reject(error);
     }
 );
