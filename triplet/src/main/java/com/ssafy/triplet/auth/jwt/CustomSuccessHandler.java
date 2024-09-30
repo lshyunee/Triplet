@@ -52,21 +52,8 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 + "; HttpOnly"
                 + (authorizationRefresh.getSecure() ? "; Secure" : "")
                 + "; SameSite=None");
-
-        // JSON 응답 만들기
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        Map<String, Object> responseBody = new HashMap<>();
-        responseBody.put("code", "200");
-        responseBody.put("message", "소셜 로그인 성공");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        String jsonResponse = objectMapper.writeValueAsString(responseBody);
-
-        // JSON 응답 쓰기
-        response.getWriter().write(jsonResponse);
-        response.setStatus(HttpStatus.OK.value());
+        // 클라이언트로 redirect
+        response.sendRedirect("https://j11b202.p.ssafy.io/home");
     }
 
     private Cookie createCookie(String key, String value) {
