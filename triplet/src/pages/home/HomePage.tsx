@@ -21,6 +21,7 @@ import { ReactComponent as CAFlag } from '../../assets/pay/ca.svg';
 import UpcomingTravelCard from '../../components/travel/UpcomingTravelCard';
 import useAxios from '../../hooks/useAxios';
 import UpcomingTravelHomeCard from '../../components/travel/UpcomingTravelHomeCard';
+import CreateTravelCard from '../../components/travel/CreateTravelCard';
 
 const MainDiv = styled.div`
     background-color: #F3F4F6;
@@ -166,7 +167,8 @@ const HomePage = () => {
 
     // Redux 스토어에서 데이터를 가져옴
     const travelData = useSelector((state:any) => state.ongoingTravel);
-    
+    const upcomingData = useSelector((state: any) => state.upcomingTravels?.travels || []);
+
     // useAxios 훅으로 데이터 요청
     const { data: infoData, error: infoError, refetch: infoRefetch } = useAxios("/travels/ongoing", "GET");
 
@@ -214,8 +216,11 @@ const HomePage = () => {
                         <OngoingTravelCard />
                     </Link>
                 ) : (
-                    // travelData가 없으면 OngoingTravelCard를 비활성화하고, UpcomingTravelCard 렌더링
-                    <UpcomingTravelHomeCard />
+                    upcomingData.length > 0 ? (
+                        <UpcomingTravelHomeCard />
+                    ) : (
+                        <CreateTravelCard/>
+                    )
                 )}
                 <Link to="/pay/qr">
                     <LittleDiv>
