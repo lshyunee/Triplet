@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
 
 const CardDiv = styled.div`
-  width: 156px;
-  height: 156px; /* 카드 높이를 좀 더 늘림 */
+  width: 100%;
+  aspect-ratio: 1 / 1;
   border-radius: 20px;
   overflow: hidden;
   position: relative;

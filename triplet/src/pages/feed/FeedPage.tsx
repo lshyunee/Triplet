@@ -114,20 +114,12 @@ const FilterBtn = styled.button`
 const TravelDiv = styled.div`
     margin-top: 12px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(156px, 1fr));
-    gap: 16px; /* 카드 사이에 16px의 간격 추가 */
-    place-items: center; /* 가로, 세로축 모두 중앙 정렬 */
-    justify-content: start; /* 왼쪽에서부터 아이템을 정렬 */
+    grid-template-columns: repeat(2, 1fr); /* 각 칼럼의 너비를 균등하게 설정 */
+    gap: 16px;
+    place-items: center;
+    justify-content: start;
     margin-bottom: 26px;
-
-    /* 그리드가 최소 2개의 열을 유지하도록 설정 */
-    @media (min-width: 360px) {
-        grid-template-columns: repeat(2, minmax(156px, 1fr));
-    }
-
-    @media (min-width: 768px) {
-        grid-template-columns: repeat(auto-fit, minmax(156px, 1fr));
-    }
+    height: auto; /* 부모의 높이에 맞게 자동으로 크기 설정 */
 `;
 
 

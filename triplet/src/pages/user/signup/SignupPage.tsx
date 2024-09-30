@@ -235,12 +235,16 @@ const SignupPage = () => {
         phoneRefetch();
     };
 
+    const [ isSend, setIsSend ] = useState(false);
+
     useEffect(() => {
         if(phoneError!==null && phoneStatus!==200){
             console.log(phoneError);
             const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
             setErrorMsg(message);
             isErrorOpen();
+        }else{
+            setIsSend(true);
         }
     }, [phoneData, phoneError])
 
@@ -277,7 +281,7 @@ const SignupPage = () => {
             name : name.value,
             phoneNumber : phoneNum,
             identificationNumber : identificationNum
-        });
+    });
 
     const signup = () => {
         signupRefetch();
@@ -357,7 +361,7 @@ const SignupPage = () => {
                     <StyledInput type="text" {...phoneNumMiddle} disabled={isCheck}/>
                     <NumP>-</NumP>
                     <StyledInput type="text" {...phoneNumBack} disabled={isCheck}/>
-                    <StyledBtn onClick={certificateSend} disabled={isCheck}>인증번호 발송</StyledBtn>
+                    <StyledBtn onClick={certificateSend} disabled={isSend}>인증번호 발송</StyledBtn>
                 </PhoneDiv>
                 <HowP>인증번호</HowP>
                 <CheckDiv>
