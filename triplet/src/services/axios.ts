@@ -23,8 +23,6 @@ axiosInstance.interceptors.response.use(
             originalRequest._retry = true;  // 재시도를 방지하는 플래그
             try {
                 // 토큰 재발급 요청
-                await axiosInstance.post('/reissue');
-
                 // 원래의 요청을 재시도
                 return axiosInstance(originalRequest);
             } catch (reissueError) {
@@ -34,7 +32,7 @@ axiosInstance.interceptors.response.use(
             }
         }
         
-        // 다른 에러는 그대로 처리
+        // 다른 에러는 그대로 처리 .
         return Promise.reject(error);
     }
 );
