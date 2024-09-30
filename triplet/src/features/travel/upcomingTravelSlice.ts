@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../../store';
 
 interface TravelState {
     travelId: number;
@@ -40,5 +41,8 @@ const upcomingTravelSlice = createSlice({
     },
 });
 
+export const selectTravelByTitleId = (state : RootState, titleId : number) => {
+    return state.upcomingTravel.travels.find(travel => travel.travelId === titleId);
+};
 export const { addTravels, setTravels } = upcomingTravelSlice.actions;
 export default upcomingTravelSlice.reducer;

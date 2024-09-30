@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 // router import
 import Home from '../pages/home/HomePage';
-import FeedPAge from '../pages/feed/FeedPage';
+import FeedPage from '../pages/feed/FeedPage';
 import MyPage from '../pages/mypage/MyPage';
 import Pay from '../pages/pay/PayPage';
 import Travels from '../pages/travels/TravelsPage';
@@ -23,6 +23,7 @@ import QRPage from '../pages/pay/QRPage';
 import QRPayPage from '../pages/pay/QRPayPage';
 import QRCompletePage from '../pages/pay/QRCompletePage';
 import CreateTravelPage from '../pages/travels/CreateTravelPage';
+import UpcomingTravelDetailPage from '../pages/travels/UpcomingTravelDetailPage';
 import OngoingTravelDetailPage from '../pages/travels/OngoingTravelDetailPage';
 
 
@@ -32,7 +33,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/login" element={<Login/>}/>
             <Route path="/signup" element={<Signup/>}/>
             <Route path="/home" element={<Home/>}/>
-            <Route path="/feed" element={<FeedPAge/>}/>
+            <Route path="/feed" element={<FeedPage/>}/>
             <Route path="/mypage" element={<MyPage/>} />
             <Route path="/mypage/info-edit" element={<MyInfoEditPage/>} />
             <Route path="/mypage/password-edit" element={<PasswordEditPage/>} />
@@ -49,6 +50,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/travels" element={<Travels/>}/>
             <Route path="/travels/create" element={<CreateTravelPage/>}/>
             <Route path="/travels/ongoing/detail" element={<OngoingTravelDetailPage/>}/>
+            <Route path="/travels/upcoming/:id/detail" element={<UpcomingTravelDetailPage/>}/>
             <Route path="/alarm" element={<Alarm/>}/>
         </Routes>
 );

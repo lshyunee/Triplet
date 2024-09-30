@@ -123,7 +123,7 @@ const TravelDiv = styled.div`
 `;
 
 
-const FeedPAge = () => {
+const FeedPage = () => {
 
     const dispatch = useDispatch();
 
@@ -182,4 +182,4 @@ const FeedPAge = () => {
     );
 };
 
-export default FeedPAge;
+export default FeedPage;

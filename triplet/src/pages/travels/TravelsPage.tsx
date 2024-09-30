@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import Header from '../../components/header/Header';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
 import styled from 'styled-components';
 import { Link } from 'react-router-dom';
@@ -10,6 +10,8 @@ import UpcomingTravelCard from '../../components/travel/UpcomingTravelCard';
 import CompleteTravelCard from '../../components/travel/CompleteTravelCard';
 
 import { ReactComponent as CreateBtn } from '../../assets/travel/create.svg';
+import { RootState } from '../../store';
+import { selectAllTravelIds } from '../../features/travel/completedTravelSlice';
 
 const TravelDiv = styled.div`
     min-height : calc(100vh - 56px);
@@ -38,7 +40,7 @@ const OngoingTravelDiv = styled.div`
 const UpcomingTravelDiv = styled.div`
     display : flex;
     flex-direction : column;
-    margin-bottom : 12px;
+    margin-bottom : 26px;
 `
 
 const CompleteTravelDiv = styled.div`
@@ -50,20 +52,10 @@ const CompleteTravelDiv = styled.div`
 const TravelCardDiv = styled.div`
     margin-top: 12px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(156px, 100%), 1fr));
+    grid-template-columns: repeat(2, minmax(min(100px,100%), 1fr));
     gap: 16px; /* 카드 사이에 16px의 간격 추가 */
     place-items: center; /* 가로, 세로축 모두 중앙 정렬 */
     justify-content: start; /* 왼쪽에서부터 아이템을 정렬 */
-    margin-bottom: 26px;
-
-    /* 그리드가 최소 2개의 열을 유지하도록 설정 */
-    @media (min-width: 360px) {
-        grid-template-columns: repeat(2, minmax(156px, 1fr));
-    }
-
-    @media (min-width: 768px) {
-        grid-template-columns: repeat(auto-fit, minmax(156px, 1fr));
-    }
 `;
 
 const CreateTravelDiv = styled.div`
@@ -71,6 +63,11 @@ const CreateTravelDiv = styled.div`
     justify-content : right;
     margin-bottom : 24px;
 `
+
+const StyledLink = styled(Link)`
+    display: block; /* Link를 블록 요소로 변환 */
+    width: 100%; /* 필요한 경우 너비를 100%로 설정 */
+`;
 
 const TravelsPage = () => {
 
@@ -80,6 +77,8 @@ const TravelsPage = () => {
         dispatch(pageMove("travels"));
     }, [])
 
+    const completedTravelIds: number[] = useSelector(selectAllTravelIds);
+
     return (
         <>
             <Header/>
@@ -88,16 +87,18 @@ const TravelsPage = () => {
                     <CategoryP>
                         진행중인 여행
                     </CategoryP>
-                    <Link to="/travels/ongoing/detail">                    
+                    <StyledLink to="/travels/ongoing/detail">                    
                        <OngoingTravelCard></OngoingTravelCard>
-                    </Link>
+                    </StyledLink>
                 </OngoingTravelDiv>
                 <UpcomingTravelDiv>
                     <CategoryP>
                         다가오는 여행
                     </CategoryP>
                     <TravelCardDiv>
-                        <UpcomingTravelCard></UpcomingTravelCard>
+                        <StyledLink to="/travels/upcoming/1/detail">   
+                            <UpcomingTravelCard></UpcomingTravelCard>
+                        </StyledLink>
                     </TravelCardDiv>
                 </UpcomingTravelDiv>
                 <CompleteTravelDiv>
@@ -105,14 +106,15 @@ const TravelsPage = () => {
                         지난 여행
                     </CategoryP>
                     <TravelCardDiv>
-                        <CompleteTravelCard></CompleteTravelCard>
-                        <CompleteTravelCard></CompleteTravelCard>
-                        <CompleteTravelCard></CompleteTravelCard>
-                        <CompleteTravelCard></CompleteTravelCard>
-                        <CompleteTravelCard></CompleteTravelCard>
-                        <CompleteTravelCard></CompleteTravelCard>
-                        <CompleteTravelCard></CompleteTravelCard>
-                        <CompleteTravelCard></CompleteTravelCard>
+                        {/* {completedTravelIds.map((id:number) =>(
+                            <CompleteTravelCard key={id} travelId={id}/>
+                        ))} */}
+                        <CompleteTravelCard travelId={1}/>
+                        <CompleteTravelCard travelId={1}/>
+                        <CompleteTravelCard travelId={1}/>
+                        <CompleteTravelCard travelId={1}/>
+                        <CompleteTravelCard travelId={1}/>
+                        <CompleteTravelCard travelId={1}/>
                     </TravelCardDiv>
                 </CompleteTravelDiv>
                 <CreateTravelDiv>

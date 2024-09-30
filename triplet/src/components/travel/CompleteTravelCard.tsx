@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
 
 const CardDiv = styled.div`
-  width: 156px;
-  height: 156px; /* 카드 높이를 좀 더 늘림 */
+  width: 100%;
+  aspect-ratio: 1 / 1;
   border-radius: 20px;
   overflow: hidden;
   position: relative;
@@ -36,7 +36,7 @@ const Overlay = styled.div`
 const BottomOverlay = styled.div`
   position: relative;
   width: 100%;
-  height: 63px;
+  height : 40%;
   background-color: rgba(0, 0, 0, 0.5); /* 하단 반투명 오버레이 */
   backdrop-filter: blur(3px); /* 블러 처리 추가 */
   z-index: 3;
@@ -67,34 +67,54 @@ const ContentTitleDiv = styled.div`
     display : flex;
     flex-direction : row;
     justify-content : space-between;
-    margin-bottom : 8px;
+    margin : 3vw 0 2vw;
 `;
 
 const ContentDiv = styled.div`
+  height : 100%;
   z-index: 4;
   color: white;
-  font-size: 14px;
   font-weight: 600;
   display: flex;
-    flex-direction : column;
-  padding: 12px;
+  flex-direction : column;
+  padding: 0 2.5vw;
+  margin-left : 1vw;
 `;
 
 const PriceInfoP = styled.p`
     font-weight: 400;
-    font-size : 12px;
+    font-size : 2.5vw;
     color : white;
     margin: 0;
+    display : flex;
+    align-items : center;
 `;
+
+const DayInfoP = styled.p`
+    font-weight: 400;
+    font-size : 3.5vw;
+    color : white;
+    margin: 0;
+    display : flex;
+    align-items : center;
+`
 
 const CountryP = styled.p`
     font-weight : 500;
-    font-size : 14px;
+    font-size : 4vw;
     color : white;
     margin: 0;
+
 `
 
-const CompleteTravelCard = () => {
+interface CompleteTravelCardProps {
+  travelId : number;
+}
+
+const CompleteTravelCard: React.FC<CompleteTravelCardProps> = ({travelId}) => {
+
+  const travel:number = travelId;
+
   return (
     <CardDiv>
       <TravelImg src={SampleImg} alt="Travel" />
@@ -105,7 +125,7 @@ const CompleteTravelCard = () => {
                 <CountryP>집에가고싶다</CountryP>
                 <PriceInfoP>대한민국</PriceInfoP>
             </ContentTitleDiv>
-            <PriceInfoP>24.09.28 ~ 24.10.01</PriceInfoP>
+            <DayInfoP>24.09.28 ~ 24.10.01</DayInfoP>
         </ContentDiv>
       </BottomOverlay>
     </CardDiv>
