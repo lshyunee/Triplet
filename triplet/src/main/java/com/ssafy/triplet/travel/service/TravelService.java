@@ -24,6 +24,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -82,10 +83,17 @@ public class TravelService {
         travel.setMemberCount(request.getMemberCount());
         travel.setTotalBudget(request.getTotalBudget());
         travel.setAirportCost(request.getAirportCost());
+
         if (image != null && !image.isEmpty()) {
+            s3Service.deleteFile(travel.getImage());
+            long maxFileSize = 5 * 1024 * 1024;
+            if (image.getSize() > maxFileSize) {
+                throw new CustomException(CustomErrorCode.MAX_UPLOAD_SIZE_EXCEEDED);
+            }
             String fileUrl = s3Service.uploadFile(image);
             travel.setImage(fileUrl);
         }
+
         Country country = countryRepository.findById(request.getCountry())
                 .orElseThrow(() -> new CustomException(CustomErrorCode.COUNTRY_NOT_FOUND));
         travel.setCountry(country);
@@ -379,6 +387,10 @@ public class TravelService {
         travel.setAirportCost(request.getAirportCost());
 
         if (image != null && !image.isEmpty()) {
+            long maxFileSize = 5 * 1024 * 1024;
+            if (image.getSize() > maxFileSize) {
+                throw new CustomException(CustomErrorCode.MAX_UPLOAD_SIZE_EXCEEDED);
+            }
             String fileUrl = s3Service.uploadFile(image);
             travel.setImage(fileUrl);
         }

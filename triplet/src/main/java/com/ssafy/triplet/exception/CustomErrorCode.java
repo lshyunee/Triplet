@@ -37,7 +37,9 @@ public enum CustomErrorCode {
     USER_ALREADY_IN_TRAVEL("T0015", "해당 유저는 이미 이 여행에 속해 있습니다.", HttpStatus.CONFLICT),
     TRAVEL_MEMBER_LIMIT_EXCEEDED("T0017", "여행 인원이 초과되었습니다.", HttpStatus.BAD_REQUEST),
     USER_NOT_IN_TRAVEL("T0016", "해당 유저는 이미 이 여행에 속해 있지 않습니다.", HttpStatus.BAD_REQUEST),
-    TRAVEL_WALLET_HAS_BALANCE("T0018", "여행 지갑에 잔액이 있습니다.", HttpStatus.BAD_REQUEST);
+    TRAVEL_WALLET_HAS_BALANCE("T0018", "여행 지갑에 잔액이 있습니다.", HttpStatus.BAD_REQUEST),
+    MAX_UPLOAD_SIZE_EXCEEDED("E0003", "업로드 가능한 파일 크기를 초과했습니다.", HttpStatus.PAYLOAD_TOO_LARGE);
+
 
     private final String code;
     private final String message;

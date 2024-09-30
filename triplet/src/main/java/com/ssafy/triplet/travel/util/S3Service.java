@@ -4,6 +4,7 @@ import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,5 +47,22 @@ public class S3Service {
     private String getFileUrl(String fileName) {
         URL url = s3Client.utilities().getUrl(builder -> builder.bucket(bucketName).key(fileName));
         return url.toString();
+    }
+
+
+    public void deleteFile(String fileUrl) {
+        String fileName = extractFileNameFromUrl(fileUrl);
+        try {
+            s3Client.deleteObject(DeleteObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(fileName)
+                    .build());
+        } catch (S3Exception e) {
+            throw new RuntimeException("Failed to delete file from S3", e);
+        }
+    }
+
+    private String extractFileNameFromUrl(String fileUrl) {
+        return fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
     }
 }
