@@ -18,15 +18,15 @@ const useAxios = (
       const response = await axiosInstance({
         url,
         method,
-        data: body,
+        ...(body ? { data: body } : {}), // GET 요청 시 body를 보내지 않도록 처리
         headers,
       });
       setData(response.data);
       setStatus(response.status);
-      setError(null); // 오류 없을 때는 null로 설정
+      setError(null); // 성공 시 오류 초기화
     } catch (err: any) {
-        setData(null);
-        setError(err);
+      setData(null);
+      setError(err);
       if (err.response) {
         setStatus(err.response.status);
       }
@@ -36,12 +36,9 @@ const useAxios = (
   };
 
   useEffect(() => {
-    setData(null);
-    setError(null);
-    setStatus(null);
-    setLoading(false);
-  },[url])
-
+    // 컴포넌트 마운트 시 자동으로 fetchData 호출
+    fetchData();
+  }, [url, method, body, headers]);
 
   // refetch 함수 정의
   const refetch = () => {

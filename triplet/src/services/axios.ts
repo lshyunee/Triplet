@@ -23,14 +23,7 @@ axiosInstance.interceptors.response.use(
             originalRequest._retry = true;  // 재시도를 방지하는 플래그
             try {
                 // 토큰 재발급 요청
-                const reissueResponse = await axiosInstance.post('/reissue');
-                
-                // 토큰 재발급이 성공하면 새로운 토큰을 저장 (예: 로컬 스토리지나 상태에 저장)
-                const newAccessToken = reissueResponse.data.accessToken;
-
-                // 새로운 토큰을 Authorization 헤더에 추가
-                axiosInstance.defaults.headers.common['Authorization'] = `Bearer ${newAccessToken}`;
-                originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
+                await axiosInstance.post('/reissue');
 
                 // 원래의 요청을 재시도
                 return axiosInstance(originalRequest);
