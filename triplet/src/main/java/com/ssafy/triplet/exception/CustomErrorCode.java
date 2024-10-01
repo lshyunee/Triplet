@@ -39,7 +39,7 @@ public enum CustomErrorCode {
     USER_NOT_IN_TRAVEL("T0016", "해당 유저는 이미 이 여행에 속해 있지 않습니다.", HttpStatus.BAD_REQUEST),
     TRAVEL_WALLET_HAS_BALANCE("T0018", "여행 지갑에 잔액이 있습니다.", HttpStatus.BAD_REQUEST),
     SAME_CURRENCY_NOT_ALLOWED_ERROR("C0005","동일한 통화로 환전이 불가능합니다.", HttpStatus.BAD_REQUEST),
-    CURRENCY_MISMATCH_ERROR("C0002","외화 → 원화 , 원화 → 외화만 가능합니다.",HttpStatus.BAD_REQUEST);
+    CURRENCY_MISMATCH_ERROR("C0002","외화 → 원화 , 원화 → 외화만 가능합니다.",HttpStatus.BAD_REQUEST),
     MAX_UPLOAD_SIZE_EXCEEDED("E0003", "업로드 가능한 파일 크기를 초과했습니다.", HttpStatus.PAYLOAD_TOO_LARGE);
 
 
