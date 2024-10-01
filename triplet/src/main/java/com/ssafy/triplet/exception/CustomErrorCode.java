@@ -40,6 +40,9 @@ public enum CustomErrorCode {
     TRAVEL_WALLET_HAS_BALANCE("T0018", "여행 지갑에 잔액이 있습니다.", HttpStatus.BAD_REQUEST),
     SAME_CURRENCY_NOT_ALLOWED_ERROR("C0005","동일한 통화로 환전이 불가능합니다.", HttpStatus.BAD_REQUEST),
     CURRENCY_MISMATCH_ERROR("C0002","외화 → 원화 , 원화 → 외화만 가능합니다.",HttpStatus.BAD_REQUEST);
+    MAX_UPLOAD_SIZE_EXCEEDED("E0003", "업로드 가능한 파일 크기를 초과했습니다.", HttpStatus.PAYLOAD_TOO_LARGE);
+
+
     private final String code;
     private final String message;
     private final HttpStatus status;
