@@ -119,6 +119,7 @@ const PhoneDiv = styled.div`
 
 const ConfirmDiv = styled.div`
     width : 100%;
+    margin-bottom : 28px;
 `;
 
 const ConfirmBox = styled.button`
@@ -192,7 +193,7 @@ const SignupPage = () => {
         status: duplicatedStatus, refetch: duplicatedRefetch }
         = useAxios('/signup/is-duplicated', 'POST', {memberId : id.value});
 
-    const [ isDuplicated, setIsDuplicated ] = useState(true);
+    const [ isDuplicated, setIsDuplicated ] = useState(false);
 
     const idDuplicationCheck = () => {
         // 중복 체크 요청을 실행하기 위해 refetch 호출
@@ -202,17 +203,18 @@ const SignupPage = () => {
             setErrorMsg("아이디는 영문,숫자 포함 5~16자여야 합니다.");
             isErrorOpen();
         }
+
     };
 
     useEffect(() => {
 
         if(duplicatedData!==null){
-            setIsDuplicated(duplicatedData.data.isDuplicated);
-        }
-
-        if(duplicatedError!==null){
-            setErrorMsg("옳지 않은 아이디 입니다.");
-            isErrorOpen();
+            console.log(duplicatedData);
+            setIsDuplicated(duplicatedData.data.duplicated);
+            if(duplicatedData.data.duplicated===true){
+                setErrorMsg("이미 존재하는 아이디 입니다.");
+                isErrorOpen();
+            }
         }
 
     }, [duplicatedData, duplicatedError]);
@@ -238,14 +240,18 @@ const SignupPage = () => {
     const [ isSend, setIsSend ] = useState(false);
 
     useEffect(() => {
+        
         if(phoneError!==null && phoneStatus!==200){
             console.log(phoneError);
             const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
             setErrorMsg(message);
             isErrorOpen();
-        }else{
+        }
+        
+        if(phoneData !== null && phoneStatus===200){
             setIsSend(true);
         }
+
     }, [phoneData, phoneError])
 
 
@@ -371,7 +377,7 @@ const SignupPage = () => {
                 <CheckP>{isCheck ? "인증되었습니다." : ""}</CheckP>
                 <ConfirmDiv>  
                         <ConfirmBox onClick={signup}>회원 가입</ConfirmBox>
-                    </ConfirmDiv>
+                </ConfirmDiv>
             </InputDiv>
             <ErrorModal isOpen={isError} onClose={closeError} msg={errorMsg}></ErrorModal>
             <CompleteModal isOpen={isModel} onClose={isModelClose} msg={msg} ></CompleteModal>

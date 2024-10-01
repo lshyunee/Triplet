@@ -151,7 +151,7 @@ const LoginPage = () => {
     useEffect(() => {
         if (loginStatus === 200) {
             dispatch(loginSuccess());
-            navigate('/home');
+            navigate('/');
         }
     }, [loginStatus, dispatch, navigate]);
 
