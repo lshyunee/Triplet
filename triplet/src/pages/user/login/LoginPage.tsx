@@ -70,11 +70,11 @@ const LoginBtn = styled.button`
     padding : 14px;
 `;
 
-const NaverLoginBtn = styled.button`
+const KakaoLoginBtn = styled.button`
     width:100%;
     height:44px;
-    color : #767678;
-    background-color : #FFFFFF;
+    color : black;
+    background-color : #FBE44E;
     border-radius : 10px;
     border : 1px solid #E6E6EA;
     box-sizing: border-box;
@@ -142,7 +142,7 @@ const LoginPage = () => {
         }
     }, [loginData, loginError]);
 
-    // 네이버 로그인 버튼 핸들러
+    // 카카오 로그인 버튼 핸들러
     const handleNaverLogin = () => {
         window.location.href = 'https://j11b202.p.ssafy.io/api/v1/oauth2/authorization/kakao';
     };
@@ -188,10 +188,9 @@ const LoginPage = () => {
                 <LoginInput type="password" placeholder='비밀번호' {...pw} />
                 <LoginBtn type="submit">로그인</LoginBtn>
             </LoginForm>
-            <NaverLoginBtn onClick={handleNaverLogin}>
-                <NaverLogo />
-                네이버 로그인
-            </NaverLoginBtn>
+            <KakaoLoginBtn onClick={handleNaverLogin}>
+                카카오 로그인
+            </KakaoLoginBtn>
             <SignupDiv>
                 <SignupP>아직 회원이 아니신가요?</SignupP>
                 <StyledLink to="/signup">
