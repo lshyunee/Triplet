@@ -11,9 +11,9 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ExchangeRateCalculatorResponse {
 
-    private int sourceAmount;
+    private Long sourceAmount;
 
-    private int targetAmount;
+    private Long targetAmount;
 
 
 

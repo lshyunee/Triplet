@@ -5,13 +5,11 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ExchangeRateCalculatorRequest {
+public class ExchangeRequest {
 
     @NotNull(message = "targetCurrency 누락")
     String targetCurrency;
@@ -20,6 +18,6 @@ public class ExchangeRateCalculatorRequest {
     String sourceCurrency;
 
     @NotNull(message = "sourceAmount 누락")
-    Long sourceAmount;
+    int sourceAmount;
 
 }

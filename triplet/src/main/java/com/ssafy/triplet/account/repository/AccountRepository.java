@@ -28,4 +28,8 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
     @Modifying
     @Query("UPDATE Account fa SET fa.accountBalance = :accountBalance WHERE fa.accountNumber = :accountNumber")
     void rechargeTravelAccount(@Param("accountNumber") String accountNumber, @Param("accountBalance") double accountBalance);
+
+    Account findByMemberIdAndCurrency(Long memberId, String currency);
+
+
 }
