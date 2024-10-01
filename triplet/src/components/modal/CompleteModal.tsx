@@ -66,23 +66,45 @@ interface ModalProps {
 
 const ErrorModal: React.FC<ModalProps> = ({ isOpen, onClose, msg }) => {
   
-    // 조건부로 return 대신, 렌더링 부분에서 조건 제어
-    if (!isOpen) {
-      return null;
-    }
-  
-    return (
-      <ModalLayout onClick={onClose}>
-        <ModalContentDiv>
-          <Title>완료</Title>
-          <Description>{msg}</Description>
-          <ConfirmDiv>
-            <Button onClick={onClose}>확인</Button>
-          </ConfirmDiv>
-        </ModalContentDiv>
-      </ModalLayout>
-    );
+  // Enter 키 입력 시 모달 닫기
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        onClose();
+      }
+    };
 
+    if (isOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
+  // 외부 클릭 시 모달 닫기
+  const handleClickOutside = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  if (!isOpen) {
+    return null;
+  }
+
+  return (
+    <ModalLayout onClick={handleClickOutside}>
+      <ModalContentDiv>
+        <Title>완료</Title>
+        <Description>{msg}</Description>
+        <ConfirmDiv>
+          <Button onClick={onClose}>확인</Button>
+        </ConfirmDiv>
+      </ModalContentDiv>
+    </ModalLayout>
+  );
 }
 
 export default ErrorModal;

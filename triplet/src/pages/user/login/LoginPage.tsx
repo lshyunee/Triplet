@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate, Link } from 'react-router-dom';
 import { loginSuccess } from '../../../features/auth/authSlice';
@@ -9,8 +9,6 @@ import useInput from '../../../hooks/useInput';
 
 import ErrorModal from '../../../components/modal/ErrorModal';
 import CompleteModal from '../../../components/modal/CompleteModal';
-
-import { ReactComponent as NaverLogo } from '../../../assets/login/naver.svg';
 
 const TitleP = styled.p`
     font-size : 32px;
@@ -45,7 +43,7 @@ const StyledLink = styled(Link)`
 
 const LoginForm = styled.form`
     width: 100%;
-`
+`;
 
 const LoginInput = styled.input`
     width:100%;
@@ -122,9 +120,15 @@ const LoginPage = () => {
     const { data: loginData, error: loginError, loading: loginLoading, status: loginStatus, refetch: loginRefetch } = useAxios('/login', 'POST', formData);
 
     // 로그인 핸들러
-    const handleLogin = (e : any) => {
+    const handleLogin = (e: any) => {
         e.preventDefault(); // 폼 기본 동작 방지
-        loginRefetch(); // 클릭 시 요청 재시도
+        if (!isError && !isComplete) {
+            loginRefetch(); // 클릭 시 요청 재시도
+            // 로그인 버튼에서 포커스 제거
+            if (loginBtnRef.current) {
+                loginBtnRef.current.blur(); // 포커스 제거
+            }
+        }
     };
     
     useEffect(() => {
@@ -159,24 +163,68 @@ const LoginPage = () => {
     const [isError, setIsError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
 
-    const isErrorOpen = () => {
-        setIsError(true);
-    };
-
+    const isErrorOpen = () => setIsError(true);
     const closeError = () => {
         setIsError(false);
+        preventEnterKeyAfterModalClose();
     };
 
     const [isComplete, setIsComplete] = useState(false);
     const [completeMsg, setCompleteMsg] = useState('');
 
-    const isCompleteOpen = () => {
-        setIsComplete(true);
-    };
-
+    const isCompleteOpen = () => setIsComplete(true);
     const closeComplete = () => {
         setIsComplete(false);
+        preventEnterKeyAfterModalClose();
     };
+
+    // 상태 관리 변수
+    const [enterPressed, setEnterPressed] = useState(false); // Enter 키가 눌린 상태를 추적
+
+    // 버튼에 대한 참조 추가
+    const loginBtnRef = useRef<HTMLButtonElement>(null);
+
+    // 모달이 닫힐 때 Enter 키 입력을 방지하는 함수
+    const preventEnterKeyAfterModalClose = () => {
+        // 모달 닫힌 후 300ms 동안 Enter 키 이벤트 방지
+        setTimeout(() => {
+            setEnterPressed(false); // Enter 키 상태 초기화
+        }, 300);  // 300ms 후에 Enter 키 입력을 다시 허용
+    };
+
+    // 모달이 열릴 때 포커스 제거
+    useEffect(() => {
+        if (isError || isComplete) {
+            const inputElements = document.querySelectorAll('input');
+            inputElements.forEach(input => input.blur()); // 모든 input 필드에서 포커스 제거
+        }
+    }, [isError, isComplete]);
+
+    // 모달이 열려 있을 때 Enter 키 입력 막기
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === 'Enter' && (isError || isComplete)) {
+                event.preventDefault(); // 모달이 열려 있을 때 Enter 키 입력을 막음
+                setEnterPressed(true);  // Enter 키가 눌렸음을 기록
+                // 포커스를 다른 곳으로 옮김
+                if (document.activeElement instanceof HTMLElement) {
+                    document.activeElement.blur(); // 현재 포커스된 요소에서 포커스 제거
+                }
+            }
+        };
+
+        // 모달이 열려 있을 때만 이벤트 리스너 추가
+        if (isError || isComplete) {
+            window.addEventListener('keydown', handleKeyDown);
+        } else {
+            window.removeEventListener('keydown', handleKeyDown);
+        }
+
+        // cleanup 함수로 이벤트 리스너 제거
+        return () => {
+            window.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isError, isComplete]);
 
     return (
         <BigDiv>
@@ -186,7 +234,7 @@ const LoginPage = () => {
             <LoginForm onSubmit={handleLogin}>
                 <LoginInput type="text" placeholder='아이디' {...id} />
                 <LoginInput type="password" placeholder='비밀번호' {...pw} />
-                <LoginBtn type="submit">로그인</LoginBtn>
+                <LoginBtn ref={loginBtnRef} type="submit" disabled={enterPressed}>로그인</LoginBtn> {/* 버튼에 참조 추가 */}
             </LoginForm>
             <KakaoLoginBtn onClick={handleNaverLogin}>
                 카카오 로그인
@@ -202,5 +250,4 @@ const LoginPage = () => {
         </BigDiv>
     );
 };
-
 export default LoginPage;
