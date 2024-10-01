@@ -1,8 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import BackHeader from '../../components/header/BackHeader';
+import { useParams } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { pageMove } from '../../features/navigation/naviSlice';
 
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
+import BackHeader from '../../components/header/BackHeader';
 import OngoingTravelDetailCard from '../../components/travel/OngoingTravelDetailCard';
 import TravelDetailPay from '../../components/travel/TravelDetailPay';
 
@@ -11,7 +14,6 @@ import { ReactComponent as PayIcon } from '../../assets/common/payIcon.svg';
 import { ReactComponent as ShareIcon } from '../../assets/common/shareIcon.svg';
 import { selectTravelByTitleId } from '../../features/travel/upcomingTravelSlice';
 import { RootState } from '../../store';
-
 
 const DetailDiv = styled.div`
     padding : 56px 0 0 0;
@@ -111,94 +113,20 @@ const MoneyCategoryProgressDiv = styled.div`
 
 interface MonyeProgressProps {
     paid : string;
+    color : string;
 }
 
-const MoneyEatDiv = styled.div`
+const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
     width: 100%;
-    background-color: rgba(0,213,255,0.5);
+    background-color: ${props => props.color};
     border-radius: 50px;
     overflow: hidden;
     height: 20px;
 `;
 
-const MoneyEatBarDiv = styled.div<MonyeProgressProps>`
+const MoneyChartBar = styled.div<MonyeProgressProps>`
     height : 100%;
-    background-color : rgba(0,213,255);
-    width : ${props => props.paid || '50%'};
-    border-radius : 50px;
-`
-
-const MoneyRideDiv = styled.div`
-    width: 100%;
-    background-color: rgba(0,200,251,0.5);
-    border-radius: 50px;
-    overflow: hidden;
-    height: 20px;
-`;
-
-const MoneyRideBarDiv = styled.div<MonyeProgressProps>`
-    height : 100%;
-    background-color : rgba(0,200,251);
-    width : ${props => props.paid || '50%'};
-    border-radius : 50px;
-`
-
-const MoneyTourDiv = styled.div`
-    width: 100%;
-    background-color: rgba(0,184,245,0.5);
-    border-radius: 50px;
-    overflow: hidden;
-    height: 20px;
-`;
-
-const MoneyTourBarDiv = styled.div<MonyeProgressProps>`
-    height : 100%;
-    background-color : rgba(0, 184, 245);
-    width : ${props => props.paid || '50%'};
-    border-radius : 50px;
-`
-
-const MoneyShopDiv = styled.div`
-    width: 100%;
-    background-color: rgba(0,172,241,0.5);
-    border-radius: 50px;
-    overflow: hidden;
-    height: 20px;
-`;
-
-const MoneyShopBarDiv = styled.div<MonyeProgressProps>`
-    height : 100%;
-    background-color : rgba(0, 172, 241);
-    width : ${props => props.paid || '50%'};
-    border-radius : 50px;
-`
-
-const MoneyStayDiv = styled.div`
-    width: 100%;
-    background-color: rgba(0,155,235,0.5);
-    border-radius: 50px;
-    overflow: hidden;
-    height: 20px;
-`;
-
-const MoneyStayBarDiv = styled.div<MonyeProgressProps>`
-    height : 100%;
-    background-color : rgba(0, 155, 235);
-    width : ${props => props.paid || '50%'};
-    border-radius : 50px;
-`
-
-const MoneyEtcDiv = styled.div`
-    width: 100%;
-    background-color: rgba(0,141,231,0.5);
-    border-radius: 50px;
-    overflow: hidden;
-    height: 20px;
-`;
-
-const MoneyEtcBarDiv = styled.div<MonyeProgressProps>`
-    height : 100%;
-    background-color : rgba(0, 141, 231);
+    background-color : ${props => props.color};
     width : ${props => props.paid || '50%'};
     border-radius : 50px;
 `
@@ -209,14 +137,6 @@ const MoneyCategoryP = styled.p`
     font-weight : 600;
     margin : 0;
     margin-left : 2px;
-`
-
-const MoneyP = styled.p`
-    color : #666666;
-    font-size : 16px;
-    font-wegiht : 500;
-    margin : 0
-    margin-right : 2px;
 `
 
 const MoneyTitleDiv = styled.div`
@@ -258,126 +178,147 @@ const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
 `;
 
 
-const OngoingTravelDetailPage = () => {
+const CompletedTravelDetailPage = () => {
+  const dispatch = useDispatch();
 
-    
-    return (
-        <>
-        <BackHeader title="고래상어보러가자"></BackHeader>
-        <DetailDiv>
-          <Img src={SampleImg}></Img>
-          <Overlay />
-          <ContentDiv>
-              <TravelCardDiv>
-              <OngoingTravelDetailCard />
-              </TravelCardDiv>
-              <TravelDetailPay/>
-              <CategoryBudgetDiv>
-                  <CategoryTitleDiv>
-                      <CategoryTitleFontDiv>
-                          <PayIcon/>
-                          <TitleP>여행 지출 내역</TitleP>
-                      </CategoryTitleFontDiv>
-                      <RightArrow/>
-                  </CategoryTitleDiv>
-              </CategoryBudgetDiv>
-                <MoneyDiv>
-                    <MoneyCategoryDiv>
-                        <MoneyCategoryP>항공</MoneyCategoryP>
-                        <MoneyCategoryP>600,000원</MoneyCategoryP>
-                    </MoneyCategoryDiv>
-                    <MoneyCategoryProgressDiv>
-                        <MoneyTitleDiv>
-                            <MoneyCategoryP>식사</MoneyCategoryP>
-                            <MoneyComsumpP color="#00D5FF">30%</MoneyComsumpP>
-                        </MoneyTitleDiv>
-                        <BudgetDiv>
-                            <MoneyBudgetComsumpP color='#00D5FF'>600,000</MoneyBudgetComsumpP>
-                            <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
-                        </BudgetDiv>
-                    </MoneyCategoryProgressDiv>
-                    <MoneyEatDiv>
-                        <MoneyEatBarDiv paid="80%"/>
-                    </MoneyEatDiv>
-                    <MoneyCategoryProgressDiv>
-                        <MoneyTitleDiv>
-                            <MoneyCategoryP>교통</MoneyCategoryP>
-                            <MoneyComsumpP color="#00C8FB">30%</MoneyComsumpP>
-                        </MoneyTitleDiv>
-                        <BudgetDiv>
-                            <MoneyBudgetComsumpP color='#00C8FB'>600,000</MoneyBudgetComsumpP>
-                            <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
-                        </BudgetDiv>
-                    </MoneyCategoryProgressDiv>
-                    <MoneyRideDiv>
-                        <MoneyRideBarDiv paid="30%"/>
-                    </MoneyRideDiv>
-                    <MoneyCategoryProgressDiv>
-                        <MoneyTitleDiv>
-                            <MoneyCategoryP>관광</MoneyCategoryP>
-                            <MoneyComsumpP color="#00B8F5">30%</MoneyComsumpP>
-                        </MoneyTitleDiv>
-                        <BudgetDiv>
-                            <MoneyBudgetComsumpP color='#00B8F5'>600,000</MoneyBudgetComsumpP>
-                            <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
-                        </BudgetDiv>
-                    </MoneyCategoryProgressDiv>
-                    <MoneyTourDiv>
-                        <MoneyTourBarDiv paid="30%"/>
-                    </MoneyTourDiv>
-                    <MoneyCategoryProgressDiv>
-                        <MoneyTitleDiv>
-                            <MoneyCategoryP>쇼핑</MoneyCategoryP>
-                            <MoneyComsumpP color="#00ACF1">30%</MoneyComsumpP>
-                        </MoneyTitleDiv>
-                        <BudgetDiv>
-                            <MoneyBudgetComsumpP color='#00ACF1'>600,000</MoneyBudgetComsumpP>
-                            <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
-                        </BudgetDiv>
-                    </MoneyCategoryProgressDiv>
-                    <MoneyShopDiv>
-                        <MoneyShopBarDiv paid="30%"/>
-                    </MoneyShopDiv>
-                    <MoneyCategoryProgressDiv>
-                        <MoneyTitleDiv>
-                            <MoneyCategoryP>숙박</MoneyCategoryP>
-                            <MoneyComsumpP color="#009BEB">30%</MoneyComsumpP>
-                        </MoneyTitleDiv>
-                        <BudgetDiv>
-                            <MoneyBudgetComsumpP color='#009BEB'>600,000</MoneyBudgetComsumpP>
-                            <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
-                        </BudgetDiv>
-                    </MoneyCategoryProgressDiv>
-                    <MoneyStayDiv>
-                        <MoneyStayBarDiv paid="30%"/>
-                    </MoneyStayDiv>
-                    <MoneyCategoryProgressDiv>
-                        <MoneyTitleDiv>
-                            <MoneyCategoryP>기타</MoneyCategoryP>
-                            <MoneyComsumpP color="#008DE7">30%</MoneyComsumpP>
-                        </MoneyTitleDiv>
-                        <BudgetDiv>
-                            <MoneyBudgetComsumpP color='#008DE7'>600,000</MoneyBudgetComsumpP>
-                            <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
-                        </BudgetDiv>
-                    </MoneyCategoryProgressDiv>
-                    <MoneyEtcDiv>
-                        <MoneyEtcBarDiv paid="30%"/>
-                    </MoneyEtcDiv>
-                </MoneyDiv>
-              <CategoryShareDiv>
-                  <CategoryTitleDiv>
-                      <CategoryTitleFontDiv>
-                          <ShareIcon/>
-                          <TitleP>여행 공유 옵션</TitleP>
-                      </CategoryTitleFontDiv>
-                      <RightArrow/>
-                  </CategoryTitleDiv>
-              </CategoryShareDiv>
-          </ContentDiv>
-        </DetailDiv>
-      </>
-    )
+  useEffect(() => {
+    dispatch(pageMove("travels"));
+  }, [dispatch]);
+
+  const { id } = useParams();
+
+  const travel = useSelector( (state:RootState) => selectTravelByTitleId(state, Number(id)));
+
+  const hexToRgba = (hex:string, alpha:string) => {
+    // hex 코드에서 # 제거
+    const strippedHex = hex.replace('#', '');
+
+    // 16진수 값으로 변환
+    const r = parseInt(strippedHex.substring(0, 2), 16);
+    const g = parseInt(strippedHex.substring(2, 4), 16);
+    const b = parseInt(strippedHex.substring(4, 6), 16);
+
+    // rgba 문자열 생성
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+
+  return (
+    <>
+    <BackHeader title="고래상어보러가자"></BackHeader>
+    <DetailDiv>
+      <Img src={SampleImg}></Img>
+      <Overlay />
+      <ContentDiv>
+          <TravelCardDiv>
+          <OngoingTravelDetailCard />
+          </TravelCardDiv>
+          <TravelDetailPay/>
+          <CategoryBudgetDiv>
+              <CategoryTitleDiv>
+                  <CategoryTitleFontDiv>
+                      <PayIcon/>
+                      <TitleP>여행 지출 내역</TitleP>
+                  </CategoryTitleFontDiv>
+                  <RightArrow/>
+              </CategoryTitleDiv>
+          </CategoryBudgetDiv>
+            <MoneyDiv>
+                <MoneyCategoryDiv>
+                    <MoneyCategoryP>항공</MoneyCategoryP>
+                    <MoneyCategoryP>600,000원</MoneyCategoryP>
+                </MoneyCategoryDiv>
+                <MoneyCategoryProgressDiv>
+                    <MoneyTitleDiv>
+                        <MoneyCategoryP>식사</MoneyCategoryP>
+                        <MoneyComsumpP color="#00D5FF">30%</MoneyComsumpP>
+                    </MoneyTitleDiv>
+                    <BudgetDiv>
+                        <MoneyBudgetComsumpP color='#00D5FF'>600,000</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                    </BudgetDiv>
+                </MoneyCategoryProgressDiv>
+                <MoneyChartConsumpBar color={hexToRgba("#00D5FF","0.3")}>
+                    <MoneyChartBar paid="80%" color="#00D5FF"/>
+                </MoneyChartConsumpBar>
+                <MoneyCategoryProgressDiv>
+                    <MoneyTitleDiv>
+                        <MoneyCategoryP>교통</MoneyCategoryP>
+                        <MoneyComsumpP color="#00C8FB">30%</MoneyComsumpP>
+                    </MoneyTitleDiv>
+                    <BudgetDiv>
+                        <MoneyBudgetComsumpP color='#00C8FB'>600,000</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                    </BudgetDiv>
+                </MoneyCategoryProgressDiv>
+                <MoneyChartConsumpBar color={hexToRgba("#00C8FB","0.3")}>
+                    <MoneyChartBar paid="30%" color="#00C8FB"/>
+                </MoneyChartConsumpBar>
+                <MoneyCategoryProgressDiv>
+                    <MoneyTitleDiv>
+                        <MoneyCategoryP>관광</MoneyCategoryP>
+                        <MoneyComsumpP color="#00B8F5">30%</MoneyComsumpP>
+                    </MoneyTitleDiv>
+                    <BudgetDiv>
+                        <MoneyBudgetComsumpP color='#00B8F5'>600,000</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                    </BudgetDiv>
+                </MoneyCategoryProgressDiv>
+                <MoneyChartConsumpBar  color={hexToRgba("#00B8F5","0.3")}>
+                    <MoneyChartBar paid="30%" color="#00B8F5"/>
+                </MoneyChartConsumpBar>
+                <MoneyCategoryProgressDiv>
+                    <MoneyTitleDiv>
+                        <MoneyCategoryP>쇼핑</MoneyCategoryP>
+                        <MoneyComsumpP color="#00ACF1">30%</MoneyComsumpP>
+                    </MoneyTitleDiv>
+                    <BudgetDiv>
+                        <MoneyBudgetComsumpP color='#00ACF1'>600,000</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                    </BudgetDiv>
+                </MoneyCategoryProgressDiv>
+                <MoneyChartConsumpBar  color={hexToRgba("#00ACF1","0.3")}>
+                    <MoneyChartBar paid="30%" color='#00ACF1'/>
+                </MoneyChartConsumpBar>
+                <MoneyCategoryProgressDiv>
+                    <MoneyTitleDiv>
+                        <MoneyCategoryP>숙박</MoneyCategoryP>
+                        <MoneyComsumpP color="#009BEB">30%</MoneyComsumpP>
+                    </MoneyTitleDiv>
+                    <BudgetDiv>
+                        <MoneyBudgetComsumpP color='#009BEB'>600,000</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                    </BudgetDiv>
+                </MoneyCategoryProgressDiv>
+                <MoneyChartConsumpBar color={hexToRgba("#009BEB","0.3")}>
+                    <MoneyChartBar paid="30%"  color='#009BEB'/>
+                </MoneyChartConsumpBar>
+                <MoneyCategoryProgressDiv>
+                    <MoneyTitleDiv>
+                        <MoneyCategoryP>기타</MoneyCategoryP>
+                        <MoneyComsumpP color="#008DE7">30%</MoneyComsumpP>
+                    </MoneyTitleDiv>
+                    <BudgetDiv>
+                        <MoneyBudgetComsumpP color='#008DE7'>600,000</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                    </BudgetDiv>
+                </MoneyCategoryProgressDiv>
+                <MoneyChartConsumpBar color={hexToRgba("#008DE7","0.3")}>
+                    <MoneyChartBar paid="30%" color='#008DE7'/>
+                </MoneyChartConsumpBar>
+            </MoneyDiv>
+          <CategoryShareDiv>
+              <CategoryTitleDiv>
+                  <CategoryTitleFontDiv>
+                      <ShareIcon/>
+                      <TitleP>여행 공유 옵션</TitleP>
+                  </CategoryTitleFontDiv>
+                  <RightArrow/>
+              </CategoryTitleDiv>
+          </CategoryShareDiv>
+      </ContentDiv>
+    </DetailDiv>
+  </>
+  );
 }
 
-export default OngoingTravelDetailPage;
+export default CompletedTravelDetailPage;

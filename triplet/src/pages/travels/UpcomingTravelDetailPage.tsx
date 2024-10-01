@@ -113,94 +113,20 @@ const MoneyCategoryProgressDiv = styled.div`
 
 interface MonyeProgressProps {
     paid : string;
+    color : string;
 }
 
-const MoneyEatDiv = styled.div`
+const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
     width: 100%;
-    background-color: rgba(0,213,255,0.5);
+    background-color: ${props => props.color};
     border-radius: 50px;
     overflow: hidden;
     height: 20px;
 `;
 
-const MoneyEatBarDiv = styled.div<MonyeProgressProps>`
+const MoneyChartBar = styled.div<MonyeProgressProps>`
     height : 100%;
-    background-color : rgba(0,213,255);
-    width : ${props => props.paid || '50%'};
-    border-radius : 50px;
-`
-
-const MoneyRideDiv = styled.div`
-    width: 100%;
-    background-color: rgba(0,200,251,0.5);
-    border-radius: 50px;
-    overflow: hidden;
-    height: 20px;
-`;
-
-const MoneyRideBarDiv = styled.div<MonyeProgressProps>`
-    height : 100%;
-    background-color : rgba(0,200,251);
-    width : ${props => props.paid || '50%'};
-    border-radius : 50px;
-`
-
-const MoneyTourDiv = styled.div`
-    width: 100%;
-    background-color: rgba(0,184,245,0.5);
-    border-radius: 50px;
-    overflow: hidden;
-    height: 20px;
-`;
-
-const MoneyTourBarDiv = styled.div<MonyeProgressProps>`
-    height : 100%;
-    background-color : rgba(0, 184, 245);
-    width : ${props => props.paid || '50%'};
-    border-radius : 50px;
-`
-
-const MoneyShopDiv = styled.div`
-    width: 100%;
-    background-color: rgba(0,172,241,0.5);
-    border-radius: 50px;
-    overflow: hidden;
-    height: 20px;
-`;
-
-const MoneyShopBarDiv = styled.div<MonyeProgressProps>`
-    height : 100%;
-    background-color : rgba(0, 172, 241);
-    width : ${props => props.paid || '50%'};
-    border-radius : 50px;
-`
-
-const MoneyStayDiv = styled.div`
-    width: 100%;
-    background-color: rgba(0,155,235,0.5);
-    border-radius: 50px;
-    overflow: hidden;
-    height: 20px;
-`;
-
-const MoneyStayBarDiv = styled.div<MonyeProgressProps>`
-    height : 100%;
-    background-color : rgba(0, 155, 235);
-    width : ${props => props.paid || '50%'};
-    border-radius : 50px;
-`
-
-const MoneyEtcDiv = styled.div`
-    width: 100%;
-    background-color: rgba(0,141,231,0.5);
-    border-radius: 50px;
-    overflow: hidden;
-    height: 20px;
-`;
-
-const MoneyEtcBarDiv = styled.div<MonyeProgressProps>`
-    height : 100%;
-    background-color : rgba(0, 141, 231);
+    background-color : ${props => props.color};
     width : ${props => props.paid || '50%'};
     border-radius : 50px;
 `
@@ -211,14 +137,6 @@ const MoneyCategoryP = styled.p`
     font-weight : 600;
     margin : 0;
     margin-left : 2px;
-`
-
-const MoneyP = styled.p`
-    color : #666666;
-    font-size : 16px;
-    font-wegiht : 500;
-    margin : 0
-    margin-right : 2px;
 `
 
 const MoneyTitleDiv = styled.div`
@@ -260,7 +178,7 @@ const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
 `;
 
 
-const UpcomingTravelDetailPage = () => {
+const CompletedTravelDetailPage = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -271,6 +189,18 @@ const UpcomingTravelDetailPage = () => {
 
   const travel = useSelector( (state:RootState) => selectTravelByTitleId(state, Number(id)));
 
+  const hexToRgba = (hex:string, alpha:string) => {
+    // hex 코드에서 # 제거
+    const strippedHex = hex.replace('#', '');
+
+    // 16진수 값으로 변환
+    const r = parseInt(strippedHex.substring(0, 2), 16);
+    const g = parseInt(strippedHex.substring(2, 4), 16);
+    const b = parseInt(strippedHex.substring(4, 6), 16);
+
+    // rgba 문자열 생성
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
 
   return (
     <>
@@ -307,9 +237,9 @@ const UpcomingTravelDetailPage = () => {
                         <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
-                <MoneyEatDiv>
-                    <MoneyEatBarDiv paid="80%"/>
-                </MoneyEatDiv>
+                <MoneyChartConsumpBar color={hexToRgba("#00D5FF","0.3")}>
+                    <MoneyChartBar paid="80%" color="#00D5FF"/>
+                </MoneyChartConsumpBar>
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
                         <MoneyCategoryP>교통</MoneyCategoryP>
@@ -320,9 +250,9 @@ const UpcomingTravelDetailPage = () => {
                         <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
-                <MoneyRideDiv>
-                    <MoneyRideBarDiv paid="30%"/>
-                </MoneyRideDiv>
+                <MoneyChartConsumpBar color={hexToRgba("#00C8FB","0.3")}>
+                    <MoneyChartBar paid="30%" color="#00C8FB"/>
+                </MoneyChartConsumpBar>
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
                         <MoneyCategoryP>관광</MoneyCategoryP>
@@ -333,9 +263,9 @@ const UpcomingTravelDetailPage = () => {
                         <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
-                <MoneyTourDiv>
-                    <MoneyTourBarDiv paid="30%"/>
-                </MoneyTourDiv>
+                <MoneyChartConsumpBar  color={hexToRgba("#00B8F5","0.3")}>
+                    <MoneyChartBar paid="30%" color="#00B8F5"/>
+                </MoneyChartConsumpBar>
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
                         <MoneyCategoryP>쇼핑</MoneyCategoryP>
@@ -346,9 +276,9 @@ const UpcomingTravelDetailPage = () => {
                         <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
-                <MoneyShopDiv>
-                    <MoneyShopBarDiv paid="30%"/>
-                </MoneyShopDiv>
+                <MoneyChartConsumpBar  color={hexToRgba("#00ACF1","0.3")}>
+                    <MoneyChartBar paid="30%" color='#00ACF1'/>
+                </MoneyChartConsumpBar>
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
                         <MoneyCategoryP>숙박</MoneyCategoryP>
@@ -359,9 +289,9 @@ const UpcomingTravelDetailPage = () => {
                         <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
-                <MoneyStayDiv>
-                    <MoneyStayBarDiv paid="30%"/>
-                </MoneyStayDiv>
+                <MoneyChartConsumpBar color={hexToRgba("#009BEB","0.3")}>
+                    <MoneyChartBar paid="30%"  color='#009BEB'/>
+                </MoneyChartConsumpBar>
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
                         <MoneyCategoryP>기타</MoneyCategoryP>
@@ -372,9 +302,9 @@ const UpcomingTravelDetailPage = () => {
                         <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
-                <MoneyEtcDiv>
-                    <MoneyEtcBarDiv paid="30%"/>
-                </MoneyEtcDiv>
+                <MoneyChartConsumpBar color={hexToRgba("#008DE7","0.3")}>
+                    <MoneyChartBar paid="30%" color='#008DE7'/>
+                </MoneyChartConsumpBar>
             </MoneyDiv>
           <CategoryShareDiv>
               <CategoryTitleDiv>
@@ -391,4 +321,4 @@ const UpcomingTravelDetailPage = () => {
   );
 }
 
-export default UpcomingTravelDetailPage;
+export default CompletedTravelDetailPage;
