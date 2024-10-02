@@ -10,6 +10,8 @@ import { ReactComponent as RightArrow} from '../../assets/common/rightArrow.svg'
 
 import Logout from '../user/logout/LogoutModal';
 import WithdrawalModal from '../user/withdrawal/WithdrawalModal';
+import { useSelector } from 'react-redux';
+import { userInfo } from 'os';
 
 const PageDiv = styled.div`
     background-color : #F3F4F6;
@@ -104,31 +106,15 @@ const MyPage = () => {
 
     const title = "마이페이지"
     const dispatch = useDispatch();
-    const [ name, setName ] = useState('');
-    const [ birth, setBirth ] = useState('');
-    const [ phoneNum, setPhoneNum ] = useState('');
     const [ isLogOutOpen, setIsLogOutOpen ] = useState(false);
+    const userData = useSelector((state:any) => state.userInfo);
+
+    const { name, birth, phoneNumber } = userData;
 
     useEffect(() => {
         dispatch(pageMove("mypage"));
     }, [])
 
-    const { data: infoData, error: infoError, loading: infoLoading,
-        status: infoStatus, refetch: infoRefetch }
-        = useAxios('/user/my', 'GET');
-
-    useEffect(() => {
-        infoRefetch();
-    },[])
-
-    useEffect(() => {
-        if(infoData!==null){
-            console.log(infoData);
-            setName(infoData.data.name);
-            setBirth(infoData.data.birth);
-            setPhoneNum(infoData.data.phoneNumber);
-        }
-    },[infoData]);
 
     const openLogout = () => {
         setIsLogOutOpen(true);
@@ -160,7 +146,7 @@ const MyPage = () => {
                     </InfoDiv>
                     <InfoDiv>
                         <InfoP>전화번호</InfoP>
-                        <CategoryP>{phoneNum}</CategoryP>
+                        <CategoryP>{phoneNumber}</CategoryP>
                     </InfoDiv>
                 </MyInfoDiv>
                 <MyInfoConfigDiv>

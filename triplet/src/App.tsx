@@ -45,7 +45,9 @@ const App: React.FC = () => {
   const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
   useEffect(() => {
-    const offPages = ["/login", "/signup", "/simple-password/set","/simple-password/setConfirm" ,"/simple-password/confirm", "/pay/qr"];
+    const offPages = ["/login", "/signup", "/simple-password/set","/simple-password/setConfirm" ,"/simple-password/confirm", "/pay/qr",
+      "/mypage/info-set"
+    ];
     if (offPages.includes(location.pathname)) {
       setIsActive(false);
     } else {

@@ -5,7 +5,7 @@ import Header from '../../components/header/Header';
 import { useSelector, useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
 import { ongoingTravelDataInsert } from '../../features/travel/ongoingTravelSlice';
-import { Link as RouterLink} from 'react-router-dom';
+import { Link as RouterLink, useNavigate} from 'react-router-dom';
 
 import { ReactComponent as SimplePay} from '../../assets/main/simplePay.svg';
 import { ReactComponent as TravelPlan} from '../../assets/main/travelPlan.svg';
@@ -22,6 +22,7 @@ import UpcomingTravelCard from '../../components/travel/UpcomingTravelCard';
 import useAxios from '../../hooks/useAxios';
 import UpcomingTravelHomeCard from '../../components/travel/UpcomingTravelHomeCard';
 import CreateTravelCard from '../../components/travel/CreateTravelCard';
+import { setUserInfo } from '../../features/user/userInfoSlice';
 
 const MainDiv = styled.div`
     background-color: #F3F4F6;
@@ -159,6 +160,7 @@ const ButtonArea = styled.div`
 
 const HomePage = () => {
 
+    const navigate = useNavigate();
     const dispatch = useDispatch();
 
     useEffect(()=>{
@@ -168,9 +170,11 @@ const HomePage = () => {
     // Redux 스토어에서 데이터를 가져옴
     const travelData = useSelector((state:any) => state.ongoingTravel);
     const upcomingData = useSelector((state: any) => state.upcomingTravels?.travels || []);
+    const userData = useSelector((state:any) => state.userInfo);
 
     // useAxios 훅으로 데이터 요청
     const { data: infoData, error: infoError, refetch: infoRefetch } = useAxios("/travels/ongoing", "GET");
+    const { data : userInfoData, error: userInfoError, status: userInfoStatus, refetch: userInfoRefetch } = useAxios("/user/my","GET");
 
     // 컴포넌트가 처음 렌더링될 때, 데이터가 없으면 Axios 요청을 트리거
     useEffect(() => {
@@ -178,6 +182,12 @@ const HomePage = () => {
             infoRefetch();
         }
     }, [travelData.travelId]);
+
+    useEffect(()=>{
+        if (!userData.memberId) {
+            userInfoRefetch();
+        }
+    }, [userData])
 
     // Axios 요청 결과를 Redux 스토어에 저장
     useEffect(() => {
@@ -206,7 +216,40 @@ const HomePage = () => {
         }
     }, [infoData, infoError]);
 
+    useEffect(() => {
 
+        // userInfoData가 존재하고, userInfoStatus가 200일 때 Redux에 데이터를 저장
+        if (userInfoData && userInfoStatus === 200 && userInfoData.data) {
+            dispatch(setUserInfo({
+                memberId: userInfoData.data.memberId,
+                name: userInfoData.data.name,
+                birth: userInfoData.data.birth,
+                gender: userInfoData.data.gender,
+                phoneNumber: userInfoData.data.phoneNumber,
+            }));
+        }
+    
+        if(userInfoStatus!==null&&userInfoStatus!==200){
+            console.log(userInfoStatus);
+            // userInfoData가 없거나 필드가 null/undefined일 때 '/mypage/info-set'으로 이동
+            if (!userInfoData || !userInfoData.data) {
+                navigate('/mypage/info-set');
+            } else if (userInfoData.data){
+                const { memberId, name, birth, gender, phoneNumber } = userInfoData.data;
+                if (
+                    memberId === null || memberId === undefined ||
+                    name === null || name === undefined ||
+                    birth === null || birth === undefined ||
+                    gender === null || gender === undefined ||
+                    phoneNumber === null || phoneNumber === undefined
+                ) {
+                    navigate('/mypage/info-set');
+                }
+            }
+        }
+    }, [userInfoData, userInfoError]);
+    
+ 
     return (
         <MainDiv>
             <Header/>
