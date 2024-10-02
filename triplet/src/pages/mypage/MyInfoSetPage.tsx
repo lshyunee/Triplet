@@ -20,11 +20,12 @@ const EntireDiv = styled.div`
     min-height : 600px;
     margin : 0px 16px 0;
     height : calc(100vh - 112px);
-    padding-top : 56px;
+    padding : 56px 0;
 `;
 
 const InputDiv = styled.div`
     margin-top : 40px;
+    margin-bottom : 27px;
 `;
 
 const NumP = styled.p`
@@ -122,7 +123,6 @@ const ConfirmBtn = styled.button`
     font-size : 14px;
     border : none;
     margin-top : 66px;
-    margin-bottom : 28px;
 `;
 
 
@@ -204,12 +204,21 @@ const MyInfoSetPage = () => {
             phoneRefetch();
         };
 
+    const [ isSend, setIsSend ] = useState(false);
+
     useEffect(() => {
-        if( phoneError!==null ){
+        
+        if(phoneError!==null && phoneStatus!==200){
+            console.log(phoneError);
             const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
             setErrorMsg(message);
             isErrorOpen();
         }
+        
+        if(phoneData !== null && phoneStatus===200){
+            setIsSend(true);
+        }
+
     }, [phoneData, phoneError])
 
     const { data : smsData, error: smsError, loading: smsLoading,
@@ -220,15 +229,6 @@ const MyInfoSetPage = () => {
     const certificateCheck = () => {
         smsRefetch();
     }
-
-    useEffect(() => {
-        if(phoneError!==null && phoneStatus!==200){
-            console.log(phoneError);
-            const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
-            setErrorMsg(message);
-            isErrorOpen();
-        }
-    }, [phoneData, phoneError])
 
     const [ isCheck, setIsCheck ] = useState(false);
 
@@ -265,7 +265,7 @@ const MyInfoSetPage = () => {
     useEffect(() => {
 
         if(editData !== null){
-            setMsg("정보 수정이 완료 되었습니다.");
+            setMsg("내 정보 등록이 완료 되었습니다.");
             isModalOpen();
             navigate(-1);
         }
@@ -304,7 +304,7 @@ const MyInfoSetPage = () => {
 
     return (
         <>
-            <BackHeader title={"내 정보 수정"}/>
+            <BackHeader title={"내 정보 등록"}/>
             <EntireDiv>
                 <InputDiv>
                     <InputDistanceDiv>
@@ -328,7 +328,7 @@ const MyInfoSetPage = () => {
                             <StyledInput type="text" {...phoneNumMiddle} disabled={isCheck}/>
                             <NumP>-</NumP>
                             <StyledInput type="text" {...phoneNumBack} disabled={isCheck}/>
-                            <StyledBtn onClick={certificateSend} disabled={isCheck}>인증번호 발송</StyledBtn>
+                            <StyledBtn onClick={certificateSend} disabled={isSend}>인증번호 발송</StyledBtn>
                         </PhoneDiv>
                     </InputDistanceDiv>
                     <InputDistanceDiv>
