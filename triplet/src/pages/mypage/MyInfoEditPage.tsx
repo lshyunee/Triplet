@@ -204,12 +204,21 @@ const MyInfoEditPage = () => {
             phoneRefetch();
         };
 
+    const [ isSend, setIsSend ] = useState(false);
+
     useEffect(() => {
-        if( phoneError!==null ){
+        
+        if(phoneError!==null && phoneStatus!==200){
+            console.log(phoneError);
             const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
             setErrorMsg(message);
             isErrorOpen();
         }
+        
+        if(phoneData !== null && phoneStatus===200){
+            setIsSend(true);
+        }
+
     }, [phoneData, phoneError])
 
     const { data : smsData, error: smsError, loading: smsLoading,
@@ -220,15 +229,6 @@ const MyInfoEditPage = () => {
     const certificateCheck = () => {
         smsRefetch();
     }
-
-    useEffect(() => {
-        if(phoneError!==null && phoneStatus!==200){
-            console.log(phoneError);
-            const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
-            setErrorMsg(message);
-            isErrorOpen();
-        }
-    }, [phoneData, phoneError])
 
     const [ isCheck, setIsCheck ] = useState(false);
 
@@ -328,7 +328,7 @@ const MyInfoEditPage = () => {
                             <StyledInput type="text" {...phoneNumMiddle} disabled={isCheck}/>
                             <NumP>-</NumP>
                             <StyledInput type="text" {...phoneNumBack} disabled={isCheck}/>
-                            <StyledBtn onClick={certificateSend} disabled={isCheck}>인증번호 발송</StyledBtn>
+                            <StyledBtn onClick={certificateSend} disabled={isSend}>인증번호 발송</StyledBtn>
                         </PhoneDiv>
                     </InputDistanceDiv>
                     <InputDistanceDiv>

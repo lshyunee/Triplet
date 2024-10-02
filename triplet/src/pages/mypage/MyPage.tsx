@@ -14,8 +14,8 @@ import WithdrawalModal from '../user/withdrawal/WithdrawalModal';
 const PageDiv = styled.div`
     background-color : #F3F4F6;
     width: 100%;
-    min-height: 100vh;
-    padding-top : 56px;
+    min-height: (100vh - 112px);
+    padding : 56px 0;
     > *{
         margin-bottom : 8px;
     }
