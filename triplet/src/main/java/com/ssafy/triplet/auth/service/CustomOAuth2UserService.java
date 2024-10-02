@@ -20,6 +20,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        log.info("loadUser");
         OAuth2User oAuth2User = super.loadUser(userRequest);
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
@@ -34,14 +35,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String username = oAuth2Response.getProvider() + " " + oAuth2Response.getProviderId();
 
         Member existData = memberRepository.findByMemberId(username);
-        log.info("existData = {}", existData);
 
         if (existData == null) {
             Member member = Member.builder()
                     .memberId(username)
                     .role("ROLE_USER")
                     .build();
-            log.info("existData22222 = {}", existData);
 
             memberRepository.save(member);
             MemberAuthDto memberAuthDto = new MemberAuthDto(username, "ROLE_USER");
