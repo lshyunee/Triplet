@@ -38,7 +38,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 "/api/v1/signup",
                 "/api/v1/reissue",
                 "/api/v1/sms",
-                "/api/v1/oauth2/authorization"
+                "/api/v1/oauth2/authorization",
+                "/api/v1/login/oauth2/code"
         );
         String requestURI = request.getRequestURI();
         log.info("requestURI: {}", requestURI);

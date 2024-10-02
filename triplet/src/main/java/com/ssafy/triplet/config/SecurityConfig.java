@@ -51,6 +51,8 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig
                                 .baseUri("/api/v1/oauth2/authorization"))
+                        .redirectionEndpoint(redirectionEndpointConfig -> redirectionEndpointConfig
+                                .baseUri("/api/v1/login/oauth2/code"))  // OAuth2 콜백 경로 설정
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
                         .successHandler(customSuccessHandler));
@@ -58,7 +60,7 @@ public class SecurityConfig {
         http // 경로별 인가 작업
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/error", "/api/v1/login", "/api/v1/signup",
-                                "/api/v1/signup/is-duplicated",
+                                "/api/v1/signup/is-duplicated", "/api/v1/login/oauth2/code/**",
                                 "/api/v1/reissue", "/api/v1/sms/**").permitAll()
                         .anyRequest().hasRole("USER")
                 );

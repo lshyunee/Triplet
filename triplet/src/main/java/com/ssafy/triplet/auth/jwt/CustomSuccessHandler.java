@@ -53,7 +53,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 + (authorizationRefresh.getSecure() ? "; Secure" : "")
                 + "; SameSite=None");
         // 클라이언트로 redirect
-        response.sendRedirect("https://j11b202.p.ssafy.io/home");
+        response.sendRedirect("https://j11b202.p.ssafy.io/mypage/info-set");
     }
 
     private Cookie createCookie(String key, String value) {
