@@ -8,6 +8,10 @@ import { ReactComponent as Calendar } from '../../assets/pay/calendar.svg';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 
+import { ReactComponent as Plus } from '../../assets/common/plus.svg';
+import { ReactComponent as Minus } from '../../assets/common/minus.svg';
+
+
 const s = {
   Container: styled.div`
     margin-top: 56px;
@@ -52,6 +56,10 @@ const s = {
     margin-bottom: 4px;
     margin-left: 4px;
   `,
+  InputBoxArea: styled.div`
+    width: 100%;
+    display: flex;
+  `,
   InputBox: styled.input`
     font-size: 14px;
     font-weight: 500;
@@ -72,6 +80,32 @@ const s = {
     width: 100%;
     padding: 0 16px;
   `,
+  Number: styled.p`
+    font-weight : 500;
+    font-size : 14px;
+  `,
+  NumberArea: styled.div`
+    display: flex;
+    justify-content: center; /* 중앙 정렬 */
+    align-items: center;
+    background-color: #F9FAFC;
+    border: 1px solid #F0F0F0;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    width: 106px;
+    height: 44px;
+    gap: 16px; /* 버튼과 숫자 사이의 간격 */
+  `,
+  CountArea: styled.div`
+    display: flex;
+    flex-direction: row;
+  `,
+  UnitText: styled.p`
+    font-weight: 500;
+    font-size: 14px;
+    margin-left: 8px;
+  `
 }
 
 
@@ -99,10 +133,54 @@ const CreateTravelPage = () => {
     };
   }, [isDateOpen]);
 
+  const [ isErrorOpen, setIsErrorOpen ] = useState(false);
+  const [ errorMsg, setErrorMsg ] = useState('');
+  const [ person, setPerson ] = useState(1);
+
+  const errorOpen = () => {
+    setIsErrorOpen(true);
+  }
+
+  const decreasePerson = () => {
+    if(person === 1){
+      setErrorMsg("인원수는 1 이상이어야 합니다.");
+      errorOpen();
+      return;
+    }
+    setPerson(person-1);
+  }
+
+  const increasePerson = () => {
+    setPerson(person+1);
+  }
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [image, setImage] = useState<string>();
+  const [changeImg, setChangeImg] = useState<File>();
+  const [imgUrl, setImgUrl] = useState<string>();
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFilesArray = Array.from(e.target.files);
+      const file = e.target.files?.[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          setImage(reader.result as string);
+          setImgUrl(URL.createObjectURL(file));
+        };
+        setChangeImg(newFilesArray[0]);
+        reader.readAsDataURL(file);
+      };
+    };
+  };
+
   return (
     <>
     <BackHeader title='여행 등록'/>
     <s.Container>
+      <s.InputText>여행 제목</s.InputText>
+      <s.InputBoxArea><s.InputBox placeholder='여행 제목을 입력하세요.'></s.InputBox></s.InputBoxArea>
       <s.InputText>여행 일정</s.InputText>
       <s.CalendarButton>
         <s.CalendarTextArea onClick={() => setIsDateOpen(true)}>
@@ -124,7 +202,26 @@ const CreateTravelPage = () => {
         <option value="dd">ㄴㅇㄹ</option>
       </s.DropDown>
       <s.InputText>여행 인원</s.InputText>
-      <s.InputBox placeholder='여행 인원을 입력하세요.'/>
+      <s.CountArea>
+        <s.NumberArea>
+          <Minus onClick={decreasePerson}></Minus>
+          <s.Number>{person}</s.Number>
+          <Plus onClick={increasePerson}></Plus>
+        </s.NumberArea>
+        <s.UnitText>명</s.UnitText>
+      </s.CountArea>
+      <s.InputText>여행 이미지</s.InputText>
+      <button onClick={() => {
+        fileInputRef.current?.click()
+      }}>bbbb</button>
+      <input
+        ref={fileInputRef}
+        type='file'
+        accept='image/*'
+        multiple
+        style={{display: 'none'}}
+        onChange={handleImageUpload}
+      />
     </s.Container>
     </>
   );

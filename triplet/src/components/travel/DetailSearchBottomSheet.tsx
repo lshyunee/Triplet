@@ -97,7 +97,7 @@ const NumberP = styled.p`
 
 const BudgetP = styled.p`
   font-weight : 500;
-  font-size : !4px;
+  font-size : 14px;
 `
 
 const NumberDiv = styled.div`
@@ -135,7 +135,7 @@ const SaveButton = styled.button`
 
 const BudgetInput = styled.input`
   width : 106px;
-  hegiht : 44px;
+  height : 44px;
   color : black;
   background-color : #F9FAFC;
   border : 1px solid #F0F0F0;
@@ -252,7 +252,7 @@ const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({
   const [ person, setPerson ] = useState(1);
 
   const decreasePerson = () => {
-    if(person==1){
+    if(person === 1){
       setErrorMsg("인원수는 1 이상이어야 합니다.");
       errorOpen();
       return;
