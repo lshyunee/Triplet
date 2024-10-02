@@ -31,6 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        log.info("JWT Filter");
         // 아래 경로에 포함되면 jwt검사 생략
         List<String> whiteList = List.of(
                 "/error",

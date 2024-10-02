@@ -3,6 +3,7 @@ package com.ssafy.triplet.config;
 import com.ssafy.triplet.auth.jwt.*;
 import com.ssafy.triplet.auth.service.CustomOAuth2UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
+    private final CustomFailureHandler customFailureHandler;
     private final CustomAuthenticationProvider customAuthenticationProvider;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final CorsConfigurationSource corsConfigurationSource;
@@ -36,6 +38,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        log.info("securityFilterChain");
         http // cors 설정
                 .cors(cors -> cors.configurationSource(corsConfigurationSource));
         http // form 로그인 disable
@@ -55,7 +58,8 @@ public class SecurityConfig {
                                 .baseUri("/api/v1/login/oauth2/code/*"))  // OAuth2 콜백 경로 설정
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
-                        .successHandler(customSuccessHandler));
+                        .successHandler(customSuccessHandler)
+                        .failureHandler(customFailureHandler));
 
         http // 경로별 인가 작업
                 .authorizeHttpRequests(auth -> auth
