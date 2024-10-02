@@ -38,8 +38,8 @@ const StyledInput = styled.input`
 
 const PasswordDiv = styled.div`
     margin : 0 16px 0;
-    height : calc(100vh - 112px);
-    padding-top : 56px;
+    min-height : calc (100vh - 112px);
+    padding : 56px 0;
 
 `;
 

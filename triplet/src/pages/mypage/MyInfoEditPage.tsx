@@ -20,11 +20,12 @@ const EntireDiv = styled.div`
     min-height : 600px;
     margin : 0px 16px 0;
     height : calc(100vh - 112px);
-    padding-top : 56px;
+    padding : 56px 0;
 `;
 
 const InputDiv = styled.div`
     margin-top : 40px;
+    margin-bottom : 27px;
 `;
 
 const NumP = styled.p`
@@ -122,7 +123,6 @@ const ConfirmBtn = styled.button`
     font-size : 14px;
     border : none;
     margin-top : 66px;
-    margin-bottom : 28px;
 `;
 
 
