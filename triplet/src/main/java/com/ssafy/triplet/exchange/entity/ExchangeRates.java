@@ -24,4 +24,10 @@ public class ExchangeRates {
 
     int exchangeMin;
 
+    // 환율 변화율
+    String changePercentage;
+
+    // 환율 변화 상태 -1 : 하락, 0: 변화없음 1: 상승
+    int changeStatus;
+
 }

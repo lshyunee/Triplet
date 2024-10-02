@@ -2,7 +2,6 @@ package com.ssafy.triplet.exchange.controller;
 
 import com.ssafy.triplet.auth.dto.CustomUserPrincipal;
 import com.ssafy.triplet.exchange.dto.request.ExchangeRateCalculatorRequest;
-import com.ssafy.triplet.exchange.dto.response.ExchangeRateResponse;
 import com.ssafy.triplet.exchange.entity.ExchangeRates;
 import com.ssafy.triplet.exchange.service.ExchangeRateService;
 import com.ssafy.triplet.response.ApiResponse;
@@ -24,7 +23,7 @@ public class ExchangeRateController {
     @GetMapping("/exchange-rate-list")
     public ResponseEntity<?> getExchangeRate() {
 
-        List<ExchangeRateResponse> result = exchangeRateService.getExchangeRates();
+        List<ExchangeRates> result = exchangeRateService.getExchangeRates();
         return ResponseEntity.ok(new ApiResponse("200", "전체 환율 조회 성공", result));
     }
 
@@ -38,7 +37,7 @@ public class ExchangeRateController {
     @PostMapping("/exchange-cal")
     public ResponseEntity<?> calExchangeRate(@RequestBody ExchangeRateCalculatorRequest request) {
 
-        Map<String, Object> response = exchangeRateService.getCurrentExchangeRateCalculator(request);
+        Map<String, Object> response = exchangeRateService.calculateExchangeRate(request);
 
         return ResponseEntity.ok(new ApiResponse("200", (String) response.get("message"), response.get("result")));
 
@@ -50,7 +49,7 @@ public class ExchangeRateController {
 
         Map<String, Object> response = exchangeRateService.exchange(customUserPrincipal.getMemberId(),request);
 
-        return ResponseEntity.ok(new ApiResponse("200", (String) response.get("message"), response.get("result")));
+        return ResponseEntity.ok(new ApiResponse("200", "환전 성공", response.get("result")));
 
     }
 }
