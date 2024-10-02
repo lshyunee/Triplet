@@ -26,6 +26,7 @@ import CreateTravelPage from '../pages/travels/CreateTravelPage';
 import UpcomingTravelDetailPage from '../pages/travels/UpcomingTravelDetailPage';
 import OngoingTravelDetailPage from '../pages/travels/OngoingTravelDetailPage';
 import CompletedTravelDetailPage from '../pages/travels/CompletedTravelDetailPage';
+import MyInfoSetPage from '../pages/mypage/MyInfoSetPage';
 
 const AppRoutes: React.FC = () => (
         <Routes>
@@ -34,6 +35,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/signup" element={<Signup/>}/>
             <Route path="/feed" element={<FeedPage/>}/>
             <Route path="/mypage" element={<MyPage/>} />
+            <Route path="/mypage/info-set" element={<MyInfoSetPage/>}/>
             <Route path="/mypage/info-edit" element={<MyInfoEditPage/>} />
             <Route path="/mypage/password-edit" element={<PasswordEditPage/>} />
             <Route path="/simple-password/set" element={<SimplePasswordSetPage/>} />

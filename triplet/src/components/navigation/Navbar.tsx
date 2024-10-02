@@ -67,7 +67,7 @@ const Navbar = () => {
     <NavbarContainer>
       <StyledUl>
         <StyledLi>
-          <Link to="/home" style={{ textDecoration: 'none' }}>
+          <Link to="/" style={{ textDecoration: 'none' }}>
             {currentPage === 'home' ? <HomeImgActive /> : <HomeImg />}
             <StyledP isActive={currentPage === 'home'}>홈</StyledP>
           </Link>
