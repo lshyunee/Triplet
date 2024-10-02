@@ -15,8 +15,8 @@ const shuffleArray = (array: number[]) => {
 };
 
 const PasswordDiv = styled.div`
-    height : calc(100vh-56px);
-    padding : 0.3vh 0;
+    min-height : calc(100vh - 56px);
+    padding : 0.3vh 0 0;
 `
 
 const TitleDiv = styled.div`
@@ -24,7 +24,7 @@ const TitleDiv = styled.div`
     display : flex;
     flex-direction : column;
     text-align : center;
-    padding-top : 100px;
+    padding-top : 20vh;
 `;
 
 const Title = styled.p`
