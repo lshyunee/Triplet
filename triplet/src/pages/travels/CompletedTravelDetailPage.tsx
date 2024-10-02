@@ -6,7 +6,7 @@ import { pageMove } from '../../features/navigation/naviSlice';
 
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
 import BackHeader from '../../components/header/BackHeader';
-import OngoingTravelDetailCard from '../../components/travel/OngoingTravelDetailCard';
+import TravelDetailCard from '../../components/travel/TravelDetailCard';
 import TravelDetailPay from '../../components/travel/TravelDetailPay';
 
 import { ReactComponent as RightArrow } from '../../assets/common/rightArrow.svg';
@@ -14,6 +14,7 @@ import { ReactComponent as PayIcon } from '../../assets/common/payIcon.svg';
 import { ReactComponent as ShareIcon } from '../../assets/common/shareIcon.svg';
 import { selectTravelByTitleId } from '../../features/travel/upcomingTravelSlice';
 import { RootState } from '../../store';
+import useAxios from '../../hooks/useAxios';
 
 const DetailDiv = styled.div`
     padding : 56px 0 0 0;
@@ -177,19 +178,175 @@ const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
     color : ${props => props.color || "#666666"}
 `;
 
+interface TravelDetails {
+    travelId: number;
+    inviteCode: string;
+    country: string;
+    countryId: number;
+    currency: string;
+    startDate: Date;  // Date 타입
+    endDate: Date;    // Date 타입
+    title: string;
+    image: string;
+    creatorId: number;
+    myTravel: boolean;
+    memberCount: number;
+    totalBudget: number;
+    airportCost: number;
+    totalBudgetWon: number;
+    status: boolean;
+    shareStatus: boolean;
+    budgets: any[];
+}
+
+interface Budget {
+    categoryId: number;
+    categoryName: string;
+    categoryBudget: number;
+    usedBudget: number;
+    fiftyBudget: number;
+    eightyBudget: number;
+    budgetWon: number;
+}
+
+interface BudgetDetails {
+    isComplete: boolean;
+    budgetList: Budget[];
+}
 
 const CompletedTravelDetailPage = () => {
-  const dispatch = useDispatch();
+    const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(pageMove("travels"));
-  }, [dispatch]);
+    useEffect(() => {
+        dispatch(pageMove("travels"));
+    }, [dispatch]);
 
-  const { id } = useParams();
+    const { id } = useParams();
 
-  const travel = useSelector( (state:RootState) => selectTravelByTitleId(state, Number(id)));
+    const { data: travelData, error: travelError, 
+        status: travelStatus, refetch: travelRefetch    
+    } = useAxios(`/travels/${id}`, "GET");
 
-  const hexToRgba = (hex:string, alpha:string) => {
+    const { data: budgetData, error: budgetError,
+        status: budgetStatus, refetch: budgetRefetch
+    } = useAxios(`/expenditure-expenses/${id}`, "GET");
+
+    const [travelDetails, setTravelDetails] = useState<TravelDetails | null>(null);
+
+    useEffect(() => {
+        if (travelData) {
+            const {
+                travelId, inviteCode, country, countryId,
+                currency, startDate, endDate, title, image,
+                creatorId, myTravel, memberCount, totalBudget,
+                airportCost, totalBudgetWon, status,
+                shareStatus, budgets
+            } = travelData;
+
+            // startDate와 endDate가 문자열로 들어온다면, Date 객체로 변환
+            setTravelDetails({
+                travelId,
+                inviteCode,
+                country,
+                countryId,
+                currency,
+                startDate: new Date(startDate), // Date로 변환
+                endDate: new Date(endDate),     // Date로 변환
+                title,
+                image,
+                creatorId,
+                myTravel,
+                memberCount,
+                totalBudget,
+                airportCost,
+                totalBudgetWon,
+                status,
+                shareStatus,
+                budgets,
+            });
+        }
+    }, [travelData, travelError]);
+
+    let travelId: number = 0;
+    let inviteCode: string = '';
+    let country: string = '';
+    let countryId: number = 0;
+    let currency: string = '';
+    let startDate: Date = new Date(0);
+    let endDate: Date = new Date(0); 
+    let title: string = '';
+    let image: string = '';
+    let creatorId: number = 0;
+    let myTravel: boolean = false;
+    let memberCount: number = 0;
+    let totalBudget: number = 0;
+    let airportCost: number = 0;
+    let totalBudgetWon: number = 0;
+    let status: boolean = false;
+    let shareStatus: boolean = false;
+    let budgets: any[] = [];  // 빈 배열로 초기화
+
+    if (travelDetails) {
+        ({
+            travelId, inviteCode, country, countryId, currency, startDate, endDate, title, image, 
+            creatorId, myTravel, memberCount, totalBudget, airportCost, totalBudgetWon, status, 
+            shareStatus, budgets
+        } = travelDetails);
+    }
+
+    const [budgetDetails, setBudgetDetails] = useState<BudgetDetails | null>(null);
+
+    useEffect(() => {
+        if (budgetData) {
+            const { isComplete, budgetList } = budgetData;
+    
+            setBudgetDetails({
+                isComplete,
+                budgetList: budgetList.map((budget: Budget) => ({
+                    categoryId: budget.categoryId,
+                    categoryName: budget.categoryName,
+                    categoryBudget: budget.categoryBudget,
+                    usedBudget: budget.usedBudget,
+                    fiftyBudget: budget.fiftyBudget,
+                    eightyBudget: budget.eightyBudget,
+                    budgetWon: budget.budgetWon
+                }))
+            });
+        }
+    
+        if (budgetError) {
+            // Handle budgetError here
+        }
+    }, [budgetData, budgetError]);
+    
+    let categoryId: number = 0;
+    let categoryName: string = '';
+    let categoryBudget: number = 0;
+    let usedBudget: number = 0;
+    let fiftyBudget: number = 0;
+    let eightyBudget: number = 0;
+    let budgetWon: number = 0;
+    
+    if (budgetDetails) {
+        const { isComplete, budgetList } = budgetDetails;
+    
+        budgetList.forEach((budget: any) => {
+            categoryId = budget.categoryId;
+            categoryName = budget.categoryName;
+            categoryBudget = budget.categoryBudget;
+            usedBudget = budget.usedBudget;
+            fiftyBudget = budget.fiftyBudget;
+            eightyBudget = budget.eightyBudget;
+            budgetWon = budget.budgetWon;
+    
+            console.log(categoryId, categoryName, categoryBudget, usedBudget);
+        });
+        
+        console.log(isComplete);
+    }
+    
+
+    const hexToRgba = (hex:string, alpha:string) => {
     // hex 코드에서 # 제거
     const strippedHex = hex.replace('#', '');
 
@@ -210,7 +367,7 @@ const CompletedTravelDetailPage = () => {
       <Overlay />
       <ContentDiv>
           <TravelCardDiv>
-          <OngoingTravelDetailCard />
+          <TravelDetailCard title={title} startDate={startDate} endDate={endDate} country={country} memberCount={memberCount} totalBudgetWon={totalBudgetWon} />
           </TravelCardDiv>
           <TravelDetailPay/>
           <CategoryBudgetDiv>

@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useAxios from '../../hooks/useAxios';
-import { useDispatch } from 'react-redux';
-
-import { ongoingTravelDataInsert } from '../../features/travel/ongoingTravelSlice';
 
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
 
@@ -107,43 +104,17 @@ const PriceInfoP = styled.p`
     color : #666666;
 `;
 
-const OngoingTravelDetailCard = () => {
+interface TravelDetailCardProps {
+    title : String,
+    startDate : Date,
+    endDate : Date,
+    country : String,
+    memberCount : number,
+    totalBudgetWon : number,
+}
 
-    const dispatch = useDispatch();
+const TravelDetailCard: React.FC<TravelDetailCardProps> = () => {
 
-    const { data : infoData, error : infoError, loading : infoLoading,
-        status : infoStatus, refetch : infoRefetch
-    } = useAxios("/travels/ongoing","GET");
-
-    useEffect(()=>{
-        infoRefetch();
-    },[])
-
-    useEffect(() => {
-        if (infoData !== null) {
-            dispatch(ongoingTravelDataInsert({
-                travelId: infoData.travelId,
-                title: infoData.title,
-                startDate: new Date(infoData.startDate),
-                endDate: new Date(infoData.endDate),
-                image: infoData.image,
-                countryName: infoData.countryName,
-                countryId: infoData.countryId,
-                currency: infoData.currency,
-                memberCount: infoData.memberCount,
-                totalBudget: infoData.totalBudget,
-                status: infoData.status,
-                shareStatus: infoData.shareStatus,
-                shared: infoData.shared
-            }));
-        }
-    
-        if (infoError !== null) {
-            console.error("Error fetching travel data:", infoError);
-        }
-
-        
-    }, [infoData, infoError]);
 
     return (
         <PositionDiv>
@@ -160,4 +131,4 @@ const OngoingTravelDetailCard = () => {
     );
 };
 
-export default OngoingTravelDetailCard;
+export default TravelDetailCard;

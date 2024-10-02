@@ -6,7 +6,7 @@ import { pageMove } from '../../features/navigation/naviSlice';
 
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
 import BackHeader from '../../components/header/BackHeader';
-import OngoingTravelDetailCard from '../../components/travel/OngoingTravelDetailCard';
+import TravelDetailCard from '../../components/travel/TravelDetailCard';
 import TravelDetailPay from '../../components/travel/TravelDetailPay';
 
 import { ReactComponent as RightArrow } from '../../assets/common/rightArrow.svg';
@@ -210,7 +210,7 @@ const CompletedTravelDetailPage = () => {
       <Overlay />
       <ContentDiv>
           <TravelCardDiv>
-          <OngoingTravelDetailCard />
+          {/* <TravelDetailCard /> */}
           </TravelCardDiv>
           <TravelDetailPay/>
           <CategoryBudgetDiv>
