@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Entity
@@ -20,13 +18,13 @@ public class Merchant {
     @Column(name = "merchant_name", nullable = false)
     private String merchantName;
 
-    @Column(name = "account_number", nullable = false)
-    private String accountNumber;
+    @Column(name = "country", nullable = false)
+    private String country;
 
-    @Column(name = "bank", nullable = false)
-    private String bank;
+    @Column(name = "currency", nullable = false)
+    private String currency;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "category_id", referencedColumnName = "category_id", nullable = false)
     private Category category;
 }

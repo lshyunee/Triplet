@@ -13,13 +13,10 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ExchangeRateCalculatorRequest {
 
-    @NotNull(message = "targetCurrency 누락")
     String targetCurrency;
 
-    @NotNull(message = "sourceCurrency 누락")
     String sourceCurrency;
 
-    @NotNull(message = "sourceAmount 누락")
     Long sourceAmount;
 
 }
