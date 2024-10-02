@@ -1,5 +1,6 @@
 package com.ssafy.triplet.auth.service;
 
+import com.ssafy.triplet.account.service.AccountService;
 import com.ssafy.triplet.auth.dto.*;
 import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
+    private final AccountService accountService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -37,12 +39,16 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         Member existData = memberRepository.findByMemberId(username);
 
         if (existData == null) {
+            // 새 유저 생성
             Member member = Member.builder()
                     .memberId(username)
                     .role("ROLE_USER")
                     .build();
 
-            memberRepository.save(member);
+            Member savedMember = memberRepository.save(member);
+            // 계좌 자동생성
+            accountService.createAccount(savedMember);
+            accountService.generateForeignAccounts(savedMember);
             MemberAuthDto memberAuthDto = new MemberAuthDto(username, "ROLE_USER");
 
             return new CustomUserPrincipal(memberAuthDto);
