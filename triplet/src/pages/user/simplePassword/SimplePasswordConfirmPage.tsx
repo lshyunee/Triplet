@@ -16,8 +16,7 @@ const shuffleArray = (array: number[]) => {
 
 const PasswordDiv = styled.div`
     height : calc(100vh-56px);
-    margin : 0 78px 0;
-    padding-top : 56px;
+    padding : 0.3vh 0;
 `
 
 const TitleDiv = styled.div`
@@ -122,10 +121,10 @@ const SimplePasswordConfirmPage = () => {
 
     return (
         <div>
-            <BackHeader title={"간편비밀번호 설정"} />
+            <BackHeader title={"간편비밀번호 확인"} />
             <PasswordDiv>
                 <TitleDiv>
-                    <Title>간편비밀번호 설정</Title>
+                    <Title>간편비밀번호 확인</Title>
                     <Description>
                         비밀번호를 입력해주세요.
                     </Description>
