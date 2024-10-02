@@ -1,12 +1,13 @@
 package com.ssafy.triplet.member.dto.request;
 
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 
 @Getter
 public class MemberUpdateRequest {
 
-    @Pattern(regexp = "^[a-zA-Z0-9]{5,16}$", message = "아이디는 5~16자의 영문, 숫자입니다.")
+    @NotNull
     private String name;
     @Pattern(regexp = "^[0-9]{10,11}$", message = "휴대폰 번호는 10~11자의 숫자입니다.")
     private String phoneNumber;
