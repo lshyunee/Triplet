@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .authorizationEndpoint(authorizationEndpointConfig -> authorizationEndpointConfig
                                 .baseUri("/api/v1/oauth2/authorization"))
                         .redirectionEndpoint(redirectionEndpointConfig -> redirectionEndpointConfig
-                                .baseUri("/api/v1/login/oauth2/code"))  // OAuth2 콜백 경로 설정
+                                .baseUri("/api/v1/login/oauth2/code/*"))  // OAuth2 콜백 경로 설정
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService))
                         .successHandler(customSuccessHandler));
