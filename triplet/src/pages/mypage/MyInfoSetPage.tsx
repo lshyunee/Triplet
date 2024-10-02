@@ -208,14 +208,14 @@ const MyInfoSetPage = () => {
 
     useEffect(() => {
         
-        if(phoneError!==null && phoneStatus!==200){
+        if(phoneError && phoneStatus!==200){
             console.log(phoneError);
             const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
             setErrorMsg(message);
             isErrorOpen();
         }
         
-        if(phoneData !== null && phoneStatus===200){
+        if(phoneData && phoneStatus===200){
             setIsSend(true);
         }
 
@@ -246,7 +246,7 @@ const MyInfoSetPage = () => {
     const { data: editData, error: editError, loading: editLoading,
         status: editStatus, refetch: editRefetch }
         = useAxios('/user/my', 'PUT', {
-            name : name,
+            name : name.value,
             phoneNumber : phoneNum,
             identificationNumber : identificationNum
         });
@@ -257,21 +257,21 @@ const MyInfoSetPage = () => {
             isErrorOpen();
             return;
         }
-        if(isCheck === true){
+        if(isCheck){
             editRefetch();
         }   
     }
 
     useEffect(() => {
 
-        if(editData !== null){
+        if(editData){
             setMsg("내 정보 등록이 완료 되었습니다.");
             isModalOpen();
-            navigate(-1);
+            navigate("/");
         }
 
-        if(editError !== null){
-            const message = editError.response.data.message || "정보 수정이 불가능합니다.";
+        if(editError){
+            const message = editError.response.data.message || "정보 등록이 불가능합니다.";
             setErrorMsg(message);
             isErrorOpen();
         }

@@ -246,7 +246,7 @@ const MyInfoEditPage = () => {
     const { data: editData, error: editError, loading: editLoading,
         status: editStatus, refetch: editRefetch }
         = useAxios('/user/my', 'PUT', {
-            name : name,
+            name : name.value,
             phoneNumber : phoneNum,
             identificationNumber : identificationNum
         });
