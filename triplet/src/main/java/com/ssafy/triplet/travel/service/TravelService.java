@@ -16,15 +16,28 @@ import com.ssafy.triplet.travel.specification.TravelSpecification;
 import com.ssafy.triplet.travel.util.InviteCodeGenerator;
 import com.ssafy.triplet.travel.util.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.IndexQuery;
+import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+
+
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.springframework.data.domain.PageImpl;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -48,7 +61,8 @@ public class TravelService {
     private final AccountService accountService;
     private final S3Service s3Service;
     private final InviteCodeGenerator inviteCodeGenerator;
-
+    private final ElasticsearchTemplate elasticsearchTemplate;
+    private final RestHighLevelClient client;
 
 
     @Transactional
@@ -113,6 +127,9 @@ public class TravelService {
         if (!userId.equals(travel.getCreatorId())) {
             throw new CustomException(CustomErrorCode.NOT_TRAVEL_CREATOR);
         }
+        if (travel.isStatus()) {
+            elasticsearchTemplate.delete(travelId.toString(), Travel.class);
+        }
         travelRepository.deleteById(travelId);
     }
 
@@ -160,6 +177,7 @@ public class TravelService {
         Travel travel = travelRepository.findById(request.getTravelId())
                 .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
         TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
+
         if (!travel.isStatus()) {
             throw new CustomException(CustomErrorCode.TRAVEL_NOT_COMPLETED);
         }
@@ -170,6 +188,10 @@ public class TravelService {
                 request.getIsShared() != 1 && request.getShareStatus() != 0) {
             throw new CustomException(CustomErrorCode.INVALID_STATUS_VALUE);
         }
+
+        boolean oldSharedStatus = travel.isShared();
+        boolean oldShareStatus = travel.isShareStatus();
+
         if (request.getIsShared() == 1) {
             travel.setShared(true);
             if (request.getShareStatus() == 1) {
@@ -184,8 +206,13 @@ public class TravelService {
             travel.setShareStatus(false);
             travelWallet.setShare(false);
         }
+
+        if (oldSharedStatus != travel.isShared() || oldShareStatus != travel.isShareStatus()) {
+            indexOrUpdateTravel(travel);
+        }
         travelRepository.save(travel);
     }
+
 
     @Transactional
     public TravelResponse inviteTravel(String inviteCode, Long userId) {
@@ -233,18 +260,112 @@ public class TravelService {
     }
 
 
+//    public Page<TravelListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
+//                                                     Integer month, Integer minDays, Integer maxDays, int page, int kind, int size) {
+//        Specification<Travel> spec = Specification.where(TravelSpecification.excludeCreator(userId))
+//                .and(countryName != null ? TravelSpecification.countryNameContains(countryName) : null)
+//                .and(memberCount != null ? TravelSpecification.memberCountEquals(memberCount) : null)
+//                .and(minBudget != null && maxBudget != null ? TravelSpecification.totalBudgetWonBetween(minBudget, maxBudget) : null)
+//                .and(month != null ? TravelSpecification.travelMonth(month) : null)
+//                .and(minDays != null && maxDays != null ? TravelSpecification.travelDurationBetween(minDays, maxDays) : null);
+//        Pageable pageable = PageRequest.of(page, size);
+//        return travelRepository.findAll(spec, pageable)
+//                .map(this::convertToTravelListResponse);
+//    }
+
     public Page<TravelListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
-                                                     Integer month, Integer minDays, Integer maxDays, int page, int size) {
-        Specification<Travel> spec = Specification.where(TravelSpecification.excludeCreator(userId))
-                .and(countryName != null ? TravelSpecification.countryNameContains(countryName) : null)
-                .and(memberCount != null ? TravelSpecification.memberCountEquals(memberCount) : null)
-                .and(minBudget != null && maxBudget != null ? TravelSpecification.totalBudgetWonBetween(minBudget, maxBudget) : null)
-                .and(month != null ? TravelSpecification.travelMonth(month) : null)
-                .and(minDays != null && maxDays != null ? TravelSpecification.travelDurationBetween(minDays, maxDays) : null);
-        Pageable pageable = PageRequest.of(page, size);
-        return travelRepository.findAll(spec, pageable)
-                .map(this::convertToTravelListResponse);
+                                                     Integer month, Integer minDays, Integer maxDays, int page, int kind, int size) {
+        if (kind == 0) {
+            return getRecommendedTravels(userId, countryName, memberCount, minBudget, maxBudget, month, minDays, maxDays, page, size);
+        } else {
+            Specification<Travel> spec = Specification.where(TravelSpecification.excludeCreator(userId))
+                    .and(countryName != null ? TravelSpecification.countryNameContains(countryName) : null)
+                    .and(memberCount != null ? TravelSpecification.memberCountEquals(memberCount) : null)
+                    .and(minBudget != null && maxBudget != null ? TravelSpecification.totalBudgetWonBetween(minBudget, maxBudget) : null)
+                    .and(month != null ? TravelSpecification.travelMonth(month) : null)
+                    .and(minDays != null && maxDays != null ? TravelSpecification.travelDurationBetween(minDays, maxDays) : null);
+
+            Pageable pageable = PageRequest.of(page, size);
+            return travelRepository.findAll(spec, pageable)
+                    .map(this::convertToTravelListResponse);
+        }
     }
+
+    private Page<TravelListResponse> getRecommendedTravels(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
+                                                           Integer month, Integer minDays, Integer maxDays, int page, int size) {
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+
+// Query 작성
+        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
+                .must(QueryBuilders.termQuery("countryName", countryName)); // 국가 이름 필터링
+
+// 멤버 수 필터링
+        if (memberCount != null) {
+            boolQuery.must(QueryBuilders.termQuery("memberCount", memberCount));
+        }
+
+// 예산 범위 필터링
+        if (minBudget != null && maxBudget != null) {
+            boolQuery.must(QueryBuilders.rangeQuery("totalBudget")
+                    .gte(minBudget)
+                    .lte(maxBudget));
+        }
+
+// 여행 기간 필터링 (월)
+        if (month != null) {
+            boolQuery.must(QueryBuilders.termQuery("month", month)); // 여행 시작일의 월을 기준으로 필터링
+        }
+
+// 여행 일수 필터링
+        if (minDays != null && maxDays != null) {
+            boolQuery.must(QueryBuilders.rangeQuery("travelDuration") // travelDuration은 여행 기간을 의미
+                    .gte(minDays)
+                    .lte(maxDays));
+        }
+
+// 최종적으로 boolQuery를 searchSourceBuilder에 설정
+        searchSourceBuilder.query(boolQuery);
+
+
+        // Pagination 설정
+        searchSourceBuilder.from(page * size);
+        searchSourceBuilder.size(size);
+
+        // Elasticsearch 요청
+        SearchRequest searchRequest = new SearchRequest("travel").source(searchSourceBuilder);
+        SearchResponse searchResponse;
+
+        try {
+            searchResponse = client.search(searchRequest, RequestOptions.DEFAULT); // RestHighLevelClient 사용
+        } catch (IOException e) {
+            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR); // 예외 처리 필요
+        }
+
+        // 결과 변환
+        List<TravelListResponse> travelListResponses = Arrays.stream(searchResponse.getHits().getHits())
+                .map(hit -> {
+                    Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+                    Travel travel = new Travel();
+                    travel.setId((Long) sourceAsMap.get("id"));
+                    travel.setTitle((String) sourceAsMap.get("title"));
+                    travel.setStartDate(LocalDate.parse((String) sourceAsMap.get("startDate"))); // 날짜 형식 변환
+                    travel.setEndDate(LocalDate.parse((String) sourceAsMap.get("endDate"))); // 날짜 형식 변환
+                    travel.setImage((String) sourceAsMap.get("image"));
+                    travel.setMemberCount((Integer) sourceAsMap.get("memberCount"));
+
+                    Country country = new Country();
+                    country.setId((int) sourceAsMap.get("countryId"));
+                    country.setName((String) sourceAsMap.get("countryName"));
+                    country.setCurrency((String) sourceAsMap.get("currency"));
+                    travel.setCountry(country);
+
+                    return convertToTravelListResponse(travel); // Travel 객체를 TravelListResponse로 변환
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(travelListResponses, PageRequest.of(page, size), searchResponse.getHits().getTotalHits().value);
+    }
+
 
     public TravelListPagedResponse toPagedResponse(Page<TravelListResponse> page) {
         TravelListPagedResponse response = new TravelListPagedResponse();
@@ -510,4 +631,24 @@ public class TravelService {
         groupAccountStake.setTotalMoney(0d);
         groupAccountStakeRepostory.save(groupAccountStake);
     }
+
+    public void indexOrUpdateTravel(Travel travel) {
+        String id = travel.getId().toString();
+
+        // status가 true일 경우 데이터를 적재 또는 업데이트
+        if (travel.isStatus()) {
+            IndexQuery indexQuery = new IndexQueryBuilder()
+                    .withId(id)
+                    .withObject(travel)
+                    .build();
+
+            // 인덱스 좌표 추가 (예: "travel" 인덱스 이름 사용)
+            elasticsearchTemplate.index(indexQuery, IndexCoordinates.of("travel"));
+        }
+        // status가 false일 경우 Elasticsearch에서 해당 데이터 삭제
+        else {
+            elasticsearchTemplate.delete(id, IndexCoordinates.of("travel"));
+        }
+    }
+
 }

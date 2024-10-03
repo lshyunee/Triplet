@@ -194,10 +194,11 @@ public class TravelController {
                                                                               @RequestParam(required = false) Integer month,
                                                                               @RequestParam(required = false) Integer minDays,
                                                                               @RequestParam(required = false) Integer maxDays,
+                                                                              @RequestParam(defaultValue = "0") int kind,
                                                                               @RequestParam(defaultValue = "0") int page) {
         try {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
-            Page<TravelListResponse> travelList = travelService.getTravelSNSList(userId, countryName, memberCount, minBudget, maxBudget, month, minDays, maxDays, page, 10);
+            Page<TravelListResponse> travelList = travelService.getTravelSNSList(userId, countryName, memberCount, minBudget, maxBudget, month, minDays, maxDays, page, kind, 10);
             TravelListPagedResponse pagedResponse = travelService.toPagedResponse(travelList);
             if (travelList.isEmpty()) {
                 return ResponseEntity.ok(new ApiResponse<>("200", "게시글이 없습니다."));
