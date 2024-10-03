@@ -40,7 +40,8 @@ const CheckP = styled.p`
     color : #008DE7;
 `
 const StyledInput = styled.input`
-    background-color : #F9FAFC;
+    background-color : ${ (props) => props.disabled ? '#A1A1A1' : 'white'};
+    color : ${ (props) => props.disabled ? 'white' : 'black'};
     width:100%;
     height:44px;
     border-radius : 10px;
@@ -50,7 +51,8 @@ const StyledInput = styled.input`
 `;
 
 const StyledInputFront = styled.input`
-    background-color : #F9FAFC;
+    background-color : ${ (props) => props.disabled ? '#A1A1A1' : 'white'};
+    color : ${ (props) => props.disabled ? 'white' : 'black' };
     border-radius : 10px;
     border : 1px solid #F0F0F0;
     box-sizing: border-box;
@@ -60,14 +62,15 @@ const StyledInputFront = styled.input`
     text-align:center;
 `;
 
+
 const StyledBtn = styled.button`
     width:74px;
     height:44px;
-    border : 1px solid #008DE7;
+    border : 1px solid ${ (props) => props.disabled ? '#A1A1A1': '#008DE7'};
     border-radius : 10px;
     font-weight: 600;
-    background-color : white;
-    color : #008DE7;
+    background-color : ${ (props) => props.disabled ? '#A1A1A1' : 'white'};
+    color : ${ (props) => props.disabled ? 'white' : '#008DE7'};
     flex-shrink: 0;
     margin-left : 8px;
 `;
@@ -177,11 +180,11 @@ const MyInfoEditPage = () => {
     useEffect(() => {
         
         if(infoData !== null){
-            name.setValue(infoData.data.name);
-            identificationNumFront.setValue(infoData.data.birth);
-            phoneNumFront.setValue(infoData.data.phoneNumber.slice(0,3));
-            phoneNumMiddle.setValue(infoData.data.phoneNumber.slice(3,7));
-            phoneNumBack.setValue(infoData.data.phoneNumber.slice(7,11));
+            name.changeData(infoData.data.name);
+            identificationNumFront.changeData(infoData.data.birth);
+            phoneNumFront.changeData(infoData.data.phoneNumber.slice(0,3));
+            phoneNumMiddle.changeData(infoData.data.phoneNumber.slice(3,7));
+            phoneNumBack.changeData(infoData.data.phoneNumber.slice(7,11));
         }
 
     },[infoData])
@@ -304,46 +307,44 @@ const MyInfoEditPage = () => {
 
     return (
         <>
-            <BackHeader title={"내 정보 수정"}/>
+            <BackHeader title="내 정보 수정" />
             <EntireDiv>
                 <InputDiv>
                     <InputDistanceDiv>
                         <HowP>이름</HowP>
-                        <StyledInput type="text" {...name}/>
-                    </InputDistanceDiv>   
+                        <StyledInput type="text" value={name.value} onChange={name.onChange} />
+                    </InputDistanceDiv>
                     <InputDistanceDiv>
                         <HowP>주민등록번호</HowP>
                         <RegistDiv>
-                            <StyledInputFront type="text" {...identificationNumFront}/>
+                            <StyledInputFront type="text" value={identificationNumFront.value} onChange={identificationNumFront.onChange} />
                             <NumP>-</NumP>
-                            <StyledInput type="text" {...identificationNumBack} disabled={false}/>
+                            <StyledInput type="text" value={identificationNumBack.value} onChange={identificationNumBack.onChange} />
                             <NumP>* * * * * *</NumP>
                         </RegistDiv>
                     </InputDistanceDiv>
                     <InputDistanceDiv>
                         <HowP>전화번호</HowP>
                         <PhoneDiv>
-                            <StyledInputFront type="text" {...phoneNumFront} disabled={isCheck} />
+                            <StyledInputFront type="text" value={phoneNumFront.value} onChange={phoneNumFront.onChange} />
                             <NumP>-</NumP>
-                            <StyledInput type="text" {...phoneNumMiddle} disabled={isCheck}/>
+                            <StyledInput type="text" value={phoneNumMiddle.value} onChange={phoneNumMiddle.onChange} />
                             <NumP>-</NumP>
-                            <StyledInput type="text" {...phoneNumBack} disabled={isCheck}/>
-                            <StyledBtn onClick={certificateSend} disabled={isSend}>인증번호 발송</StyledBtn>
+                            <StyledInput type="text" value={phoneNumBack.value} onChange={phoneNumBack.onChange} />
+                            <StyledBtn onClick={certificateSend}>인증번호 발송</StyledBtn>
                         </PhoneDiv>
                     </InputDistanceDiv>
                     <InputDistanceDiv>
                         <HowP>인증번호</HowP>
                         <CheckDiv>
-                            <StyledInput type="text" {...certificationNum} disabled={isCheck}/>
-                            <StyledBtn onClick={certificateCheck} disabled={isCheck}>확인</StyledBtn>
+                            <StyledInput type="text" value={certificationNum.value} onChange={certificationNum.onChange} />
+                            <StyledBtn onClick={certificateCheck}>확인</StyledBtn>
                         </CheckDiv>
                         <CheckP>{isCheck ? "인증되었습니다." : ""}</CheckP>
                     </InputDistanceDiv>
                     <ConfirmBtn onClick={myInfoEdit}>수정 완료</ConfirmBtn>
                 </InputDiv>
             </EntireDiv>
-            <ErrorModal isOpen={isError} onClose={closeError} msg={errorMsg}></ErrorModal>
-            <CompleteModal isOpen={isModel} onClose={isModelClose} msg={msg} ></CompleteModal>
         </>
     );
 };

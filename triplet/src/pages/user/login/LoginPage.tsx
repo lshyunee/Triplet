@@ -232,9 +232,9 @@ const LoginPage = () => {
                 <TitleP>Triplet</TitleP>
             </TitleDiv>
             <LoginForm onSubmit={handleLogin}>
-                <LoginInput type="text" placeholder='아이디' {...id} />
-                <LoginInput type="password" placeholder='비밀번호' {...pw} />
-                <LoginBtn ref={loginBtnRef} type="submit" disabled={enterPressed}>로그인</LoginBtn> {/* 버튼에 참조 추가 */}
+                <LoginInput type="text" placeholder="아이디" value={id.value} onChange={id.onChange} />
+                <LoginInput type="password" placeholder="비밀번호" value={pw.value} onChange={pw.onChange} />
+                <LoginBtn ref={loginBtnRef} type="submit" disabled={enterPressed}>로그인</LoginBtn>
             </LoginForm>
             <KakaoLoginBtn onClick={handleNaverLogin}>
                 카카오 로그인

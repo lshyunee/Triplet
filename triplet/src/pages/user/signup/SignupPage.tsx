@@ -49,7 +49,8 @@ const ExplainDiv = styled.div`
 `;
 
 const StyledInput = styled.input`
-    background-color : #F9FAFC;
+    background-color : ${ (props) => props.disabled ? '#A1A1A1' : 'white'};
+    color : ${ (props) => props.disabled ? 'white' : '#008DE7'};
     width: 100%;
     height:44px;
     margin-bottom : 10px;
@@ -60,7 +61,8 @@ const StyledInput = styled.input`
 `;
 
 const StyledInputFront = styled.input`
-    background-color : #F9FAFC;
+    background-color : ${ (props) => props.disabled ? '#A1A1A1' : 'white'};
+    color : ${ (props) => props.disabled ? 'white' : '#008DE7'};
     border-radius : 10px;
     border : 1px solid #F0F0F0;
     box-sizing: border-box;

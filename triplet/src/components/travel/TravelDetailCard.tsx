@@ -113,7 +113,8 @@ interface TravelDetailCardProps {
     totalBudgetWon : number,
 }
 
-const TravelDetailCard: React.FC<TravelDetailCardProps> = () => {
+const TravelDetailCard: React.FC<TravelDetailCardProps> = 
+        ({title, startDate, endDate, country, memberCount, totalBudgetWon}) => {
 
 
     return (

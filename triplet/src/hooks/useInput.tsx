@@ -21,8 +21,12 @@ const useInput = (validator?: (value: string) => boolean) => {
         setValue(value);
       }
     };
+
+    const changeData = (v:any) => {
+      setValue(v);
+    }
   
-    return { value, onChange, setValue };
+    return { value, onChange, changeData };
   };
 
   export default useInput;
