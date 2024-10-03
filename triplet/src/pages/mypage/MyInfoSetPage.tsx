@@ -9,6 +9,9 @@ import CompleteModal from '../../components/modal/CompleteModal';
 
 import useAxios from '../../hooks/useAxios';
 import useInput from '../../hooks/useInput';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { setUserInfo } from '../../features/user/userInfoSlice';
 
 const HowP = styled.p`
     font-size : 12px;
@@ -170,11 +173,34 @@ const MyInfoSetPage = () => {
 
     
     const [ isSend, setIsSend ] = useState(false);
+    const dispatch = useDispatch();
 
+    const userData = useSelector((state:any) => state.userInfo);
+
+    const { data : userInfoData, error: userInfoError, status: userInfoStatus, refetch: userInfoRefetch } = useAxios("/user/my","GET");
+
+    useEffect(()=>{
+        if (!userData.memberId) {
+            userInfoRefetch();
+        }
+    }, [userData])
 
     useEffect(() => {
-        console.log(isSend);
-    },[])
+        // userInfoData가 존재하고, userInfoStatus가 200일 때 Redux에 데이터를 저장
+        if (userInfoData && userInfoStatus === 200 && userInfoData.data) {
+            const { memberId, name, birth, gender, phoneNumber } = userInfoData.data;
+            if (
+                memberId !== null && memberId !== undefined &&
+                name !== null && name === undefined &&
+                birth !== null && birth === undefined &&
+                gender !== null && gender === undefined &&
+                phoneNumber !== null && phoneNumber !== undefined
+            ) {
+                navigate('/');
+            }
+        }
+
+    }, [userInfoData, userInfoError]);
 
 
       // 주민등록번호

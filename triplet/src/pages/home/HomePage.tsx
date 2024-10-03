@@ -191,7 +191,7 @@ const HomePage = () => {
 
     // Axios 요청 결과를 Redux 스토어에 저장
     useEffect(() => {
-        if (infoData !== null) {
+        if (infoData) {
             dispatch(ongoingTravelDataInsert({
                 travelId: infoData.travelId,
                 title: infoData.title,
@@ -209,7 +209,7 @@ const HomePage = () => {
             }));
         }
 
-        if (infoError !== null) {
+        if (infoError) {
             if(infoError.response.data.message){
                 console.log(infoError.response.data.message);
             }
