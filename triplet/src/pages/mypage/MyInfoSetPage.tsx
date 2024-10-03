@@ -191,9 +191,9 @@ const MyInfoSetPage = () => {
             const { memberId, name, birth, gender, phoneNumber } = userInfoData.data;
             if (
                 memberId !== null && memberId !== undefined &&
-                name !== null && name === undefined &&
-                birth !== null && birth === undefined &&
-                gender !== null && gender === undefined &&
+                name !== null && name !== undefined &&
+                birth !== null && birth !== undefined &&
+                gender !== null && gender !== undefined &&
                 phoneNumber !== null && phoneNumber !== undefined
             ) {
                 navigate('/');
