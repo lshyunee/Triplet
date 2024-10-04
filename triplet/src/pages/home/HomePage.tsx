@@ -181,6 +181,7 @@ const HomePage = () => {
         if (!travelData.travelId) {
             infoRefetch();
         }
+        console.log("여행아이디",travelData.travelId);
     }, [travelData.travelId]);
 
     useEffect(()=>{
@@ -191,21 +192,22 @@ const HomePage = () => {
 
     // Axios 요청 결과를 Redux 스토어에 저장
     useEffect(() => {
-        if (infoData !== null) {
+        if (infoData) {
+            console.log(infoData);
             dispatch(ongoingTravelDataInsert({
-                travelId: infoData.travelId,
-                title: infoData.title,
-                startDate: new Date(infoData.startDate),
-                endDate: new Date(infoData.endDate),
-                image: infoData.image,
-                countryName: infoData.countryName,
-                countryId: infoData.countryId,
-                currency: infoData.currency,
-                memberCount: infoData.memberCount,
-                totalBudget: infoData.totalBudget,
-                status: infoData.status,
-                shareStatus: infoData.shareStatus,
-                shared: infoData.shared,
+                travelId: infoData.data.travelId,
+                title: infoData.data.title,
+                startDate: infoData.data.startDate,
+                endDate: infoData.data.endDate,
+                image: infoData.data.image,
+                countryName: infoData.data.countryName,
+                countryId: infoData.data.countryId,
+                currency: infoData.data.currency,
+                memberCount: infoData.data.memberCount,
+                totalBudget: infoData.data.totalBudget,
+                status: infoData.data.status,
+                shareStatus: infoData.data.shareStatus,
+                shared: infoData.data.shared,
             }));
         }
 
