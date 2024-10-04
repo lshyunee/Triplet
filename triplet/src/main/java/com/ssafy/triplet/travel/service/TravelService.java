@@ -7,6 +7,7 @@ import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
+import com.ssafy.triplet.travel.dto.request.TravelCreateRequest;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
 import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.*;
@@ -52,7 +53,7 @@ public class TravelService {
 
 
     @Transactional
-    public TravelResponse createTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
+    public TravelResponse createTravel(Long userId, TravelCreateRequest request, MultipartFile image) throws IOException {
         validateTravelRequest(request, userId, 0L);
         String inviteCode = inviteCodeGenerator.generateInviteCode(request.getEndDate());
         Travel travel = buildTravel(userId, request, image, inviteCode);
