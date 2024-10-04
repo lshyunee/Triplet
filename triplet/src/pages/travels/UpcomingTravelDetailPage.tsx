@@ -123,7 +123,7 @@ const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
     background-color: ${props => props.color};
     border-radius: 50px;
     overflow: hidden;
-    height: 20px;
+    height: 12px;
 `;
 
 const MoneyChartBar = styled.div<MonyeProgressProps>`
@@ -135,7 +135,7 @@ const MoneyChartBar = styled.div<MonyeProgressProps>`
 
 const MoneyCategoryP = styled.p`
     color : #666666;
-    font-size : 16px;
+    font-size : 14px;
     font-weight : 600;
     margin : 0;
     margin-left : 2px;
@@ -258,6 +258,8 @@ useEffect(() => {
       }
 
   }, [budgetData, budgetError]);
+
+
 
   const hexToRgba = (hex:string, alpha:string) => {
     // hex 코드에서 # 제거

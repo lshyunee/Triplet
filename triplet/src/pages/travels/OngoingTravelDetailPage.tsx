@@ -123,7 +123,7 @@ const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
     background-color: ${props => props.color};
     border-radius: 50px;
     overflow: hidden;
-    height: 20px;
+    height: 12px;
 `;
 
 const MoneyChartBar = styled.div<MonyeProgressProps>`

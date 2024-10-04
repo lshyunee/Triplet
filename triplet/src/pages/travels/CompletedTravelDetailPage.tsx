@@ -122,7 +122,7 @@ const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
     background-color: ${props => props.color};
     border-radius: 50px;
     overflow: hidden;
-    height: 20px;
+    height: 12px;
 `;
 
 const MoneyChartBar = styled.div<MonyeProgressProps>`
@@ -134,7 +134,7 @@ const MoneyChartBar = styled.div<MonyeProgressProps>`
 
 const MoneyCategoryP = styled.p`
     color : #666666;
-    font-size : 16px;
+    font-size : 14px;
     font-weight : 600;
     margin : 0;
     margin-left : 2px;
@@ -298,6 +298,14 @@ const CompletedTravelDetailPage = () => {
 
     const [ useBudget, setUseBudget ] = useState(0);
 
+    let categoryId: number = 0;
+    let categoryName: string = '';
+    let categoryBudget: number = 0;
+    let usedBudget: number = 0;
+    let fiftyBudget: number = 0;
+    let eightyBudget: number = 0;
+    let budgetWon: number = 0;
+
     useEffect(() => {
         if (budgetData) {
              const { isComplete, budgetList } = budgetData;
@@ -317,7 +325,19 @@ const CompletedTravelDetailPage = () => {
     
               setUseBudget(budgetList.reduce(
                 (total:Number, usedBudget: any) => total + usedBudget, 0));
-    
+            
+                budgetList.forEach((budget: any) => {
+                    categoryId = budget.categoryId;
+                    categoryName = budget.categoryName;
+                    categoryBudget = budget.categoryBudget;
+                    usedBudget = budget.usedBudget;
+                    fiftyBudget = budget.fiftyBudget;
+                    eightyBudget = budget.eightyBudget;
+                    budgetWon = budget.budgetWon;
+            
+                    console.log(categoryId, categoryName, categoryBudget, usedBudget);
+                });
+                
           }
       
           if (budgetError) {
@@ -325,31 +345,7 @@ const CompletedTravelDetailPage = () => {
     
       }, [budgetData, budgetError]);
     
-    let categoryId: number = 0;
-    let categoryName: string = '';
-    let categoryBudget: number = 0;
-    let usedBudget: number = 0;
-    let fiftyBudget: number = 0;
-    let eightyBudget: number = 0;
-    let budgetWon: number = 0;
     
-    if (budgetDetails) {
-        const { isComplete, budgetList } = budgetDetails;
-    
-        budgetList.forEach((budget: any) => {
-            categoryId = budget.categoryId;
-            categoryName = budget.categoryName;
-            categoryBudget = budget.categoryBudget;
-            usedBudget = budget.usedBudget;
-            fiftyBudget = budget.fiftyBudget;
-            eightyBudget = budget.eightyBudget;
-            budgetWon = budget.budgetWon;
-    
-            console.log(categoryId, categoryName, categoryBudget, usedBudget);
-        });
-        
-        console.log(isComplete);
-    }
     
 
     const hexToRgba = (hex:string, alpha:string) => {
