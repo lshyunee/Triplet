@@ -6,7 +6,6 @@ import com.ssafy.triplet.travel.entity.Travel;
 import com.ssafy.triplet.travel.entity.TravelBudget;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -25,4 +24,7 @@ public interface TravelBudgetRepository extends JpaRepository<TravelBudget, Long
     @Query("SELECT new com.ssafy.triplet.travel.dto.response.CompleteTravelBudgetResponse(tb.category.categoryId, tb.category.categoryName, tb.usedBudget) " +
             "FROM TravelBudget tb WHERE tb.travel = :travel")
     List<CompleteTravelBudgetResponse> findCompleteBudgetResponseByTravel(Travel travel);
+
+    @Query("SELECT tb FROM TravelBudget tb WHERE tb.category.categoryId = :categoryId AND tb.travel.id = :travelId")
+    TravelBudget findBudgetByCategoryAndTravel(Long travelId, int categoryId);
 }

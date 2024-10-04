@@ -37,4 +37,10 @@ public class TravelBudget {
 
     @Column(name = "budget_won", nullable = false)
     private double budgetWon;
+
+    @Column(name = "over_fifty")
+    private boolean overFifty = false;
+
+    @Column(name="over_eight")
+    private boolean overEight = false;
 }
