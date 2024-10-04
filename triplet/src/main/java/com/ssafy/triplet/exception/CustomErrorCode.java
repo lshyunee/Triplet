@@ -44,8 +44,8 @@ public enum CustomErrorCode {
     MERCHANT_NOT_FOUND("A0019","가맹점이 존재하지 않습니다.",HttpStatus.NOT_FOUND),
     MERCHANT_AND_PAYMENT_CURRENCY_MISMATCH("A0029","가맹점과 동일한 통화의 계좌만 결제 가능합니다.",HttpStatus.BAD_REQUEST),
     INVALID_PRICE_VALUE("A0030","결제 금액을 확인하세요",HttpStatus.BAD_REQUEST),
-    TRAVEL_BUDGET_NOT_FOUND("T0020", "카테고리 여행 예산을 찾을 수 없습니다.", HttpStatus.NOT_FOUND);
-
+    TRAVEL_BUDGET_NOT_FOUND("T0020", "카테고리 여행 예산을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
+    ACCOUNT_PERMISSION_DENIED("A0031","계좌에 접근할 권한이 없습니다.",HttpStatus.FORBIDDEN);
     private final String code;
     private final String message;
     private final HttpStatus status;

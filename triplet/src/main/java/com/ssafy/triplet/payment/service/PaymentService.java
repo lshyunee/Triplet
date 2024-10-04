@@ -6,13 +6,11 @@ import com.ssafy.triplet.account.repository.AccountRepository;
 import com.ssafy.triplet.account.repository.TransactionListRepository;
 import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.exception.CustomException;
+import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.payment.dto.request.PaymentRequest;
 import com.ssafy.triplet.payment.dto.response.PaymentResponse;
 import com.ssafy.triplet.travel.entity.*;
-import com.ssafy.triplet.travel.repository.MerchantRepository;
-import com.ssafy.triplet.travel.repository.TravelBudgetRepository;
-import com.ssafy.triplet.travel.repository.TravelTransactionListRepository;
-import com.ssafy.triplet.travel.repository.TravelWalletRepository;
+import com.ssafy.triplet.travel.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,31 +30,44 @@ public class PaymentService {
 
     private final TravelBudgetRepository travelBudgetRepository;
 
-    public Merchant getMerchantById(Long id) {
+    private final MemberRepository memberRepository;
+    private final TravelMemberRepository travelMemberRepository;
 
+
+    public Merchant getMerchantById(Long id) {
         return merchantRepository.findById(id).orElse(null);
     }
 
-
     @Transactional
-    public PaymentResponse paymentProcess(PaymentRequest request) {
-        PaymentResponse result = null;
-        if (request.getIsTravel()) {
-            result = travelAccountPayment(request);
-        } else {
-            result = commonAccountPayment(request);
-        }
-
-        return result;
+    public PaymentResponse paymentProcess(PaymentRequest request, String memberId) {
+        return request.getIsTravel() ? travelAccountPayment(request, memberId) : commonAccountPayment(request,memberId);
     }
 
 
-    public PaymentResponse travelAccountPayment(PaymentRequest request) {
-        TravelWallet travelWallet = travelWalletRepository.findById(request.getAccountId()).orElse(null);
-        Merchant merchant = merchantRepository.findById(request.getMerchantId()).orElse(null);
-        validateMerchantAndPaymentCurrency(merchant, travelWallet);
+    private void checkPermissions(String memberId, Travel travel) {
+        Long id = memberRepository.findIdByMemberId(memberId);
+        TravelMember tm = travelMemberRepository.findByMemberIdAndTravelId(id, travel.getId())
+                .orElseThrow(() -> new CustomException(CustomErrorCode.ACCOUNT_PERMISSION_DENIED));
+    }
+
+    private void checkPermissions(String memberId, Account account) {
+        Long id = memberRepository.findIdByMemberId(memberId);
+        if (id != account.getMember().getId()) {
+            throw new CustomException(CustomErrorCode.ACCOUNT_PERMISSION_DENIED);
+        }
+    }
+
+    public PaymentResponse travelAccountPayment(PaymentRequest request, String memberId) {
+        TravelWallet travelWallet = travelWalletRepository.findById(request.getAccountId())
+                .orElseThrow(() -> new CustomException(CustomErrorCode.WITHDRAWAL_ACCOUNT_NOT_FOUND));
+        Merchant merchant = merchantRepository.findById(request.getMerchantId())
+                .orElseThrow(() -> new CustomException(CustomErrorCode.MERCHANT_NOT_FOUND));
+
+        checkPermissions(memberId, travelWallet.getTravelId());
+
+        validateCurrencyMatch(merchant.getCurrency(), travelWallet.getCurrency());
         Double price = request.getPrice();
-        validateWalletBalance(travelWallet, price);
+        validateWalletBalance(travelWallet.getBalance(), price);
 
         // 지갑 금액 빼고 기록
         processTransaction(travelWallet, merchant, price);
@@ -89,13 +100,13 @@ public class PaymentService {
     // 50 넘음 80 넘음
 
     private void updateBudgetUsageRate(TravelBudget travelBudget) {
-        
-        if(!travelBudget.isOverFifty() && travelBudget.getFiftyBudget() <= travelBudget.getUsedBudget()){
-                travelBudget.setOverFifty(true);
-                // 50% 초과 푸시알림 
-                
-        }else if(travelBudget.isOverFifty() && !travelBudget.isOverEight()){
-            if(travelBudget.getEightyBudget() <= travelBudget.getUsedBudget()){
+
+        if (!travelBudget.isOverFifty() && travelBudget.getFiftyBudget() <= travelBudget.getUsedBudget()) {
+            travelBudget.setOverFifty(true);
+            // 50% 초과 푸시알림
+
+        } else if (travelBudget.isOverFifty() && !travelBudget.isOverEight()) {
+            if (travelBudget.getEightyBudget() <= travelBudget.getUsedBudget()) {
                 travelBudget.setOverEight(true);
                 // 80% 초과 푸시알림
 
@@ -127,13 +138,19 @@ public class PaymentService {
     }
 
 
-    public PaymentResponse commonAccountPayment(PaymentRequest request) {
+    public PaymentResponse commonAccountPayment(PaymentRequest request, String memberId) {
+        Account account = accountRepository.findById(request.getAccountId())
+                .orElseThrow(() -> new CustomException(CustomErrorCode.WITHDRAWAL_ACCOUNT_NOT_FOUND));
 
-        Account account = accountRepository.findById(request.getAccountId()).orElse(null);
-        Merchant merchant = merchantRepository.findById(request.getMerchantId()).orElse(null);
-        validateMerchantAndPaymentCurrency(merchant, account);
+        Merchant merchant = merchantRepository.findById(request.getMerchantId())
+                .orElseThrow(() -> new CustomException(CustomErrorCode.MERCHANT_NOT_FOUND));
+
+        checkPermissions(memberId,account);
+
+        validateCurrencyMatch(merchant.getCurrency(), account.getCurrency());
+
         Double price = request.getPrice();
-        validateAccountBalance(account, price);
+        validateWalletBalance(account.getAccountBalance(), price);
 
         processTransaction(account, merchant, price);
 
@@ -172,11 +189,8 @@ public class PaymentService {
     }
 
 
-    private void validateAccountBalance(Account account, Double price) {
-        if (account == null) {
-            throw new CustomException(CustomErrorCode.WITHDRAWAL_ACCOUNT_NOT_FOUND);
-        }
-        if (account.getAccountBalance() < price) {
+    private void validateWalletBalance(Double balance, Double price) {
+        if (balance < price) {
             throw new CustomException(CustomErrorCode.INSUFFICIENT_BALANCE);
         }
         if (0 >= price) {
@@ -184,42 +198,8 @@ public class PaymentService {
         }
     }
 
-    private void validateWalletBalance(TravelWallet travelWallet, Double price) {
-        if (travelWallet == null) {
-            throw new CustomException(CustomErrorCode.WITHDRAWAL_ACCOUNT_NOT_FOUND);
-        }
-        if (travelWallet.getBalance() < price) {
-            throw new CustomException(CustomErrorCode.INSUFFICIENT_BALANCE);
-        }
-        if (0 >= price) {
-            throw new CustomException(CustomErrorCode.INVALID_PRICE_VALUE);
-        }
-    }
-
-    private void validateMerchantAndPaymentCurrency(Merchant merchant, Account account) {
-        if (merchant == null) {
-            throw new CustomException(CustomErrorCode.MERCHANT_NOT_FOUND);
-        }
-        if (account == null) {
-            throw new CustomException(CustomErrorCode.WITHDRAWAL_ACCOUNT_NOT_FOUND);
-        }
-        if (!account.getCurrency().equals(merchant.getCurrency())) {
-            throw new CustomException(CustomErrorCode.MERCHANT_AND_PAYMENT_CURRENCY_MISMATCH);
-        }
-    }
-
-
-
-
-
-    private void validateMerchantAndPaymentCurrency(Merchant merchant, TravelWallet travelWallet) {
-        if (merchant == null) {
-            throw new CustomException(CustomErrorCode.MERCHANT_NOT_FOUND);
-        }
-        if (travelWallet == null) {
-            throw new CustomException(CustomErrorCode.WITHDRAWAL_ACCOUNT_NOT_FOUND);
-        }
-        if (!travelWallet.getCurrency().equals(merchant.getCurrency())) {
+    private void validateCurrencyMatch(String merchantCurrency, String accountCurrency) {
+        if (!merchantCurrency.equals(accountCurrency)) {
             throw new CustomException(CustomErrorCode.MERCHANT_AND_PAYMENT_CURRENCY_MISMATCH);
         }
     }
