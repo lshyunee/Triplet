@@ -97,7 +97,7 @@ const LogoutModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <ModalLayout onClick={onClose}>
-      <ModalContentDiv>
+      <ModalContentDiv onClick={(e) => e.stopPropagation()}>
         <Title>로그아웃</Title>
         <Description>로그아웃 하시겠습니까?</Description>
         <ConfirmDiv>

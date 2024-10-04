@@ -3,6 +3,9 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
+import { RootState } from '../../store';
+import { useSelector } from 'react-redux';
+import { selectUpcomingTravelByTitleId } from '../../features/travel/upcomingTravelSlice';
 
 const CardDiv = styled.div`
   width: 100%;
@@ -94,7 +97,7 @@ const PriceInfoP = styled.p`
 
 const DayInfoP = styled.p`
     font-weight: 400;
-    font-size : 3.5vw;
+    font-size : 2.7vw;
     color : white;
     margin: 0;
     display : flex;
@@ -116,20 +119,30 @@ const StyledLink = styled(Link)`
     color: inherit !important;         /* 링크 색상 기본값 제거 */
 `;
 
+interface CompleteTravelCardProps {
+  travelId : number;
+}
 
-const UpcomingTravelCard = () => {
+const UpcomingTravelCard : React.FC<CompleteTravelCardProps> = ({travelId}) => {
+
+  const travel:number = travelId;
+  const travelData = useSelector((state : RootState) => selectUpcomingTravelByTitleId(state, travel)) || null;
+
   return (
-    <StyledLink to="/travels/upcoming/1/detail"> 
+  <StyledLink to={`/travels/upcoming/${travel}/detail`}>
       <CardDiv>
         <TravelImg src={SampleImg} alt="Travel" />
         <Overlay />
         <BottomOverlay>
-          <ContentDiv>
+        <ContentDiv>
               <ContentTitleDiv>
-                  <CountryP>집에가고싶다</CountryP>
-                  <PriceInfoP>대한민국</PriceInfoP>
+                  <CountryP>{travelData?.title}</CountryP>
+                  <PriceInfoP>{travelData?.countryName}</PriceInfoP>
               </ContentTitleDiv>
-              <DayInfoP>24.09.28 ~ 24.10.01</DayInfoP>
+              <DayInfoP>
+              {travelData?.startDate ? new Date(travelData.startDate).toLocaleDateString() : ''} ~
+              {travelData?.endDate ? new Date(travelData.endDate).toLocaleDateString() : ''}
+            </DayInfoP>
           </ContentDiv>
         </BottomOverlay>
       </CardDiv>

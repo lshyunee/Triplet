@@ -3,15 +3,15 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 interface TravelState {
   travelId: number;
   title: string;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
   image: string;
   countryName: string;
   countryId: number;
   currency: string;
   memberCount: number;
   totalBudget: number;
-  usedBudget : number;
+  usedBudget: number;
   status: boolean;
   shareStatus: boolean;
   shared: boolean;
@@ -20,15 +20,15 @@ interface TravelState {
 const initialState: TravelState = {
   travelId: 0,
   title: "",
-  startDate: new Date(),
-  endDate: new Date(),
+  startDate: "",
+  endDate: "",
   image: "",
   countryName: "",
   countryId: 0,
   currency: "",
   memberCount: 0,
   totalBudget: 0,
-  usedBudget : 0,
+  usedBudget: 0,
   status: false,
   shareStatus: false,
   shared: false,
@@ -55,7 +55,7 @@ const ongoingTravelSlice = createSlice({
         shareStatus,
         shared,
       } = action.payload;
-      
+
       if (travelId !== undefined) state.travelId = travelId;
       if (title !== undefined) state.title = title;
       if (startDate !== undefined) state.startDate = startDate;
@@ -71,6 +71,7 @@ const ongoingTravelSlice = createSlice({
       if (shareStatus !== undefined) state.shareStatus = shareStatus;
       if (shared !== undefined) state.shared = shared;
     },
+
   },
 });
 

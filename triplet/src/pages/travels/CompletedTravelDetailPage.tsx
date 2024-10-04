@@ -12,7 +12,7 @@ import TravelDetailPay from '../../components/travel/TravelDetailPay';
 import { ReactComponent as RightArrow } from '../../assets/common/rightArrow.svg';
 import { ReactComponent as PayIcon } from '../../assets/common/payIcon.svg';
 import { ReactComponent as ShareIcon } from '../../assets/common/shareIcon.svg';
-import { selectTravelByTitleId } from '../../features/travel/upcomingTravelSlice';
+import { selectUpcomingTravelByTitleId } from '../../features/travel/upcomingTravelSlice';
 import { RootState } from '../../store';
 import useAxios from '../../hooks/useAxios';
 
@@ -184,8 +184,8 @@ interface TravelDetails {
     country: string;
     countryId: number;
     currency: string;
-    startDate: Date;  // Date 타입
-    endDate: Date;    // Date 타입
+    startDate: string;  // Date 타입
+    endDate: string;    // Date 타입
     title: string;
     image: string;
     creatorId: number;
@@ -250,8 +250,8 @@ const CompletedTravelDetailPage = () => {
                 country,
                 countryId,
                 currency,
-                startDate: new Date(startDate), // Date로 변환
-                endDate: new Date(endDate),     // Date로 변환
+                startDate,
+                endDate,     
                 title,
                 image,
                 creatorId,
@@ -272,8 +272,8 @@ const CompletedTravelDetailPage = () => {
     let country: string = '';
     let countryId: number = 0;
     let currency: string = '';
-    let startDate: Date = new Date(0);
-    let endDate: Date = new Date(0); 
+    let startDate: string = "";
+    let endDate: string = ""; 
     let title: string = '';
     let image: string = '';
     let creatorId: number = 0;
@@ -296,28 +296,34 @@ const CompletedTravelDetailPage = () => {
 
     const [budgetDetails, setBudgetDetails] = useState<BudgetDetails | null>(null);
 
+    const [ useBudget, setUseBudget ] = useState(0);
+
     useEffect(() => {
         if (budgetData) {
-            const { isComplete, budgetList } = budgetData;
+             const { isComplete, budgetList } = budgetData;
+      
+              setBudgetDetails({
+                  isComplete,
+                  budgetList: budgetList.map((budget: Budget) => ({
+                      categoryId: budget.categoryId,
+                      categoryName: budget.categoryName,
+                      categoryBudget: budget.categoryBudget,
+                      usedBudget: budget.usedBudget,
+                      fiftyBudget: budget.fiftyBudget,
+                      eightyBudget: budget.eightyBudget,
+                      budgetWon: budget.budgetWon
+                  }))
+              });
     
-            setBudgetDetails({
-                isComplete,
-                budgetList: budgetList.map((budget: Budget) => ({
-                    categoryId: budget.categoryId,
-                    categoryName: budget.categoryName,
-                    categoryBudget: budget.categoryBudget,
-                    usedBudget: budget.usedBudget,
-                    fiftyBudget: budget.fiftyBudget,
-                    eightyBudget: budget.eightyBudget,
-                    budgetWon: budget.budgetWon
-                }))
-            });
-        }
+              setUseBudget(budgetList.reduce(
+                (total:Number, usedBudget: any) => total + usedBudget, 0));
     
-        if (budgetError) {
-            // Handle budgetError here
-        }
-    }, [budgetData, budgetError]);
+          }
+      
+          if (budgetError) {
+          }
+    
+      }, [budgetData, budgetError]);
     
     let categoryId: number = 0;
     let categoryName: string = '';
@@ -367,7 +373,13 @@ const CompletedTravelDetailPage = () => {
       <Overlay />
       <ContentDiv>
           <TravelCardDiv>
-          <TravelDetailCard title={title} startDate={startDate} endDate={endDate} country={country} memberCount={memberCount} totalBudgetWon={totalBudgetWon} />
+          <TravelDetailCard 
+          title={title} 
+          startDate={startDate} 
+          endDate={endDate} country={country} 
+          memberCount={memberCount} 
+          usedBudget={useBudget}
+          totalBudgetWon={totalBudgetWon} />
           </TravelCardDiv>
           <TravelDetailPay/>
           <CategoryBudgetDiv>

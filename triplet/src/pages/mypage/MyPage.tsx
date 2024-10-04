@@ -115,6 +115,7 @@ const MyPage = () => {
 
     useEffect(() => {
         dispatch(pageMove("mypage"));
+        console.log(memberId);
     }, [])
 
 

@@ -12,8 +12,10 @@ import TravelDetailPay from '../../components/travel/TravelDetailPay';
 import { ReactComponent as RightArrow } from '../../assets/common/rightArrow.svg';
 import { ReactComponent as PayIcon } from '../../assets/common/payIcon.svg';
 import { ReactComponent as ShareIcon } from '../../assets/common/shareIcon.svg';
-import { selectTravelByTitleId } from '../../features/travel/upcomingTravelSlice';
+import { selectUpcomingTravelByTitleId } from '../../features/travel/upcomingTravelSlice';
 import { RootState } from '../../store';
+import useAxios from '../../hooks/useAxios';
+import { ongoingTravelDataInsert } from '../../features/travel/ongoingTravelSlice';
 
 const DetailDiv = styled.div`
     padding : 56px 0 0 0;
@@ -133,7 +135,7 @@ const MoneyChartBar = styled.div<MonyeProgressProps>`
 
 const MoneyCategoryP = styled.p`
     color : #666666;
-    font-size : 16px;
+    font-size : 14px;
     font-weight : 600;
     margin : 0;
     margin-left : 2px;
@@ -185,9 +187,90 @@ const CompletedTravelDetailPage = () => {
     dispatch(pageMove("travels"));
   }, [dispatch]);
 
-  const { id } = useParams();
+  const travel = useSelector((state:any) => state.ongoingTravel);
 
-  const travel = useSelector( (state:RootState) => selectTravelByTitleId(state, Number(id)));
+  const { data : travelData, error : travelError, status : travelStatus,
+    refetch : travelRefetch
+  } = useAxios("/travels/ongoing", "GET");
+
+  const { data: budgetData, error: budgetError,
+    status: budgetStatus, refetch: budgetRefetch
+} = useAxios(`/expenditure-expenses/${travel.id}`, "GET");
+
+useEffect(()=> {
+    if(!travel?.travelId){
+        travelRefetch();
+        budgetRefetch();
+    }
+  }, [])
+
+  useEffect(() => {
+    if (travelData && travelData.data) {
+      dispatch(ongoingTravelDataInsert({
+        travelId: travelData.data.travelId,
+        title: travelData.data.title,
+        startDate: travelData.data.startDate,
+        endDate: travelData.data.endDate,
+        image: travelData.data.image,
+        countryName: travelData.data.countryName,
+        countryId: travelData.data.countryId,
+        currency: travelData.data.currency,
+        memberCount: travelData.data.memberCount,
+        totalBudget: travelData.data.totalBudget,
+        usedBudget: travelData.data.usedBudget,
+        status: travelData.data.status,
+        shareStatus: travelData.data.shareStatus,
+        shared: travelData.data.shared,
+      }));
+      console.log(travelData);
+    }
+  }, [travelData, travelError]);
+  
+  interface BudgetDetails {
+    isComplete: boolean;
+    budgetList: Budget[];
+}
+
+const [budgetDetails, setBudgetDetails] = useState<BudgetDetails | null>(null);
+
+interface Budget {
+    categoryId: number;
+    categoryName: string;
+    categoryBudget: number;
+    usedBudget: number;
+    fiftyBudget: number;
+    eightyBudget: number;
+    budgetWon: number;
+}
+
+const [ usedBudget, setUsedBudget ] = useState(0);
+
+useEffect(() => {
+    if (budgetData) {
+         const { isComplete, budgetList } = budgetData;
+  
+          setBudgetDetails({
+              isComplete,
+              budgetList: budgetList.map((budget: Budget) => ({
+                  categoryId: budget.categoryId,
+                  categoryName: budget.categoryName,
+                  categoryBudget: budget.categoryBudget,
+                  usedBudget: budget.usedBudget,
+                  fiftyBudget: budget.fiftyBudget,
+                  eightyBudget: budget.eightyBudget,
+                  budgetWon: budget.budgetWon
+              }))
+          });
+
+          setUsedBudget(budgetList.reduce(
+            (total:Number, usedBudget: any) => total + usedBudget, 0));
+
+      }
+  
+      if (budgetError) {
+      }
+
+  }, [budgetData, budgetError]);
 
   const hexToRgba = (hex:string, alpha:string) => {
     // hex 코드에서 # 제거
@@ -210,7 +293,12 @@ const CompletedTravelDetailPage = () => {
       <Overlay />
       <ContentDiv>
           <TravelCardDiv>
-          {/* <TravelDetailCard /> */}
+          <TravelDetailCard title={travel?.title||""}
+          startDate={travel?.startDate||""} endDate={travel?.endDate||""}
+          country={travel?.countryName||""}
+          memberCount={travel?.memberCount||0}
+          usedBudget={usedBudget|0}
+          totalBudgetWon={travel?.totalBudget||0}/>
           </TravelCardDiv>
           <TravelDetailPay/>
           <CategoryBudgetDiv>

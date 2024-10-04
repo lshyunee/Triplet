@@ -168,6 +168,7 @@ const MyInfoEditPage = () => {
 
     const [ phoneNum, setPhoneNum ] = useState('');
     const [ identificationNum, setIdentificationNum ] = useState('');
+    const [ memberId, setMemberId ] = useState('');
 
     const { data: infoData, error: infoError, loading: infoLoading,
             status: infoStatus, refetch: infoRefetch}
@@ -185,6 +186,7 @@ const MyInfoEditPage = () => {
             phoneNumFront.changeData(infoData.data.phoneNumber.slice(0,3));
             phoneNumMiddle.changeData(infoData.data.phoneNumber.slice(3,7));
             phoneNumBack.changeData(infoData.data.phoneNumber.slice(7,11));
+            setMemberId(infoData.data.memberId.slice(0,5));
         }
 
     },[infoData])
@@ -323,25 +325,29 @@ const MyInfoEditPage = () => {
                             <NumP>* * * * * *</NumP>
                         </RegistDiv>
                     </InputDistanceDiv>
-                    <InputDistanceDiv>
-                        <HowP>전화번호</HowP>
-                        <PhoneDiv>
-                            <StyledInputFront type="text" value={phoneNumFront.value} onChange={phoneNumFront.onChange} />
-                            <NumP>-</NumP>
-                            <StyledInput type="text" value={phoneNumMiddle.value} onChange={phoneNumMiddle.onChange} />
-                            <NumP>-</NumP>
-                            <StyledInput type="text" value={phoneNumBack.value} onChange={phoneNumBack.onChange} />
-                            <StyledBtn onClick={certificateSend}>인증번호 발송</StyledBtn>
-                        </PhoneDiv>
-                    </InputDistanceDiv>
-                    <InputDistanceDiv>
-                        <HowP>인증번호</HowP>
-                        <CheckDiv>
-                            <StyledInput type="text" value={certificationNum.value} onChange={certificationNum.onChange} />
-                            <StyledBtn onClick={certificateCheck}>확인</StyledBtn>
-                        </CheckDiv>
-                        <CheckP>{isCheck ? "인증되었습니다." : ""}</CheckP>
-                    </InputDistanceDiv>
+                    { memberId ==="kakao" ? null : (
+                        <>
+                            <InputDistanceDiv>
+                                <HowP>전화번호</HowP>
+                                <PhoneDiv>
+                                    <StyledInputFront type="text" value={phoneNumFront.value} onChange={phoneNumFront.onChange} />
+                                    <NumP>-</NumP>
+                                    <StyledInput type="text" value={phoneNumMiddle.value} onChange={phoneNumMiddle.onChange} />
+                                    <NumP>-</NumP>
+                                    <StyledInput type="text" value={phoneNumBack.value} onChange={phoneNumBack.onChange} />
+                                    <StyledBtn onClick={certificateSend}>인증번호 발송</StyledBtn>
+                                </PhoneDiv>
+                            </InputDistanceDiv>
+                            <InputDistanceDiv>
+                                <HowP>인증번호</HowP>
+                                <CheckDiv>
+                                    <StyledInput type="text" value={certificationNum.value} onChange={certificationNum.onChange} />
+                                    <StyledBtn onClick={certificateCheck}>확인</StyledBtn>
+                                </CheckDiv>
+                                <CheckP>{isCheck ? "인증되었습니다." : ""}</CheckP>
+                            </InputDistanceDiv>
+                        </>
+                    )}
                     <ConfirmBtn onClick={myInfoEdit}>수정 완료</ConfirmBtn>
                 </InputDiv>
             </EntireDiv>

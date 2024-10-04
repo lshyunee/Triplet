@@ -11,7 +11,9 @@ import CompleteTravelCard from '../../components/travel/CompleteTravelCard';
 
 import { ReactComponent as CreateBtn } from '../../assets/travel/create.svg';
 import { RootState } from '../../store';
-import { selectAllTravelIds } from '../../features/travel/completedTravelSlice';
+import { addCompletedTravels, setCompletedTravels, selectAllCompletedTravelIds } from '../../features/travel/completedTravelSlice';
+import { addUpcomingTravels, selectAllUpcomingTravelIds, setUpcomingTravels } from '../../features/travel/upcomingTravelSlice';
+import useAxios from '../../hooks/useAxios';
 
 const TravelDiv = styled.div`
     min-height : calc(100vh - 56px);
@@ -75,9 +77,40 @@ const TravelsPage = () => {
 
     useEffect(() => {
         dispatch(pageMove("travels"));
+
+        upcomingRefetch();
+        completedRefetch();
+
     }, [])
 
-    const completedTravelIds: number[] = useSelector(selectAllTravelIds);
+    const { data : upcomingData, error : upcomingError, status : upcomingStatus,
+        refetch : upcomingRefetch
+     } = useAxios("/travels/upcoming", "GET");
+
+     const { data : completedData, error : completedError, status : completedStatus,
+        refetch : completedRefetch
+     } = useAxios("/travels/completed", "GET");
+
+    useEffect(() => {
+
+        if (upcomingData && upcomingStatus === 200) {
+            dispatch(addUpcomingTravels(upcomingData.data)); // 액션을 dispatch로 호출
+          }
+
+    }, [upcomingData, upcomingError])
+
+    
+    useEffect(()=>{
+
+        if(completedData && completedStatus === 200){
+            dispatch(addCompletedTravels(completedData.data));
+        }
+
+    },[completedData, completedError])
+
+    const completedTravelIds: number[] = useSelector(selectAllCompletedTravelIds);
+    const upcomingTravelIds : number[] = useSelector(selectAllUpcomingTravelIds);
+
 
     return (
         <>
@@ -96,7 +129,9 @@ const TravelsPage = () => {
                         다가오는 여행
                     </CategoryP>
                     <TravelCardDiv>
-                        <UpcomingTravelCard/>
+                        {upcomingTravelIds.map((id:number) =>(
+                            <UpcomingTravelCard key={id} travelId={id}/>
+                        ))}
                     </TravelCardDiv>
                 </UpcomingTravelDiv>
                 <CompleteTravelDiv>
@@ -104,15 +139,9 @@ const TravelsPage = () => {
                         지난 여행
                     </CategoryP>
                     <TravelCardDiv>
-                        {/* {completedTravelIds.map((id:number) =>(
+                        {completedTravelIds.map((id:number) =>(
                             <CompleteTravelCard key={id} travelId={id}/>
-                        ))} */}
-                        <CompleteTravelCard travelId={1}/>
-                        <CompleteTravelCard travelId={1}/>
-                        <CompleteTravelCard travelId={1}/>
-                        <CompleteTravelCard travelId={1}/>
-                        <CompleteTravelCard travelId={1}/>
-                        <CompleteTravelCard travelId={1}/>
+                        ))}
                     </TravelCardDiv>
                 </CompleteTravelDiv>
                 <CreateTravelDiv>

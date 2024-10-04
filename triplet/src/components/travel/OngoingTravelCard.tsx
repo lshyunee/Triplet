@@ -135,22 +135,62 @@ const PriceInfoP = styled.p`
 const OngoingTravelCard = () => {
 
     const dispatch = useDispatch();
-
     const travelData = useSelector((state:any) => state.ongoingTravel);
+
+    const { data: infoData, error: infoError, refetch: infoRefetch } = useAxios("/travels/ongoing", "GET");
+
+    useEffect(() => {
+        if (!travelData.travelId) {
+            infoRefetch();
+        }
+        console.log("여행아이디",travelData.travelId);
+    }, [travelData.travelId]);
+
+    useEffect(() => {
+        if (infoData?.data) {
+            dispatch(ongoingTravelDataInsert({
+              travelId: infoData.data.travelId,
+              title: infoData.data.title,
+              startDate: infoData.data.startDate,
+              endDate: infoData.data.endDate,
+              image: infoData.data.image,
+              countryName: infoData.data.countryName,
+              countryId: infoData.data.countryId,
+              currency: infoData.data.currency,
+              memberCount: infoData.data.memberCount,
+              totalBudget: infoData.data.totalBudget,
+              status: infoData.data.status,
+              shareStatus: infoData.data.shareStatus,
+              shared: infoData.data.shared,
+            }));
+          }
+
+        if (infoError !== null) {
+            if(infoError.response.data.message){
+                console.log(infoError.response.data.message);
+            }
+        }
+    }, [infoData, infoError]);
+    
+    if (!travelData || !travelData.travelId) {
+        return null;
+    }
 
     return (
         <PositionDiv>
             <CardDiv>
-                <TravelImg src={SampleImg} alt="Travel" />
+                <TravelImg src={travelData?.image} alt="Travel" />
                 <Overlay />
                 <BottomOverlay /> {/* 하단 반투명 오버레이 추가 */}
-                <TitleP>고래상어보러가자</TitleP>
-                <InfoP>2024년 9월 3일 ~ 9월 7일<br />일본 · 2명</InfoP>
+                <TitleP>{travelData?.title}</TitleP>
+                <InfoP>{travelData?.startDate ? new Date(travelData.startDate).toLocaleDateString() : ''} ~ {travelData?.endDate ? 
+                new Date(travelData.endDate).toLocaleDateString() : ''}<br />
+                {travelData.countryName} · {travelData.memberCount}명</InfoP>
                 <ProgressText>30%</ProgressText> {/* 진행률 텍스트 추가 */}
                 <ProgressContainer>
                     <ProgressBar />
                 </ProgressContainer>
-                <PriceInfo>600,000 <PriceInfoP>/ 2,000,000원</PriceInfoP></PriceInfo>
+                <PriceInfo>{travelData.usedBudget} <PriceInfoP>/ {travelData.totalBudget}원</PriceInfoP></PriceInfo>
             </CardDiv>
         </PositionDiv>
     );
