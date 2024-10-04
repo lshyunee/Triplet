@@ -35,7 +35,7 @@ public class Account {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<TransactionList> transactionList = new ArrayList<>();
 
     public Account(String accountNumber, LocalDateTime accountCreatedDate, LocalDateTime accountExpiryDate) {
@@ -47,11 +47,6 @@ public class Account {
     public void createTransaction(TransactionList transaction) {
         transactionList.add(transaction);
         transaction.setAccount(this);
-    }
-
-    @PreRemove // 삭제 시 거래내역과 분리
-    public void preRemove() {
-        transactionList.forEach(transaction -> transaction.setAccount(null));
     }
 
 }

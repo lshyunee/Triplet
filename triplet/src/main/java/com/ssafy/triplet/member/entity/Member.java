@@ -10,12 +10,14 @@ import java.util.List;
 
 @Entity
 @Builder
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -29,12 +31,12 @@ public class Member {
     private String phoneNumber;
     private String role;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "krw_account_id")
     private Account krwAccount;
 
-    @OneToMany(mappedBy = "member")
     @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Account> foreignAccounts = new ArrayList<>();
 
     public void createMyKrwAccount(Account account) {
@@ -45,14 +47,6 @@ public class Member {
     public void createMyForeignAccount(Account account) {
         this.foreignAccounts.add(account);
         account.setMember(this);
-    }
-
-    @PreRemove // 삭제 시 계좌 연관관계 분리
-    public void preRemove() {
-        if (krwAccount != null) {
-            krwAccount.setMember(null);
-        }
-        foreignAccounts.forEach(account -> account.setMember(null));
     }
 
 }
