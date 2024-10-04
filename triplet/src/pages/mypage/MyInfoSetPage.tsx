@@ -160,21 +160,8 @@ const MyInfoSetPage = () => {
     const name = useInput();
     const identificationNumFront = useInput(validIdentificationFront);
     const identificationNumBack = useInput(validIdentificationBack);
-    const phoneNumFront = useInput(validPhoneNumFront);
-    const phoneNumMiddle = useInput(validPhoneNum);
-    const phoneNumBack = useInput(validPhoneNum);
-    const certificationNum = useInput(validNum);
 
-    const [ phoneNum, setPhoneNum ] = useState('');
     const [ identificationNum, setIdentificationNum ] = useState('');
-
-    
-    const [ isSend, setIsSend ] = useState(false);
-
-
-    useEffect(() => {
-        console.log(isSend);
-    },[])
 
 
       // 주민등록번호
@@ -182,61 +169,10 @@ const MyInfoSetPage = () => {
         setIdentificationNum(`${identificationNumFront.value}${identificationNumBack.value}`);
     }, [identificationNumFront, identificationNumBack])
 
-      // 전화번호 인증
-    useEffect(() => {
-        setPhoneNum(`${phoneNumFront.value}${phoneNumMiddle.value}${phoneNumBack.value}`);
-    }, [phoneNumFront, phoneNumMiddle, phoneNumBack])
-
-    const { data: phoneData, error: phoneError, loading: phoneLoading,
-        status: phoneStatus, refetch: phoneRefetch }
-        = useAxios('/sms/send','POST',{phoneNumber : phoneNum});
-
-        const certificateSend = () => {
-            phoneRefetch();
-        };
-
-    useEffect(() => {
-        
-        if(phoneError && phoneStatus!==200){
-            console.log(phoneError);
-            const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
-            setErrorMsg(message);
-            isErrorOpen();
-        }
-        
-        if(phoneData && phoneStatus===200){
-            setIsSend(true);
-        }
-
-    }, [phoneData, phoneError])
-
-    const { data : smsData, error: smsError, loading: smsLoading,
-        status: smsStatus, refetch: smsRefetch}
-        = useAxios('/sms/confirm', 'POST', 
-            {phoneNumber : phoneNum, certificationNumber: certificationNum.value});
-
-    const certificateCheck = () => {
-        smsRefetch();
-    }
-
-    const [ isCheck, setIsCheck ] = useState(false);
-
-    useEffect (() => {
-        if(smsData!==null){
-            setIsCheck(true);
-        }else if (smsError!==null){
-            console.log(smsError);
-            const message = smsError.response.data.message || '전화번호를 인증할 수 없습니다.';
-            setErrorMsg(message);
-            isErrorOpen();
-        }
-    }, [smsData, smsError]);
-
     const { data: editData, error: editError, loading: editLoading,
         status: editStatus, refetch: editRefetch }
         = useAxios('/user/my', 'PUT', {
             name : name.value,
-            phoneNumber : phoneNum,
             identificationNumber : identificationNum
         });
 
@@ -246,9 +182,8 @@ const MyInfoSetPage = () => {
             isErrorOpen();
             return;
         }
-        if(isCheck){
-            editRefetch();
-        }   
+        
+        editRefetch();
     }
 
     useEffect(() => {
@@ -308,25 +243,6 @@ const MyInfoSetPage = () => {
                             <StyledInput type="text" value={identificationNumBack.value} onChange={identificationNumBack.onChange} disabled={false}/>
                             <NumP>* * * * * *</NumP>
                         </RegistDiv>
-                    </InputDistanceDiv>
-                    <InputDistanceDiv>
-                        <HowP>전화번호</HowP>
-                        <PhoneDiv>
-                            <StyledInputFront type="text" value={phoneNumFront.value} onChange={phoneNumFront.onChange} disabled={isSend} />
-                            <NumP>-</NumP>
-                            <StyledInput type="text" value={phoneNumMiddle.value} onChange={phoneNumMiddle.onChange} disabled={isSend}/>
-                            <NumP>-</NumP>
-                            <StyledInput type="text" value={phoneNumBack.value} onChange={phoneNumBack.onChange} disabled={isSend}/>
-                            <StyledBtn onClick={certificateSend} disabled={isSend}>인증번호 발송</StyledBtn>
-                        </PhoneDiv>
-                    </InputDistanceDiv>
-                    <InputDistanceDiv>
-                        <HowP>인증번호</HowP>
-                        <CheckDiv>
-                            <StyledInput type="text" value={certificationNum.value} onChange={certificationNum.onChange} disabled={isCheck}/>
-                            <StyledBtn onClick={certificateCheck} disabled={isCheck}>확인</StyledBtn>
-                        </CheckDiv>
-                        <CheckP>{isCheck ? "인증되었습니다." : ""}</CheckP>
                     </InputDistanceDiv>
                     <ConfirmBtn onClick={myInfoEdit}>등록</ConfirmBtn>
                 </InputDiv>
