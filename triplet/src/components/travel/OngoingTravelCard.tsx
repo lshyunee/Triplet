@@ -147,24 +147,23 @@ const OngoingTravelCard = () => {
     }, [travelData.travelId]);
 
     useEffect(() => {
-        if (infoData) {
-            console.log(infoData);
+        if (infoData?.data) {
             dispatch(ongoingTravelDataInsert({
-                travelId: infoData.data.travelId,
-                title: infoData.data.title,
-                startDate: infoData.data.startDate,
-                endDate: infoData.data.endDate,
-                image: infoData.data.image,
-                countryName: infoData.data.countryName,
-                countryId: infoData.data.countryId,
-                currency: infoData.data.currency,
-                memberCount: infoData.data.memberCount,
-                totalBudget: infoData.data.totalBudget,
-                status: infoData.data.status,
-                shareStatus: infoData.data.shareStatus,
-                shared: infoData.data.shared,
+              travelId: infoData.data.travelId,
+              title: infoData.data.title,
+              startDate: infoData.data.startDate,
+              endDate: infoData.data.endDate,
+              image: infoData.data.image,
+              countryName: infoData.data.countryName,
+              countryId: infoData.data.countryId,
+              currency: infoData.data.currency,
+              memberCount: infoData.data.memberCount,
+              totalBudget: infoData.data.totalBudget,
+              status: infoData.data.status,
+              shareStatus: infoData.data.shareStatus,
+              shared: infoData.data.shared,
             }));
-        }
+          }
 
         if (infoError !== null) {
             if(infoError.response.data.message){
@@ -172,6 +171,10 @@ const OngoingTravelCard = () => {
             }
         }
     }, [infoData, infoError]);
+    
+    if (!travelData || !travelData.travelId) {
+        return null;
+    }
 
     return (
         <PositionDiv>

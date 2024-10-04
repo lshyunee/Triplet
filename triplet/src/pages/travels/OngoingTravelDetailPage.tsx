@@ -135,7 +135,7 @@ const MoneyChartBar = styled.div<MonyeProgressProps>`
 
 const MoneyCategoryP = styled.p`
     color : #666666;
-    font-size : 16px;
+    font-size : 14px;
     font-weight : 600;
     margin : 0;
     margin-left : 2px;

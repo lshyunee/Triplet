@@ -31,6 +31,10 @@ const upcomingTravelSlice = createSlice({
     initialState,
     reducers: {
         addUpcomingTravels: (state, action: PayloadAction<TravelState[]>) => {
+            if (!action.payload) {
+                return;
+              }
+              
             const newTravels = action.payload.filter(newTravel => 
               !state.travels.some(existingTravel => existingTravel.travelId === newTravel.travelId)
             );
