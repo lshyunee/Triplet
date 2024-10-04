@@ -12,8 +12,10 @@ import TravelDetailPay from '../../components/travel/TravelDetailPay';
 import { ReactComponent as RightArrow } from '../../assets/common/rightArrow.svg';
 import { ReactComponent as PayIcon } from '../../assets/common/payIcon.svg';
 import { ReactComponent as ShareIcon } from '../../assets/common/shareIcon.svg';
-import { selectTravelByTitleId } from '../../features/travel/upcomingTravelSlice';
+import { addUpcomingTravels, selectUpcomingTravelByTitleId } from '../../features/travel/upcomingTravelSlice';
 import { RootState } from '../../store';
+import useAxios from '../../hooks/useAxios';
+import { addCompletedTravels } from '../../features/travel/completedTravelSlice';
 
 const DetailDiv = styled.div`
     padding : 56px 0 0 0;
@@ -187,7 +189,75 @@ const CompletedTravelDetailPage = () => {
 
   const { id } = useParams();
 
-  const travel = useSelector( (state:RootState) => selectTravelByTitleId(state, Number(id)));
+  const travel = useSelector( (state:RootState) => selectUpcomingTravelByTitleId(state, Number(id)));
+
+  const { data : travelData, error : travelError, status : travelStatus,
+    refetch : travelRefetch
+  } = useAxios("/travels/${id}", "GET");
+
+  const { data: budgetData, error: budgetError,
+    status: budgetStatus, refetch: budgetRefetch
+} = useAxios(`/expenditure-expenses/${id}`, "GET");
+
+  useEffect(()=> {
+    if(!travel?.travelId){
+        travelRefetch();
+        budgetRefetch();
+    }
+  }, [])
+
+  useEffect(()=>{
+    if(travelData){
+        dispatch(addUpcomingTravels(travelData.data));
+        console.log(travelData);
+    }
+  }, [travelData, travelError])
+  
+interface BudgetDetails {
+    isComplete: boolean;
+    budgetList: Budget[];
+}
+
+const [budgetDetails, setBudgetDetails] = useState<BudgetDetails | null>(null);
+
+interface Budget {
+    categoryId: number;
+    categoryName: string;
+    categoryBudget: number;
+    usedBudget: number;
+    fiftyBudget: number;
+    eightyBudget: number;
+    budgetWon: number;
+}
+
+const [ usedBudget, setUsedBudget ] = useState(0);
+
+useEffect(() => {
+    if (budgetData) {
+         const { isComplete, budgetList } = budgetData;
+  
+          setBudgetDetails({
+              isComplete,
+              budgetList: budgetList.map((budget: Budget) => ({
+                  categoryId: budget.categoryId,
+                  categoryName: budget.categoryName,
+                  categoryBudget: budget.categoryBudget,
+                  usedBudget: budget.usedBudget,
+                  fiftyBudget: budget.fiftyBudget,
+                  eightyBudget: budget.eightyBudget,
+                  budgetWon: budget.budgetWon
+              }))
+          });
+
+          setUsedBudget(budgetList.reduce(
+            (total:Number, usedBudget: any) => total + usedBudget, 0));
+
+      }
+  
+      if (budgetError) {
+      }
+
+  }, [budgetData, budgetError]);
 
   const hexToRgba = (hex:string, alpha:string) => {
     // hex 코드에서 # 제거
@@ -210,7 +280,12 @@ const CompletedTravelDetailPage = () => {
       <Overlay />
       <ContentDiv>
           <TravelCardDiv>
-          {/* <TravelDetailCard /> */}
+          <TravelDetailCard title={travel?.title||""}
+          startDate={travel?.startDate||""} endDate={travel?.endDate||""}
+          country={travel?.countryName||""}
+          memberCount={travel?.memberCount||0}
+          usedBudget={usedBudget|0}
+          totalBudgetWon={travel?.totalBudget||0}/>
           </TravelCardDiv>
           <TravelDetailPay/>
           <CategoryBudgetDiv>
