@@ -32,7 +32,7 @@ const Header: React.FC = () => {
 
   return (
     <StyledDiv>
-        <Link to="/home" style={{ textDecoration: 'none' }}>
+        <Link to="/" style={{ textDecoration: 'none' }}>
             <StyledP>Triplet</StyledP>
         </Link>
         <Link to="/alarm">

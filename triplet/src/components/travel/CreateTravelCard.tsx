@@ -54,8 +54,8 @@ const ContentDiv = styled.div`
 `;
 
 const TitleP = styled.p`
-    font-weight: 300;
-    font-size: 20px;
+    font-weight: 600;
+    font-size: 16px;
     color: white;
     margin : 0;
     margin-bottom: 12px;

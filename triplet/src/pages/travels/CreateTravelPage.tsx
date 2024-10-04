@@ -175,6 +175,9 @@ const CreateTravelPage = () => {
     };
   };
 
+
+  
+
   return (
     <>
     <BackHeader title='여행 등록'/>
@@ -222,6 +225,7 @@ const CreateTravelPage = () => {
         style={{display: 'none'}}
         onChange={handleImageUpload}
       />
+      <button>test</button>
     </s.Container>
     </>
   );

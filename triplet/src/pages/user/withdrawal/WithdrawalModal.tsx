@@ -75,7 +75,7 @@ const WithdrawalModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   // Hook은 항상 호출되도록 한다.
   const { data: withdrawalData, error: withdrawalError, loading: withdrawalLoading,
     status: withdrawalStatus, refetch: withdrawalRefetch}
-    = useAxios('/my', 'DELETE', { manual: true });
+    = useAxios('/user/my', 'DELETE', { manual: true });
 
   const handleWithdrawal = () => {
     // 로그아웃을 클릭했을 때만 실제 로그아웃 API 호출
