@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 public enum CustomErrorCode {
 
     ID_ALREADY_REGISTERED("M0001", "이미 등록된 아이디입니다.", HttpStatus.BAD_REQUEST),
+    PHONENUMBER_ALREADY_REGISTERED("M0019", "이미 등록된 전화번호 입니다.", HttpStatus.BAD_REQUEST),
     PASSWORD_MISMATCH("M0006", "입력한 두 비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     INCORRECT_PASSWORD("M0013", "현재 비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
     SIMPLE_PASSWORD_MISMATCH("M0004", "간편비밀번호가 일치하지 않습니다.", HttpStatus.BAD_REQUEST),
@@ -41,11 +42,15 @@ public enum CustomErrorCode {
     SAME_CURRENCY_NOT_ALLOWED_ERROR("C0005","동일한 통화로 환전이 불가능합니다.", HttpStatus.BAD_REQUEST),
     CURRENCY_MISMATCH_ERROR("C0002","외화 → 원화 , 원화 → 외화만 가능합니다.",HttpStatus.BAD_REQUEST),
     MAX_UPLOAD_SIZE_EXCEEDED("E0003", "업로드 가능한 파일 크기를 초과했습니다.", HttpStatus.PAYLOAD_TOO_LARGE),
+    ELASTICSEARCH_ERROR("E0004", "Elasticsearch 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR),
     MERCHANT_NOT_FOUND("A0019","가맹점이 존재하지 않습니다.",HttpStatus.NOT_FOUND),
     MERCHANT_AND_PAYMENT_CURRENCY_MISMATCH("A0029","가맹점과 동일한 통화의 계좌만 결제 가능합니다.",HttpStatus.BAD_REQUEST),
     INVALID_PRICE_VALUE("A0030","결제 금액을 확인하세요",HttpStatus.BAD_REQUEST),
     TRAVEL_BUDGET_NOT_FOUND("T0020", "카테고리 여행 예산을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ACCOUNT_PERMISSION_DENIED("A0031","계좌에 접근할 권한이 없습니다.",HttpStatus.FORBIDDEN);
+
+
+>>>>>>> triplet/src/main/java/com/ssafy/triplet/exception/CustomErrorCode.java
     private final String code;
     private final String message;
     private final HttpStatus status;
