@@ -109,10 +109,11 @@ const MyPage = () => {
     const [ isLogOutOpen, setIsLogOutOpen ] = useState(false);
     const userData = useSelector((state:any) => state.userInfo);
 
-    const { name, birth, phoneNumber } = userData;
+    const { memberId, name, birth, phoneNumber } = userData;
 
     useEffect(() => {
         dispatch(pageMove("mypage"));
+        console.log(memberId);
     }, [])
 
 
