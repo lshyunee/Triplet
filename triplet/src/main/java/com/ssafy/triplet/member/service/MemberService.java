@@ -35,7 +35,10 @@ public class MemberService {
         if (existMember != null) {
             throw new CustomException(CustomErrorCode.ID_ALREADY_REGISTERED);
         }
-
+        // 휴대폰번호 중복확인
+        if (memberRepository.existsByPhoneNumber(request.getPhoneNumber())) {
+            throw new CustomException(CustomErrorCode.PHONENUMBER_ALREADY_REGISTERED);
+        }
         // 비밀번호 확인
         if (request.getPasswordConfirm() == null || !request.getPassword().equals(request.getPasswordConfirm())) {
             throw new CustomException(CustomErrorCode.PASSWORD_MISMATCH);

@@ -10,4 +10,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m.id FROM Member m WHERE m.memberId = :memberId")
     Long findIdByMemberId(@Param("memberId") String memberId);
+
+    boolean existsByPhoneNumber(String phoneNumber);
 }

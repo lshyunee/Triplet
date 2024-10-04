@@ -25,6 +25,7 @@ public class Member {
     private String birth;
     private Boolean gender;
     private String simplePassword;
+    @Column(unique = true)
     private String phoneNumber;
     private String role;
 
