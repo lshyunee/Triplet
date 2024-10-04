@@ -132,15 +132,20 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
             // 6자리 비밀번호가 입력되면 이동
             if (password.join('') === prePassword.join('')) {
                 resRefetch();
-                if (resStatus === 200) {
-                    navigate('/home');
-                }
             } else {
                 setIsError(true); // 에러 상태로 설정
                 setPassword([]);
             }
         }
     },[password]);
+
+    useEffect (() => {
+        
+        if(resData && resStatus===200){
+            navigate("/");
+        }
+
+    }, [resData, resError])
 
     // 지우기 버튼 클릭 핸들러
     const handleBackspace = () => {
