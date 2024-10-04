@@ -56,6 +56,8 @@ public class ExchangeRateRepository {
     // Redis의 Hash 자료형 처리하기 위해 사용
     private final HashOperations<String, String, ExchangeRates> hashOperations;
 
+    private final List<String> currencies = List.of("GBP", "CAD", "CNY", "EUR", "CHF", "USD", "JPY");
+
 
     // 환율 키 설정
     private String current = "currentExchangeRates";
@@ -119,10 +121,10 @@ public class ExchangeRateRepository {
 //    }
 
     // 외부 API 에서 환율 불러오는 메서드
-    public List<ExchangeRates> fetchExchangeRates() {
+    public Map<String, ExchangeRates> fetchExchangeRates() {
 
         // 환율 정보를 담을 리스트 생성
-        List<ExchangeRates> exchangeRates = null;
+        Map<String, ExchangeRates>  exchangeRates = null;
 
 
         // headers에 context-type을 JSON 형식으로 설정
@@ -159,7 +161,7 @@ public class ExchangeRateRepository {
             ResponseEntity<String> res = restTemplate.postForEntity(apiUrl, req, String.class);
 
             if (res.getStatusCode().is2xxSuccessful()) {
-                exchangeRates = entityParser.toEntity(res.getBody().toString());
+                exchangeRates = entityParser.getExchangeRateMap(res.getBody().toString());
             }
         } catch (Exception e) {
             log.info("환율 정보를 불러오는데 실패했습니다.");
@@ -172,32 +174,50 @@ public class ExchangeRateRepository {
     // 매일 11 시 마다 Redis에 저장된 환율 갱신하는 매서드
     @Scheduled(cron = "0 0 11 * * *")
     public void updateExchangeRatesWithLua() {
-
         // 외부 API를 통해 최신 환율 받아오기
-        List<ExchangeRates> newExchangeRates = fetchExchangeRates();
-
+        Map<String, ExchangeRates>  newExchangeRatesMap = fetchExchangeRates();
         // 최신 환율 받아오면
-        if (newExchangeRates != null) {
+        if (newExchangeRatesMap != null) {
             // Lua Script 에 맞는 데이터로 변환하기 위한 List 생성
             List<String> luaData = new ArrayList<>();
             try {
-                // 환율 데이터를 Redis 에 JSON 형식으로 저장하기 위해 매핑
-                for (ExchangeRates exchangeRate : newExchangeRates) {
+                // Redis에서 이전, 환율을 불러옴
+                Map<String, ExchangeRates> currentExchangeRatesMap = findAll("currentExchangeRates");
+                // 환율 코드로 환율 정보를 불러온 후
+                // 환율 비교 -> 변화율 계산 -> response에 담아서 리턴
+                for (String currency : currencies) {
+
+                    ExchangeRates currentExchangeRates = currentExchangeRatesMap.get(currency);
+                    ExchangeRates newExchangeRates = newExchangeRatesMap.get(currency);
+
+                    Double currentExchangeRate = Double.valueOf(currentExchangeRates.getExchangeRate().replace(",", ""));
+                    Double newExchangeRate = Double.valueOf(newExchangeRates.getExchangeRate().replace(",", ""));
+
+                    Double changePercentage = ((newExchangeRate - currentExchangeRate) / currentExchangeRate) * 100;
+
+
+                    newExchangeRates.setChangePercentage(String.format("%.2f", Math.abs(changePercentage)));
+                    newExchangeRates.setChangeStatus((int) Math.signum(changePercentage));
+
+
+
+
+                    // 환율 데이터를 Redis 에 JSON 형식으로 저장하기 위해 매핑
                     // 역직렬화 할때 ExchangeRates 로 하기위해 클래스를 같이 저장
-                    String className = exchangeRate.getClass().getName();
-                    exchangeRate.setExchangeRate(exchangeRate.getExchangeRate().replace(",",""));
-                    if(exchangeRate.getCurrency().equals("JPY")){
-                        exchangeRate.setExchangeMin(100);
-                    }else if(exchangeRate.getCurrency().equals("CNY")){
-                        exchangeRate.setExchangeMin(5);
+                    String className = newExchangeRates.getClass().getName();
+                    newExchangeRates.setExchangeRate(String.valueOf(newExchangeRate));
+                    if(newExchangeRates.getCurrency().equals("JPY")){
+                        newExchangeRates.setExchangeMin(100);
+                    }else if(newExchangeRates.getCurrency().equals("CNY")){
+                        newExchangeRates.setExchangeMin(5);
                     }else{
-                        exchangeRate.setExchangeMin(1);
+                        newExchangeRates.setExchangeMin(1);
                     }
-                    Object[] arrayFormat = {className, exchangeRate};
+                    Object[] arrayFormat = {className, newExchangeRates};
                     //  objectMapper 를통해 Json 으로 변환
                     String json = objectMapper.writeValueAsString(arrayFormat);
                     // luaData에 추가
-                    luaData.add(exchangeRate.getCurrency());
+                    luaData.add(newExchangeRates.getCurrency());
                     luaData.add(json);
                 }
             } catch (JsonProcessingException e) {
@@ -234,7 +254,10 @@ public class ExchangeRateRepository {
         return ExchangeRatesMap;
     }
 
-
+    // 지원하는 통화 조회
+    public List<String> getCurrencies() {
+        return currencies;
+    }
 
 }
 

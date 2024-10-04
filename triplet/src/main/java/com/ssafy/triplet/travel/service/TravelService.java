@@ -7,6 +7,7 @@ import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
+import com.ssafy.triplet.travel.dto.request.TravelCreateRequest;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
 import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.*;
@@ -66,13 +67,13 @@ public class TravelService {
 
 
     @Transactional
-    public TravelResponse createTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
-        validateTravelRequest(request, userId, 0L);
+    public TravelResponse createTravel(Long userId, TravelCreateRequest request, MultipartFile image) throws IOException {
+        validateTravelRequest2(request, userId, 0L);
         String inviteCode = inviteCodeGenerator.generateInviteCode(request.getEndDate());
         Travel travel = buildTravel(userId, request, image, inviteCode);
         Travel savedTravel = travelRepository.save(travel);
         insertTravelMembers(userId, travel.getId());
-        saveTravelBudgets(request, savedTravel);
+        saveTravelBudgets2(request, savedTravel);
         travelWalletService.makeTravelWallet(savedTravel, userId);
         insertGroupAccountStake(userId, savedTravel);
         return buildTravelResponse(savedTravel, inviteCode);
@@ -136,12 +137,19 @@ public class TravelService {
     public TravelListResponse getTravelOngoingList(Long userId) {
         LocalDate today = LocalDate.now();
         Travel travel = travelRepository.findOngoingTravelByUserId(userId, today);
+        if (travel == null) {
+            return null;
+        }
         return convertToTravelListResponse(travel);
     }
 
     public List<TravelListResponse> getTravelCompleteList(Long userId) {
         LocalDate today = LocalDate.now();
         List<Travel> travelList = travelRepository.findCompletedTravelsByUserId(userId, today);
+
+        if (travelList == null) {
+            return null;
+        }
 
         List<TravelListResponse> responseList = new ArrayList<>();
         for (Travel travel : travelList) {
@@ -155,6 +163,11 @@ public class TravelService {
     public List<TravelListResponse> getTravelUpcomingList(Long userId) {
         LocalDate today = LocalDate.now();
         List<Travel> travelList = travelRepository.findUpcomingTravelsByUserId(userId, today);
+
+        if (travelList == null) {
+            return null;
+        }
+
         List<TravelListResponse> responseList = new ArrayList<>();
         for (Travel travel : travelList) {
             responseList.add(convertToTravelListResponse(travel));
@@ -495,8 +508,39 @@ public class TravelService {
         }
     }
 
+    private void validateTravelRequest2(TravelCreateRequest request, Long userId, Long travelId) {
+        if (request.getTitle() == null || request.getTitle().isEmpty() ||
+                request.getStartDate() == null || request.getEndDate() == null ||
+                request.getMemberCount() <= 0 || request.getTotalBudget() <= 0 ||
+                request.getCountry() <= 0 || request.getBudgets() == null || request.getBudgets().isEmpty()) {
+            throw new CustomException(CustomErrorCode.REQUIRED_VALUE_MISSING);
+        }
+
+        LocalDate currentDate = LocalDate.now();
+        if (request.getStartDate().isBefore(currentDate)) {
+            throw new CustomException(CustomErrorCode.INVALID_TRAVEL_START_DATE);
+        }
+
+        List<Travel> travelList = travelRepository.findAllTravelByUserId(userId);
+        for (Travel travel : travelList) {
+            if (!Objects.equals(travel.getId(), travelId)) {
+                if ((request.getStartDate().isEqual(travel.getStartDate()) || request.getStartDate().isAfter(travel.getStartDate())) &&
+                        (request.getStartDate().isBefore(travel.getEndDate()) || request.getStartDate().isEqual(travel.getEndDate())) ||
+                        (request.getEndDate().isEqual(travel.getStartDate()) || request.getEndDate().isAfter(travel.getStartDate())) &&
+                                (request.getEndDate().isBefore(travel.getEndDate()) || request.getEndDate().isEqual(travel.getEndDate())) ||
+                        (request.getStartDate().isBefore(travel.getStartDate()) && request.getEndDate().isAfter(travel.getEndDate()))) {
+                    throw new CustomException(CustomErrorCode.TRAVEL_SCHEDULE_CONFLICT);
+                }
+            }
+        }
+
+        if (request.getEndDate().isBefore(request.getStartDate())) {
+            throw new CustomException(CustomErrorCode.INVALID_TRAVEL_END_DATE);
+        }
+    }
+
     // Travel 객체 생성 메서드 (여행 생성)
-    private Travel buildTravel(Long userId, TravelRequest request, MultipartFile image, String inviteCode) throws IOException {
+    private Travel buildTravel(Long userId, TravelCreateRequest request, MultipartFile image, String inviteCode) throws IOException {
         Travel travel = new Travel();
         travel.setInviteCode(inviteCode);
         travel.setStartDate(request.getStartDate());
@@ -525,6 +569,20 @@ public class TravelService {
 
     // TravelBudget 저장 메서드 (여행 생성)
     private void saveTravelBudgets(TravelRequest request, Travel travel) {
+        for (TravelRequest.BudgetDTO budgetDTO : request.getBudgets()) {
+            TravelBudget travelBudget = new TravelBudget();
+            travelBudget.setCategory(categoryRepository.findById(budgetDTO.getCategoryId())
+                    .orElseThrow(() -> new CustomException(CustomErrorCode.CATEGORY_NOT_FOUND)));
+            travelBudget.setCategoryBudget(budgetDTO.getBudget());
+            travelBudget.setBudgetWon(budgetDTO.getBudgetWon());
+            travelBudget.setTravel(travel);
+            travelBudget.setFiftyBudget((budgetDTO.getBudget() / 2));
+            travelBudget.setEightyBudget((budgetDTO.getBudget() * 0.8));
+            travelBudgetRepository.save(travelBudget);
+        }
+    }
+
+    private void saveTravelBudgets2(TravelCreateRequest request, Travel travel) {
         for (TravelRequest.BudgetDTO budgetDTO : request.getBudgets()) {
             TravelBudget travelBudget = new TravelBudget();
             travelBudget.setCategory(categoryRepository.findById(budgetDTO.getCategoryId())

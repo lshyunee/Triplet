@@ -6,14 +6,16 @@ import com.ssafy.triplet.exchange.entity.ExchangeRates;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 public class EntityParser {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public List<ExchangeRates> toEntity(String res)  {
+    private List<ExchangeRates> toEntity(String res)  {
 
         List<ExchangeRates> result = null;
         try {
@@ -32,5 +34,15 @@ public class EntityParser {
         }
         return result;
     }
+
+    public Map<String, ExchangeRates> getExchangeRateMap(String res)  {
+        Map<String, ExchangeRates> result = new HashMap<>();
+        for (ExchangeRates exchangeRates : toEntity(res)) {
+            result.put(exchangeRates.getCurrency(), exchangeRates);
+        }
+
+        return result;
+    }
+
 
 }
