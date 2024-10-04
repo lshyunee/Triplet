@@ -106,27 +106,29 @@ const PriceInfoP = styled.p`
 
 interface TravelDetailCardProps {
     title : String,
-    startDate : Date,
-    endDate : Date,
+    startDate : String,
+    endDate : String,
     country : String,
     memberCount : number,
+    usedBudget : number,
     totalBudgetWon : number,
 }
 
 const TravelDetailCard: React.FC<TravelDetailCardProps> = 
-        ({title, startDate, endDate, country, memberCount, totalBudgetWon}) => {
+        ({title, startDate, endDate, country, memberCount,usedBudget, totalBudgetWon}) => {
 
 
     return (
         <PositionDiv>
             <CardDiv>
-                <TitleP>고래상어보러가자</TitleP>
-                <InfoP>2024년 9월 3일 ~ 9월 7일<br />일본 · 2명</InfoP>
+                <TitleP>{title}</TitleP>
+                <InfoP> { startDate} ~
+                {endDate}<br />{country} · {memberCount}명</InfoP>
                 <ProgressText>30%</ProgressText> {/* 진행률 텍스트 추가 */}
                 <ProgressContainer>
                     <ProgressBar />
                 </ProgressContainer>
-                <PriceInfo>600,000 <PriceInfoP>/ 2,000,000원</PriceInfoP></PriceInfo>
+                <PriceInfo>{usedBudget} <PriceInfoP>/ {totalBudgetWon}원</PriceInfoP></PriceInfo>
             </CardDiv>
         </PositionDiv>
     );
