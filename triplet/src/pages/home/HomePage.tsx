@@ -209,6 +209,7 @@ const HomePage = () => {
               shared: infoData.data.shared,
             }));
           }
+          
         if (infoError) {
             if(infoError.response.data.message){
                 console.log(infoError.response.data.message);
