@@ -24,6 +24,9 @@ public class Merchant {
     @Column(name = "currency", nullable = false)
     private String currency;
 
+    @Column(name = "account_number", nullable = false)
+    private String accountNumber;
+
     @OneToOne
     @JoinColumn(name = "category_id", referencedColumnName = "category_id", nullable = false)
     private Category category;
