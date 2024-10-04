@@ -50,7 +50,6 @@ public enum CustomErrorCode {
     ACCOUNT_PERMISSION_DENIED("A0031","계좌에 접근할 권한이 없습니다.",HttpStatus.FORBIDDEN);
 
 
->>>>>>> triplet/src/main/java/com/ssafy/triplet/exception/CustomErrorCode.java
     private final String code;
     private final String message;
     private final HttpStatus status;
