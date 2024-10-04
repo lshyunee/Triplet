@@ -1,5 +1,6 @@
 package com.ssafy.triplet.payment.controller;
 
+import com.ssafy.triplet.auth.dto.CustomUserPrincipal;
 import com.ssafy.triplet.payment.dto.request.PaymentRequest;
 import com.ssafy.triplet.payment.dto.response.PaymentResponse;
 import com.ssafy.triplet.payment.service.PaymentService;
@@ -8,6 +9,7 @@ import com.ssafy.triplet.travel.entity.Merchant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -29,8 +31,10 @@ public class PaymentController {
     }
 
     @PostMapping("/payment")
-    public ResponseEntity<?> postPayment(@RequestBody PaymentRequest paymentRequest) {
-        PaymentResponse res = paymentService.paymentProcess(paymentRequest);
+    public ResponseEntity<?> postPayment(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal, @RequestBody PaymentRequest paymentRequest) {
+
+
+        PaymentResponse res = paymentService.paymentProcess(paymentRequest, customUserPrincipal.getMemberId());
         return ResponseEntity.ok().body(res);
     }
 
