@@ -35,7 +35,7 @@ public class Account {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "account")
+    @OneToMany(mappedBy = "account", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<TransactionList> transactionList = new ArrayList<>();
 
     public Account(String accountNumber, LocalDateTime accountCreatedDate, LocalDateTime accountExpiryDate) {
@@ -48,4 +48,5 @@ public class Account {
         transactionList.add(transaction);
         transaction.setAccount(this);
     }
+
 }
