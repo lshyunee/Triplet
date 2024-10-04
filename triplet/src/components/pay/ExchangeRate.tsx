@@ -90,19 +90,18 @@ const ExchangeRate = (props: GlobalAccountProps): JSX.Element => {
         {isRise === 1 ? (
         <s.RateArea>
           <UpperArrow/>
-          {/* <s.RedRate>{rate.toFixed(2)}%</s.RedRate> */}
+          <s.RedRate>{rate}%</s.RedRate>
         </s.RateArea>
         ) : (
         <s.RateArea>
           <LowerArrow/>
-          {/* <s.BlueRate>{rate.toFixed(2)}%</s.BlueRate> */}
+          <s.BlueRate>{rate}%</s.BlueRate>
         </s.RateArea>
         )}
-        
       </s.RightArea>
     </s.Containter>
     </>
   );
-}
+};
 
 export default ExchangeRate;

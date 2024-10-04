@@ -72,11 +72,11 @@ const LittleDiv = styled.div`
         margin-left: 12px;
     }
 
-  &:hover {
+    &:hover {
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-    border-radius: 10px;
+    border-radius: 20px;
     transition: box-shadow 0.3s ease; /* 부드러운 전환 효과 */
-  }
+    }
 `
 
 const TitleDiv = styled.div`
@@ -97,9 +97,9 @@ const LargeDiv = styled.div`
 
     &:hover {
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-    border-radius: 10px;
+    border-radius: 20px;
     transition: box-shadow 0.3s ease; /* 부드러운 전환 효과 */
-  }
+    }
 `;
 
 const Card = styled.div`
@@ -113,9 +113,9 @@ const Card = styled.div`
 
     &:hover {
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
-    border-radius: 10px;
+    border-radius: 20px;
     transition: box-shadow 0.3s ease; /* 부드러운 전환 효과 */
-  }
+    }
 `;
 
 const CardTitle = styled.span`
