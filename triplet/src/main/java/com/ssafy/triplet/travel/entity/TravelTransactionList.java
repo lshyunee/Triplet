@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -27,11 +26,8 @@ public class TravelTransactionList {
     @Column(name = "balance", nullable = false)
     private double balance;
 
-    @Column(name = "merchant_id")
-    private Long merchantId;
-
-    @Column(name = "transaction_type")
-    private String transactionType;
+    @Column(name="transaction_name",nullable = false)
+    private String transactionName;
 
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "category_id")

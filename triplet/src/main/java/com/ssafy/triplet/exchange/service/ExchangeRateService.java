@@ -222,10 +222,10 @@ public class ExchangeRateService {
 
     private void processTransaction(Account sourceAccount, Account targetAccount, ExchangeRateCalculatorResponse exchangeRateAmount) {
         updateAccountBalance(sourceAccount, -exchangeRateAmount.getSourceAmount());
-        logTransaction(sourceAccount, exchangeRateAmount.getSourceAmount(), "출금", "환전",targetAccount.getAccountNumber());
+        logTransaction(sourceAccount,2, exchangeRateAmount.getSourceAmount(), "출금", "환전",targetAccount.getAccountNumber());
 
         updateAccountBalance(targetAccount, exchangeRateAmount.getTargetAmount());
-        logTransaction(targetAccount, exchangeRateAmount.getTargetAmount(), "입금","환전", sourceAccount.getAccountNumber());
+        logTransaction(targetAccount,1, exchangeRateAmount.getTargetAmount(), "입금","환전", sourceAccount.getAccountNumber());
     }
 
     private void updateAccountBalance(Account account, Long amount) {
@@ -234,9 +234,9 @@ public class ExchangeRateService {
     }
 
 
-    private void logTransaction(Account account, Long amount, String typeName,String transactionName,String targetAccountNumber) {
+    private void logTransaction(Account account, int transactionType, Long amount, String typeName,String transactionName,String targetAccountNumber) {
         TransactionList transaction = TransactionList.builder()
-                .transactionType(2) // 트랜잭션 타입 상수로 치환 가능
+                .transactionType(transactionType) // 트랜잭션 타입 상수로 치환 가능
                 .transactionTypeName(typeName)
                 .transactionAccountNumber(targetAccountNumber)
                 .price(amount)

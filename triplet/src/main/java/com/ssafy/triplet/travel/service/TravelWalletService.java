@@ -84,7 +84,7 @@ public class TravelWalletService {
         }
         accountService.rechargeForTravelAccount(response.getAccountNumber(), updatedAccountBalance);
         travelWalletRepository.rechargeTravelWallet(request.getTravelId(), updatedWalletBalance);
-        return addRechargeForTransactionList(travel, category, updatedWalletBalance, request);
+        return addRechargeForTransactionList(travel, category, updatedWalletBalance, request,member.getName());
     }
 
     private Travel findTravelById(Long travelId) {
@@ -98,16 +98,16 @@ public class TravelWalletService {
 
 
     @Transactional
-    public TransactionListResponse addRechargeForTransactionList(Travel travel, int categoryId, double balanceTravelWallet, TravelWalletRechargeRequest request) {
+    public TransactionListResponse addRechargeForTransactionList(Travel travel, int categoryId, double balanceTravelWallet, TravelWalletRechargeRequest request, String name) {
         TravelTransactionList list = new TravelTransactionList();
         list.setTravel(travel);
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CustomException("A0009", "카테고리 ID가 유효하지 않습니다."));
         list.setCategory(category);
         list.setPrice(request.getChargeCost());
-        list.setMerchantId(0L);
         list.setBalance(balanceTravelWallet);
         list.setTransactionDate(request.getTransactionDate());
+        list.setTransactionName(name);
         return convertToTransactionListResponse(transactionListRepository.save(list));
     }
 
@@ -154,10 +154,9 @@ public class TravelWalletService {
         response.setTransactionDate(travelTransactionList.getTransactionDate());
         response.setCategoryName(categoryRepository.findCategoryNameByCategoryId(travelTransactionList.getCategory().getCategoryId()));
         response.setCategoryId(travelTransactionList.getCategory().getCategoryId());
-        response.setMerchantName(merchantRepository.findMerchantNameById(travelTransactionList.getMerchantId()));
+        response.setMerchantName(travelTransactionList.getTransactionName());
         response.setTravelId(travelTransactionList.getTravel().getId());
         response.setBalance(travelTransactionList.getBalance());
-        response.setTransactionType(travelTransactionList.getTransactionType());
         return response;
     }
 }

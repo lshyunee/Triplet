@@ -11,5 +11,9 @@ public interface MerchantRepository extends JpaRepository<Merchant, Long> {
     String findMerchantNameById(Long id);
 
 
+    @Query("SELECT m.currency FROM Merchant m WHERE m.id = :id")
+    String findMerchantCurrencyCodeById(Long id);
+
+
 
 }
