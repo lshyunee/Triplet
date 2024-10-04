@@ -119,12 +119,19 @@ public class TravelService {
     public TravelListResponse getTravelOngoingList(Long userId) {
         LocalDate today = LocalDate.now();
         Travel travel = travelRepository.findOngoingTravelByUserId(userId, today);
+        if (travel == null) {
+            return null;
+        }
         return convertToTravelListResponse(travel);
     }
 
     public List<TravelListResponse> getTravelCompleteList(Long userId) {
         LocalDate today = LocalDate.now();
         List<Travel> travelList = travelRepository.findCompletedTravelsByUserId(userId, today);
+
+        if (travelList == null) {
+            return null;
+        }
 
         List<TravelListResponse> responseList = new ArrayList<>();
         for (Travel travel : travelList) {
@@ -138,6 +145,11 @@ public class TravelService {
     public List<TravelListResponse> getTravelUpcomingList(Long userId) {
         LocalDate today = LocalDate.now();
         List<Travel> travelList = travelRepository.findUpcomingTravelsByUserId(userId, today);
+
+        if (travelList == null) {
+            return null;
+        }
+
         List<TravelListResponse> responseList = new ArrayList<>();
         for (Travel travel : travelList) {
             responseList.add(convertToTravelListResponse(travel));
