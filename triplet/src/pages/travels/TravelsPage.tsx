@@ -58,6 +58,11 @@ const TravelCardDiv = styled.div`
     gap: 16px; /* 카드 사이에 16px의 간격 추가 */
     place-items: center; /* 가로, 세로축 모두 중앙 정렬 */
     justify-content: start; /* 왼쪽에서부터 아이템을 정렬 */
+
+    
+  @media(min-width : 700px){
+    justify-content : center;
+  }
 `;
 
 const CreateTravelDiv = styled.div`

@@ -16,6 +16,10 @@ const CardDiv = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+
+  @media(min-width : 700px){
+    width : 90%;
+  }
 `;
 
 const TravelImg = styled.img`
@@ -82,7 +86,7 @@ const ContentDiv = styled.div`
   font-weight: 600;
   display: flex;
   flex-direction : column;
-  padding: 0 2.5vw;
+  padding: 0 2vw;
   margin-left : 1vw;
 `;
 
@@ -97,11 +101,12 @@ const PriceInfoP = styled.p`
 
 const DayInfoP = styled.p`
     font-weight: 400;
-    font-size : 2.7vw;
+    font-size : 3vw;
     color : white;
     margin: 0;
     display : flex;
     align-items : center;
+
 `
 
 const CountryP = styled.p`

@@ -197,14 +197,16 @@ const CompletedTravelDetailPage = () => {
 
   const { data: budgetData, error: budgetError,
     status: budgetStatus, refetch: budgetRefetch
-} = useAxios(`/expenditure-expenses/${id}`, "GET");
+} = useAxios(`/travels/expenditure-expenses/${id}`, "GET");
 
-  useEffect(()=> {
-    if(!travel?.travelId){
+useEffect(()=> {
+    if(!travel?.travelId ||travel.travelId === 0){
         travelRefetch();
+    }else{
         budgetRefetch();
     }
   }, [])
+
 
   useEffect(()=>{
     if(travelData){
@@ -213,6 +215,13 @@ const CompletedTravelDetailPage = () => {
     }
   }, [travelData, travelError])
   
+  useEffect(()=>{
+    if(travel && travel.travelId !== 0){
+        budgetRefetch();
+    }
+        
+  },[travel])
+
 interface BudgetDetails {
     isComplete: boolean;
     budgetList: Budget[];
@@ -234,7 +243,7 @@ const [ usedBudget, setUsedBudget ] = useState(0);
 
 useEffect(() => {
     if (budgetData) {
-         const { isComplete, budgetList } = budgetData;
+         const { isComplete, budgetList } = budgetData.data;
   
           setBudgetDetails({
               isComplete,
@@ -251,6 +260,8 @@ useEffect(() => {
 
           setUsedBudget(budgetList.reduce(
             (total:Number, usedBudget: any) => total + usedBudget, 0));
+
+        console.log(budgetDetails?.budgetList);
 
       }
   
@@ -276,7 +287,7 @@ useEffect(() => {
 
   return (
     <>
-    <BackHeader title="고래상어보러가자"></BackHeader>
+    <BackHeader title={travel?.title||""}></BackHeader>
     <DetailDiv>
       <Img src={SampleImg}></Img>
       <Overlay />
@@ -307,11 +318,15 @@ useEffect(() => {
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
                         <MoneyCategoryP>식사</MoneyCategoryP>
-                        <MoneyComsumpP color="#00D5FF">30%</MoneyComsumpP>
+                        <MoneyComsumpP color="#00D5FF">
+                            {budgetDetails?.budgetList[0]?.usedBudget && budgetDetails?.budgetList[0]?.budgetWon 
+                                ? ((budgetDetails.budgetList[0].usedBudget / budgetDetails.budgetList[0].budgetWon) * 100).toFixed(0) 
+                                : 0}%  
+                        </MoneyComsumpP>
                     </MoneyTitleDiv>
                     <BudgetDiv>
-                        <MoneyBudgetComsumpP color='#00D5FF'>600,000</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                        <MoneyBudgetComsumpP color='#00D5FF'>{budgetDetails?.budgetList[0].usedBudget||0}</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[0].budgetWon||0}원</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar color={hexToRgba("#00D5FF","0.3")}>
@@ -320,11 +335,15 @@ useEffect(() => {
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
                         <MoneyCategoryP>교통</MoneyCategoryP>
-                        <MoneyComsumpP color="#00C8FB">30%</MoneyComsumpP>
+                        <MoneyComsumpP color="#00C8FB">
+                            {budgetDetails?.budgetList[1]?.usedBudget && budgetDetails?.budgetList[1]?.budgetWon 
+                                ? ((budgetDetails.budgetList[1].usedBudget / budgetDetails.budgetList[1].budgetWon) * 100).toFixed(0) 
+                                : 0}%
+                        </MoneyComsumpP>
                     </MoneyTitleDiv>
                     <BudgetDiv>
-                        <MoneyBudgetComsumpP color='#00C8FB'>600,000</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                        <MoneyBudgetComsumpP color='#00C8FB'>{budgetDetails?.budgetList[1].usedBudget||0}</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[1].budgetWon||0}원</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar color={hexToRgba("#00C8FB","0.3")}>
@@ -333,11 +352,15 @@ useEffect(() => {
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
                         <MoneyCategoryP>관광</MoneyCategoryP>
-                        <MoneyComsumpP color="#00B8F5">30%</MoneyComsumpP>
+                        <MoneyComsumpP color="#00B8F5">
+                                {budgetDetails?.budgetList[2]?.usedBudget && budgetDetails?.budgetList[2]?.budgetWon 
+                                ? ((budgetDetails.budgetList[2].usedBudget / budgetDetails.budgetList[2].budgetWon) * 100).toFixed(0) 
+                                : 0}%
+                        </MoneyComsumpP>
                     </MoneyTitleDiv>
                     <BudgetDiv>
-                        <MoneyBudgetComsumpP color='#00B8F5'>600,000</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                        <MoneyBudgetComsumpP color='#00B8F5'>{budgetDetails?.budgetList[2].usedBudget||0}</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[2].budgetWon||0}원</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar  color={hexToRgba("#00B8F5","0.3")}>
@@ -346,11 +369,15 @@ useEffect(() => {
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
                         <MoneyCategoryP>쇼핑</MoneyCategoryP>
-                        <MoneyComsumpP color="#00ACF1">30%</MoneyComsumpP>
+                        <MoneyComsumpP color="#00ACF1">
+                            {budgetDetails?.budgetList[3]?.usedBudget && budgetDetails?.budgetList[3]?.budgetWon 
+                                ? ((budgetDetails.budgetList[3].usedBudget / budgetDetails.budgetList[3].budgetWon) * 100).toFixed(0) 
+                                : 0}%
+                        </MoneyComsumpP>
                     </MoneyTitleDiv>
                     <BudgetDiv>
-                        <MoneyBudgetComsumpP color='#00ACF1'>600,000</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                        <MoneyBudgetComsumpP color='#00ACF1'>{budgetDetails?.budgetList[3].usedBudget||0}</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[3].budgetWon||0}원</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar  color={hexToRgba("#00ACF1","0.3")}>
@@ -359,11 +386,15 @@ useEffect(() => {
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
                         <MoneyCategoryP>숙박</MoneyCategoryP>
-                        <MoneyComsumpP color="#009BEB">30%</MoneyComsumpP>
+                        <MoneyComsumpP color="#009BEB">
+                        {budgetDetails?.budgetList[4]?.usedBudget && budgetDetails?.budgetList[4]?.budgetWon 
+                                ? ((budgetDetails.budgetList[4].usedBudget / budgetDetails.budgetList[4].budgetWon) * 100).toFixed(0) 
+                                : 0}%
+                        </MoneyComsumpP>
                     </MoneyTitleDiv>
                     <BudgetDiv>
-                        <MoneyBudgetComsumpP color='#009BEB'>600,000</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                        <MoneyBudgetComsumpP color='#009BEB'>{budgetDetails?.budgetList[4].usedBudget||0}</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[4].budgetWon||0}원</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar color={hexToRgba("#009BEB","0.3")}>
@@ -372,11 +403,15 @@ useEffect(() => {
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
                         <MoneyCategoryP>기타</MoneyCategoryP>
-                        <MoneyComsumpP color="#008DE7">30%</MoneyComsumpP>
+                        <MoneyComsumpP color="#008DE7">
+                            {budgetDetails?.budgetList[5]?.usedBudget && budgetDetails?.budgetList[5]?.budgetWon 
+                                ? ((budgetDetails.budgetList[5].usedBudget / budgetDetails.budgetList[5].budgetWon) * 100).toFixed(0) 
+                                : 0}%
+                        </MoneyComsumpP>
                     </MoneyTitleDiv>
                     <BudgetDiv>
-                        <MoneyBudgetComsumpP color='#008DE7'>600,000</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
+                        <MoneyBudgetComsumpP color='#008DE7'>{budgetDetails?.budgetList[5].usedBudget||0}</MoneyBudgetComsumpP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[5].budgetWon||0}원</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar color={hexToRgba("#008DE7","0.3")}>

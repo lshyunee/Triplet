@@ -84,6 +84,7 @@ const ProgressText = styled.div`
     color: #008DE7;
     font-size: 16px;
     font-weight: 700;
+    margin-left : 2px;
 `;
 
 const PriceInfo = styled.div`
@@ -91,12 +92,16 @@ const PriceInfo = styled.div`
     bottom: 25px; /* 하단에 딱 붙지 않도록 여백 추가 */
     right: 20px;  /* 왼쪽으로 이동해서 정렬 */
     z-index: 2;
-    color: #008DE7;
     font-size: 14px;
-    font-weight: 600;
     display: flex; /* Flexbox 사용 */
     flex-direction: row; /* 자식 요소를 가로로 배치 */
     align-items: center; /* 자식 요소를 수직으로 가운데 정렬 */
+`;
+
+const PriceUsedP = styled.p`
+    color: #008DE7;
+    font-weight: 600;
+    margin-right : 4px;
 `;
 
 const PriceInfoP = styled.p`
@@ -124,11 +129,16 @@ const TravelDetailCard: React.FC<TravelDetailCardProps> =
                 <TitleP>{title}</TitleP>
                 <InfoP> { startDate} ~
                 {endDate}<br />{country} · {memberCount}명</InfoP>
-                <ProgressText>30%</ProgressText> {/* 진행률 텍스트 추가 */}
+                <ProgressText>{(usedBudget / totalBudgetWon * 100).toFixed(0)}%</ProgressText>
                 <ProgressContainer>
                     <ProgressBar />
                 </ProgressContainer>
-                <PriceInfo>{usedBudget} <PriceInfoP>/ {totalBudgetWon}원</PriceInfoP></PriceInfo>
+                <PriceInfo>
+                    <PriceUsedP>
+                        {usedBudget} 
+                    </PriceUsedP>
+                        <PriceInfoP>/ {totalBudgetWon}원</PriceInfoP>
+                </PriceInfo>
             </CardDiv>
         </PositionDiv>
     );
