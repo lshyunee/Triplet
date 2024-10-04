@@ -48,4 +48,10 @@ public class Account {
         transactionList.add(transaction);
         transaction.setAccount(this);
     }
+
+    @PreRemove // 삭제 시 거래내역과 분리
+    public void preRemove() {
+        transactionList.forEach(transaction -> transaction.setAccount(null));
+    }
+
 }

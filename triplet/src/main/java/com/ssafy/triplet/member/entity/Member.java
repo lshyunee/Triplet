@@ -47,4 +47,12 @@ public class Member {
         account.setMember(this);
     }
 
+    @PreRemove // 삭제 시 계좌 연관관계 분리
+    public void preRemove() {
+        if (krwAccount != null) {
+            krwAccount.setMember(null);
+        }
+        foreignAccounts.forEach(account -> account.setMember(null));
+    }
+
 }
