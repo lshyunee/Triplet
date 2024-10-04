@@ -10,6 +10,8 @@ import { ReactComponent as RightArrow} from '../../assets/common/rightArrow.svg'
 
 import Logout from '../user/logout/LogoutModal';
 import WithdrawalModal from '../user/withdrawal/WithdrawalModal';
+import ErrorModal from '../../components/modal/ErrorModal';
+
 import { useSelector } from 'react-redux';
 import { userInfo } from 'os';
 
@@ -131,6 +133,23 @@ const MyPage = () => {
         setIsWithdrawal(true);
     }
 
+    const [ errorMsg, setErrorMsg] = useState('...');
+
+    const kakaoDontGoPassword = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+        console.log(memberId);
+        if(memberId.slice(0,5)==="kakao"){
+            event.preventDefault();
+        }
+        setErrorMsg("카카오 계정은 비밀번호를 변경할 수 없습니다.");
+        clickPassword();
+    }
+
+    const [ isError, setIsError ] = useState(false);
+
+    const clickPassword = () => {
+        setIsError(true);
+    }
+
     return (
         <>
             <BackHeader title={title}/>
@@ -164,7 +183,7 @@ const MyPage = () => {
                             <RightArrow/>
                         </ConfigDiv>
                     </StyledLink>
-                    <StyledLink to="/mypage/password-edit">
+                    <StyledLink to="/mypage/password-edit" onClick={(event) => kakaoDontGoPassword(event)}>
                         <ConfigDiv>
                             <CategoryP>비밀번호 변경</CategoryP>
                             <RightArrow/>
@@ -181,6 +200,7 @@ const MyPage = () => {
                 </MyInfoConfigDiv>
                 <Logout isOpen={isLogOutOpen} onClose={closeLogout}></Logout>
                 <WithdrawalModal isOpen={isWithdrawal} onClose={()=>{setIsWithdrawal(false)}}/>
+                <ErrorModal isOpen={isError} onClose={() => {setIsError(false)}} msg={errorMsg}></ErrorModal>
             </PageDiv>
         </>
     );
