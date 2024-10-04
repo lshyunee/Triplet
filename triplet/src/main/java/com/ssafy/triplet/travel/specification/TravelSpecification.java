@@ -10,7 +10,7 @@ public class TravelSpecification {
     public static Specification<Travel> excludeCreator(Long userId) {
         return (root, query, criteriaBuilder) -> {
             if (userId == null) {
-                return criteriaBuilder.conjunction(); // 아무런 조건도 추가하지 않음
+                return criteriaBuilder.conjunction();
             }
             return criteriaBuilder.notEqual(root.get("creatorId"), userId);
         };

@@ -1,5 +1,6 @@
 package com.ssafy.triplet.travel.service;
 
+import co.elastic.clients.json.JsonData;
 import com.ssafy.triplet.account.dto.response.AccountRechargeResponse;
 import com.ssafy.triplet.account.repository.AccountRepository;
 import com.ssafy.triplet.account.service.AccountService;
@@ -17,7 +18,6 @@ import com.ssafy.triplet.travel.specification.TravelSpecification;
 import com.ssafy.triplet.travel.util.InviteCodeGenerator;
 import com.ssafy.triplet.travel.util.S3Service;
 import lombok.RequiredArgsConstructor;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,20 +30,20 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.data.domain.PageImpl;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +63,7 @@ public class TravelService {
     private final S3Service s3Service;
     private final InviteCodeGenerator inviteCodeGenerator;
     private final ElasticsearchTemplate elasticsearchTemplate;
-    private final RestHighLevelClient client;
+    private final ElasticsearchClient client;
 
 
     @Transactional
@@ -272,20 +272,6 @@ public class TravelService {
         return resultMap;
     }
 
-
-//    public Page<TravelListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
-//                                                     Integer month, Integer minDays, Integer maxDays, int page, int kind, int size) {
-//        Specification<Travel> spec = Specification.where(TravelSpecification.excludeCreator(userId))
-//                .and(countryName != null ? TravelSpecification.countryNameContains(countryName) : null)
-//                .and(memberCount != null ? TravelSpecification.memberCountEquals(memberCount) : null)
-//                .and(minBudget != null && maxBudget != null ? TravelSpecification.totalBudgetWonBetween(minBudget, maxBudget) : null)
-//                .and(month != null ? TravelSpecification.travelMonth(month) : null)
-//                .and(minDays != null && maxDays != null ? TravelSpecification.travelDurationBetween(minDays, maxDays) : null);
-//        Pageable pageable = PageRequest.of(page, size);
-//        return travelRepository.findAll(spec, pageable)
-//                .map(this::convertToTravelListResponse);
-//    }
-
     public Page<TravelListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                      Integer month, Integer minDays, Integer maxDays, int page, int kind, int size) {
         if (kind == 0) {
@@ -306,78 +292,60 @@ public class TravelService {
 
     private Page<TravelListResponse> getRecommendedTravels(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                            Integer month, Integer minDays, Integer maxDays, int page, int size) {
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        BoolQuery.Builder boolQuery = QueryBuilders.bool();
+        if (userId != null) {
+            boolQuery.mustNot(QueryBuilders.term().field("creatorId").value(userId).build()._toQuery());
+        }
 
-// Query 작성
-        BoolQueryBuilder boolQuery = QueryBuilders.boolQuery()
-                .must(QueryBuilders.termQuery("countryName", countryName)); // 국가 이름 필터링
+        boolQuery.must(QueryBuilders.term().field("countryName").value(countryName).build()._toQuery());
 
-// 멤버 수 필터링
         if (memberCount != null) {
-            boolQuery.must(QueryBuilders.termQuery("memberCount", memberCount));
+            boolQuery.must(QueryBuilders.term().field("memberCount").value(memberCount).build()._toQuery());
         }
 
-// 예산 범위 필터링
         if (minBudget != null && maxBudget != null) {
-            boolQuery.must(QueryBuilders.rangeQuery("totalBudget")
-                    .gte(minBudget)
-                    .lte(maxBudget));
+            RangeQuery totalBudgetQuery = QueryBuilders.range()
+                    .field("totalBudget")
+                    .gte(JsonData.of(minBudget))
+                    .lte(JsonData.of(maxBudget))
+                    .build();
+            boolQuery.must(totalBudgetQuery._toQuery());
         }
 
-// 여행 기간 필터링 (월)
         if (month != null) {
-            boolQuery.must(QueryBuilders.termQuery("month", month)); // 여행 시작일의 월을 기준으로 필터링
+            boolQuery.must(QueryBuilders.term().field("month").value(month).build()._toQuery());
         }
 
-// 여행 일수 필터링
         if (minDays != null && maxDays != null) {
-            boolQuery.must(QueryBuilders.rangeQuery("travelDuration") // travelDuration은 여행 기간을 의미
-                    .gte(minDays)
-                    .lte(maxDays));
+            RangeQuery travelDurationQuery = QueryBuilders.range()
+                    .field("travelDuration")
+                    .gte(JsonData.of(minDays))
+                    .lte(JsonData.of(maxDays))
+                    .build();
+            boolQuery.must(travelDurationQuery._toQuery());
         }
 
-// 최종적으로 boolQuery를 searchSourceBuilder에 설정
-        searchSourceBuilder.query(boolQuery);
-
-
-        // Pagination 설정
-        searchSourceBuilder.from(page * size);
-        searchSourceBuilder.size(size);
-
-        // Elasticsearch 요청
-        SearchRequest searchRequest = new SearchRequest("travel").source(searchSourceBuilder);
-        SearchResponse searchResponse;
+        SearchRequest searchRequest = SearchRequest.of(s -> s
+                .index("travel")
+                .query(boolQuery.build()._toQuery())
+                .from(page * size)
+                .size(size)
+        );
+        SearchResponse<Travel> searchResponse;
 
         try {
-            searchResponse = client.search(searchRequest, RequestOptions.DEFAULT); // RestHighLevelClient 사용
+            searchResponse = client.search(searchRequest, Travel.class);
         } catch (IOException e) {
-            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR); // 예외 처리 필요
+            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
         }
-
-        // 결과 변환
-        List<TravelListResponse> travelListResponses = Arrays.stream(searchResponse.getHits().getHits())
-                .map(hit -> {
-                    Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-                    Travel travel = new Travel();
-                    travel.setId((Long) sourceAsMap.get("id"));
-                    travel.setTitle((String) sourceAsMap.get("title"));
-                    travel.setStartDate(LocalDate.parse((String) sourceAsMap.get("startDate"))); // 날짜 형식 변환
-                    travel.setEndDate(LocalDate.parse((String) sourceAsMap.get("endDate"))); // 날짜 형식 변환
-                    travel.setImage((String) sourceAsMap.get("image"));
-                    travel.setMemberCount((Integer) sourceAsMap.get("memberCount"));
-
-                    Country country = new Country();
-                    country.setId((int) sourceAsMap.get("countryId"));
-                    country.setName((String) sourceAsMap.get("countryName"));
-                    country.setCurrency((String) sourceAsMap.get("currency"));
-                    travel.setCountry(country);
-
-                    return convertToTravelListResponse(travel); // Travel 객체를 TravelListResponse로 변환
-                })
+        List<TravelListResponse> travelListResponses = searchResponse.hits().hits().stream()
+                .map(Hit::source)
+                .map(this::convertToTravelListResponse)
                 .collect(Collectors.toList());
 
-        return new PageImpl<>(travelListResponses, PageRequest.of(page, size), searchResponse.getHits().getTotalHits().value);
+        return new PageImpl<>(travelListResponses, PageRequest.of(page, size), searchResponse.hits().total().value());
     }
+
 
 
     public TravelListPagedResponse toPagedResponse(Page<TravelListResponse> page) {
@@ -692,18 +660,16 @@ public class TravelService {
 
     public void indexOrUpdateTravel(Travel travel) {
         String id = travel.getId().toString();
-
-        // status가 true일 경우 데이터를 적재 또는 업데이트
+        // status가 true = 데이터 적재 또는 업데이트
         if (travel.isStatus()) {
             IndexQuery indexQuery = new IndexQueryBuilder()
                     .withId(id)
                     .withObject(travel)
                     .build();
 
-            // 인덱스 좌표 추가 (예: "travel" 인덱스 이름 사용)
             elasticsearchTemplate.index(indexQuery, IndexCoordinates.of("travel"));
         }
-        // status가 false일 경우 Elasticsearch에서 해당 데이터 삭제
+        // status가 false = Elasticsearch에서 데이터 삭제
         else {
             elasticsearchTemplate.delete(id, IndexCoordinates.of("travel"));
         }
