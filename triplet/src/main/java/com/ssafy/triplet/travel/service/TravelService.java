@@ -1,5 +1,6 @@
 package com.ssafy.triplet.travel.service;
 
+import co.elastic.clients.json.JsonData;
 import com.ssafy.triplet.account.dto.response.AccountRechargeResponse;
 import com.ssafy.triplet.account.repository.AccountRepository;
 import com.ssafy.triplet.account.service.AccountService;
@@ -21,16 +22,28 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
+import org.springframework.data.elasticsearch.core.query.IndexQuery;
+import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import org.springframework.data.domain.PageImpl;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
+import co.elastic.clients.elasticsearch._types.query_dsl.QueryBuilders;
+import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +62,8 @@ public class TravelService {
     private final AccountService accountService;
     private final S3Service s3Service;
     private final InviteCodeGenerator inviteCodeGenerator;
-
+    private final ElasticsearchTemplate elasticsearchTemplate;
+    private final ElasticsearchClient client;
 
 
     @Transactional
@@ -114,6 +128,9 @@ public class TravelService {
         if (!userId.equals(travel.getCreatorId())) {
             throw new CustomException(CustomErrorCode.NOT_TRAVEL_CREATOR);
         }
+        if (travel.isStatus()) {
+            elasticsearchTemplate.delete(travelId.toString(), Travel.class);
+        }
         travelRepository.deleteById(travelId);
     }
 
@@ -173,6 +190,7 @@ public class TravelService {
         Travel travel = travelRepository.findById(request.getTravelId())
                 .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
         TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
+
         if (!travel.isStatus()) {
             throw new CustomException(CustomErrorCode.TRAVEL_NOT_COMPLETED);
         }
@@ -183,6 +201,10 @@ public class TravelService {
                 request.getIsShared() != 1 && request.getShareStatus() != 0) {
             throw new CustomException(CustomErrorCode.INVALID_STATUS_VALUE);
         }
+
+        boolean oldSharedStatus = travel.isShared();
+        boolean oldShareStatus = travel.isShareStatus();
+
         if (request.getIsShared() == 1) {
             travel.setShared(true);
             if (request.getShareStatus() == 1) {
@@ -197,8 +219,13 @@ public class TravelService {
             travel.setShareStatus(false);
             travelWallet.setShare(false);
         }
+
+        if (oldSharedStatus != travel.isShared() || oldShareStatus != travel.isShareStatus()) {
+            indexOrUpdateTravel(travel);
+        }
         travelRepository.save(travel);
     }
+
 
     @Transactional
     public TravelResponse inviteTravel(String inviteCode, Long userId) {
@@ -245,19 +272,81 @@ public class TravelService {
         return resultMap;
     }
 
-
     public Page<TravelListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
-                                                     Integer month, Integer minDays, Integer maxDays, int page, int size) {
-        Specification<Travel> spec = Specification.where(TravelSpecification.excludeCreator(userId))
-                .and(countryName != null ? TravelSpecification.countryNameContains(countryName) : null)
-                .and(memberCount != null ? TravelSpecification.memberCountEquals(memberCount) : null)
-                .and(minBudget != null && maxBudget != null ? TravelSpecification.totalBudgetWonBetween(minBudget, maxBudget) : null)
-                .and(month != null ? TravelSpecification.travelMonth(month) : null)
-                .and(minDays != null && maxDays != null ? TravelSpecification.travelDurationBetween(minDays, maxDays) : null);
-        Pageable pageable = PageRequest.of(page, size);
-        return travelRepository.findAll(spec, pageable)
-                .map(this::convertToTravelListResponse);
+                                                     Integer month, Integer minDays, Integer maxDays, int page, int kind, int size) {
+        if (kind == 0) {
+            return getRecommendedTravels(userId, countryName, memberCount, minBudget, maxBudget, month, minDays, maxDays, page, size);
+        } else {
+            Specification<Travel> spec = Specification.where(TravelSpecification.excludeCreator(userId))
+                    .and(countryName != null ? TravelSpecification.countryNameContains(countryName) : null)
+                    .and(memberCount != null ? TravelSpecification.memberCountEquals(memberCount) : null)
+                    .and(minBudget != null && maxBudget != null ? TravelSpecification.totalBudgetWonBetween(minBudget, maxBudget) : null)
+                    .and(month != null ? TravelSpecification.travelMonth(month) : null)
+                    .and(minDays != null && maxDays != null ? TravelSpecification.travelDurationBetween(minDays, maxDays) : null);
+
+            Pageable pageable = PageRequest.of(page, size);
+            return travelRepository.findAll(spec, pageable)
+                    .map(this::convertToTravelListResponse);
+        }
     }
+
+    private Page<TravelListResponse> getRecommendedTravels(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
+                                                           Integer month, Integer minDays, Integer maxDays, int page, int size) {
+        BoolQuery.Builder boolQuery = QueryBuilders.bool();
+        if (userId != null) {
+            boolQuery.mustNot(QueryBuilders.term().field("creatorId").value(userId).build()._toQuery());
+        }
+
+        boolQuery.must(QueryBuilders.term().field("countryName").value(countryName).build()._toQuery());
+
+        if (memberCount != null) {
+            boolQuery.must(QueryBuilders.term().field("memberCount").value(memberCount).build()._toQuery());
+        }
+
+        if (minBudget != null && maxBudget != null) {
+            RangeQuery totalBudgetQuery = QueryBuilders.range()
+                    .field("totalBudget")
+                    .gte(JsonData.of(minBudget))
+                    .lte(JsonData.of(maxBudget))
+                    .build();
+            boolQuery.must(totalBudgetQuery._toQuery());
+        }
+
+        if (month != null) {
+            boolQuery.must(QueryBuilders.term().field("month").value(month).build()._toQuery());
+        }
+
+        if (minDays != null && maxDays != null) {
+            RangeQuery travelDurationQuery = QueryBuilders.range()
+                    .field("travelDuration")
+                    .gte(JsonData.of(minDays))
+                    .lte(JsonData.of(maxDays))
+                    .build();
+            boolQuery.must(travelDurationQuery._toQuery());
+        }
+
+        SearchRequest searchRequest = SearchRequest.of(s -> s
+                .index("travel")
+                .query(boolQuery.build()._toQuery())
+                .from(page * size)
+                .size(size)
+        );
+        SearchResponse<Travel> searchResponse;
+
+        try {
+            searchResponse = client.search(searchRequest, Travel.class);
+        } catch (IOException e) {
+            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
+        }
+        List<TravelListResponse> travelListResponses = searchResponse.hits().hits().stream()
+                .map(Hit::source)
+                .map(this::convertToTravelListResponse)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(travelListResponses, PageRequest.of(page, size), searchResponse.hits().total().value());
+    }
+
+
 
     public TravelListPagedResponse toPagedResponse(Page<TravelListResponse> page) {
         TravelListPagedResponse response = new TravelListPagedResponse();
@@ -568,4 +657,22 @@ public class TravelService {
         groupAccountStake.setTotalMoney(0d);
         groupAccountStakeRepostory.save(groupAccountStake);
     }
+
+    public void indexOrUpdateTravel(Travel travel) {
+        String id = travel.getId().toString();
+        // status가 true = 데이터 적재 또는 업데이트
+        if (travel.isStatus()) {
+            IndexQuery indexQuery = new IndexQueryBuilder()
+                    .withId(id)
+                    .withObject(travel)
+                    .build();
+
+            elasticsearchTemplate.index(indexQuery, IndexCoordinates.of("travel"));
+        }
+        // status가 false = Elasticsearch에서 데이터 삭제
+        else {
+            elasticsearchTemplate.delete(id, IndexCoordinates.of("travel"));
+        }
+    }
+
 }
