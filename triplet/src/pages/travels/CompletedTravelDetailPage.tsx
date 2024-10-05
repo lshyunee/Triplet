@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,6 +15,7 @@ import { ReactComponent as ShareIcon } from '../../assets/common/shareIcon.svg';
 import { selectUpcomingTravelByTitleId } from '../../features/travel/upcomingTravelSlice';
 import { RootState } from '../../store';
 import useAxios from '../../hooks/useAxios';
+import ShareTravelModal from '../../components/modal/ShareTravelModal';
 
 const DetailDiv = styled.div`
     padding : 56px 0 0 0;
@@ -322,9 +323,6 @@ const CompletedTravelDetailPage = () => {
                       budgetWon: budget.budgetWon
                   }))
               });
-    
-              setUseBudget(budgetList.reduce(
-                (total:Number, usedBudget: any) => total + usedBudget, 0));
             
                 budgetList.forEach((budget: any) => {
                     categoryId = budget.categoryId;
@@ -344,9 +342,18 @@ const CompletedTravelDetailPage = () => {
           }
     
       }, [budgetData, budgetError]);
+
+    const totalUsedBudget = useMemo(() => 
+    budgetDetails?.budgetList.reduce((total, budget) => total + budget.usedBudget, 0), 
+    [budgetDetails]
+    );
     
     
+    const [ isShareModal, setShareModal ] = useState(false);
     
+    const openShareModal = () => {
+        setShareModal(true);
+    }
 
     const hexToRgba = (hex:string, alpha:string) => {
     // hex 코드에서 # 제거
@@ -472,7 +479,7 @@ const CompletedTravelDetailPage = () => {
                 </MoneyChartConsumpBar>
             </MoneyDiv>
           <CategoryShareDiv>
-              <CategoryTitleDiv>
+              <CategoryTitleDiv onClick={openShareModal}>
                   <CategoryTitleFontDiv>
                       <ShareIcon/>
                       <TitleP>여행 공유 옵션</TitleP>
@@ -482,6 +489,7 @@ const CompletedTravelDetailPage = () => {
           </CategoryShareDiv>
       </ContentDiv>
     </DetailDiv>
+    <ShareTravelModal isOpen={isShareModal} onClose={() => {setShareModal(false)}} travelId={travelId} />
   </>
   );
 }
