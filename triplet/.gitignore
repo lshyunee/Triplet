@@ -38,3 +38,5 @@ out/
 
 application-secret.properties
 build_image.sh
+
+certification.json
