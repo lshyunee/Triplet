@@ -13,13 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/vi/token")
+@RequestMapping("/api/v1/token")
 @RequiredArgsConstructor
 public class FcmTokenController {
 
     private final FCMService fcmService;
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> saveToken(@RequestBody FcmTokenDto tokenDto, @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal){
 
         fcmService.saveToken(tokenDto,customUserPrincipal.getMemberId());
