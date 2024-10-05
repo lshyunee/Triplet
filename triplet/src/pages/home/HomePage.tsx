@@ -23,6 +23,7 @@ import useAxios from '../../hooks/useAxios';
 import UpcomingTravelHomeCard from '../../components/travel/UpcomingTravelHomeCard';
 import CreateTravelCard from '../../components/travel/CreateTravelCard';
 import { setUserInfo } from '../../features/user/userInfoSlice';
+import { loginSuccess, logout } from '../../features/auth/authSlice';
 
 const MainDiv = styled.div`
     background-color: #F3F4F6;
@@ -178,6 +179,7 @@ const HomePage = () => {
 
     // 컴포넌트가 처음 렌더링될 때, 데이터가 없으면 Axios 요청을 트리거
     useEffect(() => {
+        console.log("정보받아오는중!");
         if (!travelData.travelId) {
             infoRefetch();
         }
@@ -220,6 +222,14 @@ const HomePage = () => {
 
     useEffect(() => {
 
+        if (userInfoData!==401){
+            dispatch(loginSuccess());
+        }
+
+        if (userInfoError){
+            dispatch(logout());
+        }
+
         // userInfoData가 존재하고, userInfoStatus가 200일 때 Redux에 데이터를 저장
         if (userInfoData && userInfoStatus === 200 && userInfoData.data) {
             dispatch(setUserInfo({
@@ -231,7 +241,7 @@ const HomePage = () => {
             }));
         }
     
-        if(userInfoStatus!==null&&userInfoStatus!==200){
+        if(userInfoStatus&&userInfoStatus!==200){
             console.log(userInfoStatus);
             // userInfoData가 없거나 필드가 null/undefined일 때 '/mypage/info-set'으로 이동
             if (!userInfoData || !userInfoData.data) {

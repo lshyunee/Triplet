@@ -38,28 +38,36 @@ const Div = styled.div`
 
 const App: React.FC = () => {
 
+  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
+
   const location = useLocation();
   const navigate = useNavigate();
   const [isActive, setIsActive] = useState(true);
-
-  const isAuthenticated = useSelector((state: RootState) => state.auth.isAuthenticated);
 
   useEffect(() => {
     const offPages = ["/login", "/signup", "/simple-password/set","/simple-password/setConfirm" ,"/simple-password/confirm", "/pay/qr",
       "/mypage/info-set"
     ];
+
+    const loginSuccessPages = ["/login", "/signup"];
+
     if (offPages.includes(location.pathname)) {
       setIsActive(false);
     } else {
       setIsActive(true);
     }
-  }, [location.pathname]);  // location.pathname이 변경될 때마다 실행
 
-  useEffect(()=> {
-      if(isAuthenticated){
-          navigate('/login');
-      }
-  }, [])
+    // if(!isAuthenticated){
+    //   if(location.pathname !== "/signup"){
+    //     navigate('/login');
+    //   }
+    // }else{
+    //   if(loginSuccessPages.includes(location.pathname)){
+    //     navigate('/');
+    //   }
+    // }
+
+  }, [location.pathname, isAuthenticated]);  // location.pathname이 변경될 때마다 실행
 
   const [isLoading, setIsLoading] = useState(true);
 
