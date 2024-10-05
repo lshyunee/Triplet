@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import "./firebaseNotification/firebase.js"
 import './App.css';
 
 // router import
@@ -56,29 +57,32 @@ const App: React.FC = () => {
   }, [location.pathname]);  // location.pathname이 변경될 때마다 실행
 
   useEffect(()=> {
+
       if(isAuthenticated){
           navigate('/login');
       }
   }, [])
 
+
+
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/service-worker.js')
-          .then((registration) => {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-            setIsLoading(false); // 서비스 워커가 등록되면 로딩 완료
-          }, (error) => {
-            console.log('ServiceWorker registration failed: ', error);
-            setIsLoading(false); // 서비스 워커 등록 실패 시에도 로딩 완료
-          });
-      });
-    } else {
-      setIsLoading(false); // 서비스 워커가 지원되지 않으면 바로 로딩 완료
-    }
-  }, []);
+  // useEffect(() => {
+  //   if ('serviceWorker' in navigator) {
+  //     window.addEventListener('load', () => {
+  //       navigator.serviceWorker.register('/firebase-messaging-sw.js')
+  //         .then((registration) => {
+  //           console.log('서비스 워커 등록 성공 : ', registration.scope);
+  //           setIsLoading(false); // 서비스 워커가 등록되면 로딩 완료
+  //         }, (error) => {
+  //           console.log('ServiceWorker registration failed: ', error);
+  //           setIsLoading(false); // 서비스 워커 등록 실패 시에도 로딩 완료
+  //         });
+  //     });
+  //   } else {
+  //     setIsLoading(false); // 서비스 워커가 지원되지 않으면 바로 로딩 완료
+  //   }
+  // }, []);
 
   return (
     <Div>

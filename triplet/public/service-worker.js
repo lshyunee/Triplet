@@ -43,3 +43,9 @@ self.addEventListener('activate', (event) => {
     })
   );
 });
+// 워커 파일이 업데이트되면 사용자에게 알림
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
+      self.skipWaiting();
+  }
+});
