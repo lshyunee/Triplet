@@ -35,7 +35,7 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
             const storedToken = localStorage.getItem('fcmToken');
             if (!storedToken || currentToken !== storedToken) {
                 localStorage.setItem('fcmToken', currentToken);
-                await axios.post("https://j11b202.ssafy.io/api/v1/token", { token: currentToken });
+                await axios.post("https://j11b202.p.ssafy.io/api/v1/token", { "token": currentToken });
             }
 
             return permission;
