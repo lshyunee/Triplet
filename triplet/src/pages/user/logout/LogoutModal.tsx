@@ -2,9 +2,10 @@ import React, { useEffect } from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import useAxios from '../../../hooks/useAxios';
 
 import { logout } from '../../../features/auth/authSlice';
-import useAxios from '../../../hooks/useAxios';
+import { resetInfo } from '../../../features/user/userInfoSlice';
 
 const ModalLayout = styled.div`
   position: fixed;
@@ -85,6 +86,7 @@ const LogoutModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (logoutData !== null) {
       console.log(logoutData.message);
+      dispatch(resetInfo());
       dispatch(logout());
       navigate("/login");
     }

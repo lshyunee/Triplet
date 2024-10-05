@@ -35,8 +35,11 @@ const userInfoSlice = createSlice({
             if (gender !== undefined) state.gender = gender;
             if (phoneNumber !== undefined) state.phoneNumber = phoneNumber;
         },
+        resetInfo(){
+            return initialState;
+        }
     },
 });
 
-export const { setUserInfo } = userInfoSlice.actions;
+export const { setUserInfo, resetInfo } = userInfoSlice.actions;
 export default userInfoSlice.reducer;

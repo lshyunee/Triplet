@@ -147,7 +147,7 @@ const LoginPage = () => {
     }, [loginData, loginError]);
 
     // 카카오 로그인 버튼 핸들러
-    const handleNaverLogin = () => {
+    const handleKakaoLogin = () => {
         window.location.href = 'https://j11b202.p.ssafy.io/api/v1/oauth2/authorization/kakao';
     };
 
@@ -236,7 +236,7 @@ const LoginPage = () => {
                 <LoginInput type="password" placeholder="비밀번호" value={pw.value} onChange={pw.onChange} />
                 <LoginBtn ref={loginBtnRef} type="submit" disabled={enterPressed}>로그인</LoginBtn>
             </LoginForm>
-            <KakaoLoginBtn onClick={handleNaverLogin}>
+            <KakaoLoginBtn onClick={handleKakaoLogin}>
                 카카오 로그인
             </KakaoLoginBtn>
             <SignupDiv>
