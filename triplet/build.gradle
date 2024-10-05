@@ -58,6 +58,8 @@ dependencies {
 		implementation 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
 		implementation 'co.elastic.clients:elasticsearch-java:8.13.4'
 
+	// firebase
+	implementation 'com.google.firebase:firebase-admin:7.1.1'
 }
 
 tasks.named('test') {
