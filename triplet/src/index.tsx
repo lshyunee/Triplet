@@ -22,4 +22,4 @@ root.render(
 );
 
 // PWA 활성화
-// serviceWorkerRegistration.register();
+serviceWorkerRegistration.register();
