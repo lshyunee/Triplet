@@ -15,6 +15,10 @@ import ErrorModal from '../../components/modal/ErrorModal';
 import { useSelector } from 'react-redux';
 import { userInfo } from 'os';
 
+import { requestNotificationPermission } from '../../firebaseNotification/firebase';
+
+
+
 const PageDiv = styled.div`
     background-color : #F3F4F6;
     width: 100%;
@@ -33,14 +37,14 @@ const TitleP = styled.p`
 `;
 
 const InfoP = styled.p`
-    font-size : 14px;
-    height : 14px;
-    font-weight : 500;
-    color : #666666;
-    margin-left : 12px;
-    margin-top : 0px;
-    margin-bottom : 0px;
-`;
+        font-size : 14px;
+        height : 14px;
+        font-weight : 500;
+        color : #666666;
+        margin-left : 12px;
+        margin-top : 0px;
+        margin-bottom : 0px;
+    `;
 
 const CategoryP = styled.p`
     font-size : 14px;
@@ -168,6 +172,7 @@ const MyPage = () => {
                         <InfoP>전화번호</InfoP>
                         <CategoryP>{phoneNumber}</CategoryP>
                     </InfoDiv>
+                    
                 </MyInfoDiv>
                 <MyInfoConfigDiv>
                     <TitleP>회원정보 설정</TitleP>
@@ -189,6 +194,10 @@ const MyPage = () => {
                             <RightArrow/>
                         </ConfigDiv>
                     </StyledLink>
+                    <ConfigDiv onClick={requestNotificationPermission}>
+                        <CategoryP>Push 알림 설정</CategoryP>
+                        <RightArrow/>
+                    </ConfigDiv>
                     <ConfigDiv onClick={openLogout}>
                         <CategoryP>로그아웃</CategoryP>
                         <RightArrow/>
@@ -200,8 +209,9 @@ const MyPage = () => {
                 </MyInfoConfigDiv>
                 <Logout isOpen={isLogOutOpen} onClose={closeLogout}></Logout>
                 <WithdrawalModal isOpen={isWithdrawal} onClose={()=>{setIsWithdrawal(false)}}/>
-                <ErrorModal isOpen={isError} onClose={() => {setIsError(false)}} msg={errorMsg}></ErrorModal>
+                <ErrorModal isOpen={isError} onClose={() => {setIsError(false)}} msg={errorMsg}></ErrorModal>   
             </PageDiv>
+           
         </>
     );
 };
