@@ -1,8 +1,8 @@
 package com.ssafy.triplet.travel.service;
 
-//import co.elastic.clients.elasticsearch._types.SortOrder;
-//import co.elastic.clients.elasticsearch._types.query_dsl.*;
-//import co.elastic.clients.json.JsonData;
+import co.elastic.clients.elasticsearch._types.SortOrder;
+import co.elastic.clients.elasticsearch._types.query_dsl.*;
+import co.elastic.clients.json.JsonData;
 import com.ssafy.triplet.account.dto.response.AccountRechargeResponse;
 import com.ssafy.triplet.account.repository.AccountRepository;
 import com.ssafy.triplet.account.service.AccountService;
@@ -22,30 +22,34 @@ import com.ssafy.triplet.travel.util.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
 import org.springframework.data.elasticsearch.core.query.IndexQueryBuilder;
+import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-//import org.springframework.data.domain.PageImpl;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
-//import co.elastic.clients.elasticsearch.core.SearchRequest;
-//import co.elastic.clients.elasticsearch.core.SearchResponse;
-//import co.elastic.clients.elasticsearch.core.search.Hit;
+import co.elastic.clients.elasticsearch.core.SearchRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 
 @Service
 @RequiredArgsConstructor
@@ -78,8 +82,6 @@ public class TravelService {
         saveTravelBudgets2(request, savedTravel);
         travelWalletService.makeTravelWallet(savedTravel, userId);
         insertGroupAccountStake(userId, savedTravel);
-        indexTravel(travel);
-        indexMember(userId);
         return buildTravelResponse(savedTravel, inviteCode);
     }
 
@@ -239,7 +241,6 @@ public class TravelService {
         }
         insertTravelMembers(userId, travel.getId());
         insertGroupAccountStake(userId, travel);
-        indexMember(userId);
         return buildTravelResponse(travel, travel.getInviteCode());
     }
 
@@ -248,7 +249,6 @@ public class TravelService {
         return countryRepository.getAllCountries();
     }
 
-    @Cacheable(value = "categoryList")
     public List<CategoryResponse> getCategoryList() {
         return categoryRepository.getAllCategories();
     }
@@ -273,7 +273,8 @@ public class TravelService {
     public Page<TravelListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                      Integer month, Integer minDays, Integer maxDays, int page, int kind, int size) {
 //        if (kind == 0) {
-//            return getRecommendedTravels(userId, countryName, memberCount, minBudget, maxBudget, month, minDays, maxDays, page, size);
+//            List<String> recommendedCountries = getRecommendedCountriesFromElasticsearch(userId);
+//            return convertRecommendedTravelsToPage(recommendedCountries, page, size);
 //        } else {
             Specification<Travel> spec = Specification.where(TravelSpecification.excludeCreator(userId))
                     .and(countryName != null ? TravelSpecification.countryNameContains(countryName) : null)
@@ -287,102 +288,6 @@ public class TravelService {
                     .map(this::convertToTravelListResponse);
 //        }
     }
-
-//    private Page<TravelListResponse> getRecommendedTravels(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
-//                                                           Integer month, Integer minDays, Integer maxDays, int page, int size) {
-//        BoolQuery.Builder boolQuery = QueryBuilders.bool();
-//
-//        // creatorId 제외
-//        if (userId != null) {
-//            boolQuery.mustNot(QueryBuilders.term().field("creatorId").value(userId).build()._toQuery());
-//        }
-//
-//        if (countryName != null) {
-//            boolQuery.should(QueryBuilders.match().field("countryName").query(countryName).build()._toQuery());
-//        }
-//        if (memberCount != null) {
-//            boolQuery.should(QueryBuilders.term().field("memberCount").value(memberCount).build()._toQuery());
-//        }
-//        if (minBudget != null && maxBudget != null) {
-//            RangeQuery totalBudgetQuery = QueryBuilders.range()
-//                    .field("totalBudget")
-//                    .gte(JsonData.of(minBudget))
-//                    .lte(JsonData.of(maxBudget))
-//                    .build();
-//            boolQuery.should(totalBudgetQuery._toQuery());
-//        }
-//        if (month != null) {
-//            boolQuery.should(QueryBuilders.term().field("month").value(month).build()._toQuery());
-//        }
-//        if (minDays != null && maxDays != null) {
-//            RangeQuery travelDurationQuery = QueryBuilders.range()
-//                    .field("travelDuration")
-//                    .gte(JsonData.of(minDays))
-//                    .lte(JsonData.of(maxDays))
-//                    .build();
-//            boolQuery.should(travelDurationQuery._toQuery());
-//        }
-//
-//        // 유사도 계산 쿼리 요청 생성
-//        SearchRequest searchRequest = SearchRequest.of(s -> s
-//                .index("travel")
-//                .query(q -> q.functionScore(fs -> fs
-//                        .query(boolQuery.build()._toQuery())
-//                        .scoreMode(FunctionScoreMode.Sum)
-//                        .boostMode(FunctionBoostMode.Replace)
-//                        .functions(f -> f
-//                                .weight(1.0)
-//                        )
-//                ))
-//                .from(page * size)
-//                .size(size)
-//                .minScore(0.1)
-//        );
-//
-//
-//        SearchResponse<Travel> searchResponse;
-//
-//        try {
-//            searchResponse = client.search(searchRequest, Travel.class);
-//        } catch (IOException e) {
-//            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
-//        }
-//
-//        List<TravelListResponse> travelListResponses = searchResponse.hits().hits().stream()
-//                .map(Hit::source)
-//                .map(this::convertToTravelListResponse)
-//                .collect(Collectors.toList());
-//
-//        // 유사도가 모두 0일 경우 최신 여행 목록 제공
-//        if (searchResponse.hits().total() == null || searchResponse.hits().total().value() == 0 || travelListResponses.isEmpty()) {
-//            travelListResponses = getRecentTravels(page, size);
-//        }
-//
-//        return new PageImpl<>(travelListResponses, PageRequest.of(page, size), searchResponse.hits().total().value());
-//    }
-//
-//    private List<TravelListResponse> getRecentTravels(int page, int size) {
-//        // 최신순으로 여행 목록을 가져오는 Elasticsearch 쿼리 생성
-//        SearchRequest recentRequest = SearchRequest.of(s -> s
-//                .index("travel")
-//                .sort(sort -> sort.field(f -> f.field("createdDate").order(SortOrder.Desc))) // createdDate 기준 내림차순 정렬
-//                .from(page * size)
-//                .size(size)
-//        );
-//
-//        SearchResponse<Travel> recentResponse;
-//        try {
-//            recentResponse = client.search(recentRequest, Travel.class);
-//        } catch (IOException e) {
-//            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
-//        }
-//
-//        return recentResponse.hits().hits().stream()
-//                .map(Hit::source)
-//                .map(this::convertToTravelListResponse)
-//                .collect(Collectors.toList());
-//    }
-
 
     public TravelListPagedResponse toPagedResponse(Page<TravelListResponse> page) {
         TravelListPagedResponse response = new TravelListPagedResponse();
@@ -707,55 +612,4 @@ public class TravelService {
         groupAccountStakeRepostory.save(groupAccountStake);
     }
 
-    public void indexTravel(Travel travel) {
-        String id = travel.getId().toString();
-
-        TravelDocument travelDocument = new TravelDocument();
-        travelDocument.setTravelId(travel.getId());
-        long daysBetween = ChronoUnit.DAYS.between(travel.getStartDate(), travel.getEndDate()) + 1;
-        travelDocument.setDays((int) daysBetween);
-        travelDocument.setTitle(travel.getTitle());
-        travelDocument.setImage(travel.getImage());
-        travelDocument.setMemberCount(travel.getMemberCount());
-        travelDocument.setStatus(travel.isStatus());
-        travelDocument.setCreatorId(travel.getCreatorId());
-        travelDocument.setShared(travel.isShared());
-        travelDocument.setShareStatus(travel.isShareStatus());
-        travelDocument.setTotalBudget(travel.getTotalBudget());
-        travelDocument.setTotalBudgetWon(travel.getTotalBudgetWon());
-        travelDocument.setCountry(travel.getCountry().getName());
-
-        IndexQuery indexQuery = new IndexQueryBuilder()
-                .withId(id)
-                .withObject(travelDocument)
-                .build();
-
-        elasticsearchTemplate.index(indexQuery, IndexCoordinates.of("travel"));
-    }
-
-    public void indexMember(Long userId) {
-        String id = userId.toString();
-        Member member = memberRepository.findByMemberLongId(userId);
-
-        String birth = member.getBirth();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyMMdd");
-        LocalDate birthDate = LocalDate.parse(birth, formatter);
-
-        int age = Period.between(birthDate, LocalDate.now()).getYears();
-
-        boolean genderBoolean = member.getGender(); // gender가 boolean 타입
-        int gender = genderBoolean ? 1 : 0;
-
-        MemberDocument memberDocument = new MemberDocument();
-        memberDocument.setId(member.getId());
-        memberDocument.setAge(age);
-        memberDocument.setGender(gender);
-
-        IndexQuery indexQuery = new IndexQueryBuilder()
-                .withId(id)
-                .withObject(memberDocument)
-                .build();
-
-        elasticsearchTemplate.index(indexQuery, IndexCoordinates.of("member"));
-    }
 }

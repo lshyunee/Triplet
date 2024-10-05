@@ -9,7 +9,6 @@ import com.ssafy.triplet.travel.dto.response.TransactionListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelWalletResponse;
 import com.ssafy.triplet.travel.service.TravelWalletService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Transaction;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
