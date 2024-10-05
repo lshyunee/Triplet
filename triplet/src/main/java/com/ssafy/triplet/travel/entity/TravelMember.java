@@ -1,5 +1,6 @@
 package com.ssafy.triplet.travel.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ssafy.triplet.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -22,5 +23,6 @@ public class TravelMember {
 
     @ManyToOne
     @JoinColumn(name = "travel_id", referencedColumnName = "id", nullable = false)
+    @JsonBackReference
     private Travel travel;
 }
