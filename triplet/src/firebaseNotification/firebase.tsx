@@ -35,7 +35,7 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
             if (!storedToken || currentToken !== storedToken) {
                 localStorage.setItem('fcmToken', currentToken);
                 await axios.post("https://j11b202.p.ssafy.io/api/v1/token", { "token": currentToken }).then(()=>{
-                    axios.post("https://j11b202.p.ssafy.io/api/v1/agree", { "enable": true }).catch(e => console.log("동의 여부 수정 오류 " + e));
+                    axios.put("https://j11b202.p.ssafy.io/api/v1/agree", { "enable": true }).catch(e => console.log("동의 여부 수정 오류 " + e));
                 }).catch(e=> console.log("토큰 저장 오류" + e));
             }
 
@@ -56,5 +56,5 @@ export async function notificationPermissionDenined() {
     if(storedToken){
         localStorage.removeItem('fcmToken');
     }
-    await axios.post("https://j11b202.p.ssafy.io/api/v1/agree", { "enable": false });
+    await axios.put("https://j11b202.p.ssafy.io/api/v1/agree", { "enable": false });
 }

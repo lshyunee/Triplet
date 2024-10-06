@@ -2,9 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-
-
-import { requestNotificationPermission } from '../../../firebaseNotification/firebase';
+import { requestNotificationPermission,notificationPermissionDenined } from '../../../firebaseNotification/firebase';
 const ModalLayout = styled.div`
   position: fixed;
   top: 0;
@@ -77,6 +75,10 @@ const NotificationModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     onClose();
   };
 
+  const handleDenined = () => {
+    notificationPermissionDenined();
+    onClose();
+  }
   if (!isOpen) {
     return null;
   }
@@ -87,7 +89,7 @@ const NotificationModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         <Title>Push 알림 동의</Title>
         <Description>Push 알림에 동의하시겠습니까?</Description>
         <ConfirmDiv>
-          <Button isCancel onClick={onClose}>미동의</Button>
+          <Button isCancel onClick={handleDenined}>미동의</Button>
           <Button onClick={handleAgree}>동의</Button>
         </ConfirmDiv>
       </ModalContentDiv>

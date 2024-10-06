@@ -15,7 +15,6 @@ import ErrorModal from '../../components/modal/ErrorModal';
 
 import { useSelector } from 'react-redux';
 import { userInfo } from 'os';
-import {notificationPermissionDenined} from "../../firebaseNotification/firebase";
 
 
 
@@ -128,7 +127,6 @@ const MyPage = () => {
     };
 
     const closeNotifictaion = () => {
-        notificationPermissionDenined();
         setIsNotifictaionOpen(false);
     } 
 
