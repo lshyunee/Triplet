@@ -12,6 +12,8 @@ import { ReactComponent as SWFlag } from '../../assets/pay/sw.svg';
 import { ReactComponent as CAFlag } from '../../assets/pay/ca.svg';
 import { ReactComponent as KRFlag } from '../../assets/pay/kr.svg';
 import { ReactComponent as DownArrow } from '../../assets/pay/downArrow.svg';
+import useAxios from '../../hooks/useAxios';
+import { useParams } from 'react-router-dom';
 
 
 const s = {
@@ -73,18 +75,65 @@ const s = {
     width: 100%;
     padding: 0 16px;
   `,
+    BtnArea: styled.div`
+    display: flex;
+    position: fixed;
+    bottom: 84px;
+    width: 100%;
+    left: 0;
+    right: 0;    
+  `,
+    PayBtn: styled.button`
+    width:100%;
+    height:44px;
+    color : white;
+    background-color : #008DE7;
+    border-radius : 10px;
+    border : none;
+    box-sizing: border-box;
+    margin: 0 16px;
+    padding : 14px;
+  `,
 }
 
 const ExchangePage = () => {
   const dispatch = useDispatch();
+  // 외화지갑 페이지에서 넘어온 id 저장
+  const { accountId } = useParams();
+
+  const { data: foreignDetailData, 
+		error: foreignDetailError, 
+		loading: foreignDetailLoading, 
+		status: foreignDetailStatus, 
+		refetch: foreignDetailRefetch } = useAxios(`/account/${accountId}`, 'GET');
+
+  const { data: accountData, 
+    error: accountError, 
+    loading: accountLoading, 
+    status: accountStatus, 
+    refetch: accountRefetch } = useAxios(`/account`, 'GET');
+
+  useEffect(() => {
+    const fetchData = async () => {
+			try {
+        await Promise.all([
+          accountRefetch(),     // 원화계좌 API 요청
+          foreignDetailRefetch(),  // 외화계좌 API 요청
+        ]);
+			} catch (error) {
+			  console.error('Error fetching data:', error);
+			}
+		};
+    fetchData();
+  }, []);
 
   useEffect(() => {
     dispatch(pageMove("pay"));
   }, []);
 
-  const nation:string = "일본"
+  const nation:string = "대한민국"
   const from = "일본"
-  const to:string = "대한민국"
+  const to:string = foreignDetailData?.data?.accountName
 
   const [ fromAmount, setFromAmount ] = useState<any>('0');
   const [ toAmount, setToAmount ] = useState<any>('0');
@@ -125,6 +174,18 @@ const ExchangePage = () => {
     }
   }, [toAmount])
 
+  // 환전 요청 바디
+  const requestBody = {
+    targetCurrency: foreignDetailData?.data?.currency,
+    sourceCurrency: "KRW",
+    sourceAmount: fromAmount,
+  };
+
+  const { data: exchangeData, 
+    error: exchangeError, 
+    loading: exchangeLoading, 
+    status: exchangeStatus, 
+    refetch: exchangeRefetch } = useAxios(`/exchange`, 'POST', requestBody);
 
   return(
     <>
@@ -152,7 +213,7 @@ const ExchangePage = () => {
           }
         }) ()}
       </s.TitleArea>
-      <s.Caption>보유 1,011.00 JPY</s.Caption>
+      <s.Caption>보유 {accountData?.data?.accountBalance} {accountData?.data?.currency}</s.Caption>
       <s.InputArea><s.ExchangeInput onChange={fromOnChange} value={fromAmount}/></s.InputArea>
       
       <DownArrow/>
@@ -179,8 +240,11 @@ const ExchangePage = () => {
           }
         }) ()}
       </s.TitleArea>
-      <s.Caption>보유 300,000 KRW</s.Caption>
+      <s.Caption>보유 {foreignDetailData?.data?.accountBalance} {foreignDetailData?.data?.currency}</s.Caption>
       <s.InputArea><s.ExchangeInput onChange={toOnChange} value={toAmount}/></s.InputArea>
+        <s.BtnArea>
+          <s.PayBtn onClick={() => {exchangeRefetch()}}>충전하기</s.PayBtn>
+        </s.BtnArea>
     </s.Container>
     </>
   );
