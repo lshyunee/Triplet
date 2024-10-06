@@ -2,6 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
 import { Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectCompletedTravelByTitleId } from '../../features/travel/completedTravelSlice';
+import { RootState } from '../../store';
 
 const CardDiv = styled.div`
   width: 100%;
@@ -123,19 +126,21 @@ const CompleteTravelCard: React.FC<CompleteTravelCardProps> = ({travelId}) => {
 
   const travel:number = travelId;
   
+  const travelData = useSelector((state : RootState) => selectCompletedTravelByTitleId(state, travel)) || null;
 
   return (
-    <StyledLink to="/travels/completed/1/detail"> 
+    <StyledLink to={`/travels/completed/${travel}/detail`}> 
       <CardDiv>
         <TravelImg src={SampleImg} alt="Travel" />
         <Overlay />
         <BottomOverlay>
           <ContentDiv>
               <ContentTitleDiv>
-                  <CountryP>집에가고싶다</CountryP>
-                  <PriceInfoP>대한민국</PriceInfoP>
+                  <CountryP>{travelData?.title}</CountryP>
+                  <PriceInfoP>{travelData?.countryName}</PriceInfoP>
               </ContentTitleDiv>
-              <DayInfoP>24.09.28 ~ 24.10.01</DayInfoP>
+              <DayInfoP>{travelData?.startDate ? new Date(travelData.startDate).toLocaleDateString() : ''} ~ 
+                {travelData?.endDate ? new Date(travelData.endDate).toLocaleDateString() : ''}</DayInfoP>
           </ContentDiv>
         </BottomOverlay>
       </CardDiv>

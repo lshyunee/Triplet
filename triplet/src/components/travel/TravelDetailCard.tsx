@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useAxios from '../../hooks/useAxios';
-import { useDispatch } from 'react-redux';
-
-import { ongoingTravelDataInsert } from '../../features/travel/ongoingTravelSlice';
 
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
 
@@ -87,6 +84,7 @@ const ProgressText = styled.div`
     color: #008DE7;
     font-size: 16px;
     font-weight: 700;
+    margin-left : 2px;
 `;
 
 const PriceInfo = styled.div`
@@ -94,12 +92,16 @@ const PriceInfo = styled.div`
     bottom: 25px; /* 하단에 딱 붙지 않도록 여백 추가 */
     right: 20px;  /* 왼쪽으로 이동해서 정렬 */
     z-index: 2;
-    color: #008DE7;
     font-size: 14px;
-    font-weight: 600;
     display: flex; /* Flexbox 사용 */
     flex-direction: row; /* 자식 요소를 가로로 배치 */
     align-items: center; /* 자식 요소를 수직으로 가운데 정렬 */
+`;
+
+const PriceUsedP = styled.p`
+    color: #008DE7;
+    font-weight: 600;
+    margin-right : 4px;
 `;
 
 const PriceInfoP = styled.p`
@@ -107,57 +109,39 @@ const PriceInfoP = styled.p`
     color : #666666;
 `;
 
-const OngoingTravelDetailCard = () => {
+interface TravelDetailCardProps {
+    title : String,
+    startDate : String,
+    endDate : String,
+    country : String,
+    memberCount : number,
+    usedBudget : number,
+    totalBudgetWon : number,
+}
 
-    const dispatch = useDispatch();
+const TravelDetailCard: React.FC<TravelDetailCardProps> = 
+        ({title, startDate, endDate, country, memberCount,usedBudget, totalBudgetWon}) => {
 
-    const { data : infoData, error : infoError, loading : infoLoading,
-        status : infoStatus, refetch : infoRefetch
-    } = useAxios("/travels/ongoing","GET");
-
-    useEffect(()=>{
-        infoRefetch();
-    },[])
-
-    useEffect(() => {
-        if (infoData !== null) {
-            dispatch(ongoingTravelDataInsert({
-                travelId: infoData.travelId,
-                title: infoData.title,
-                startDate: new Date(infoData.startDate),
-                endDate: new Date(infoData.endDate),
-                image: infoData.image,
-                countryName: infoData.countryName,
-                countryId: infoData.countryId,
-                currency: infoData.currency,
-                memberCount: infoData.memberCount,
-                totalBudget: infoData.totalBudget,
-                status: infoData.status,
-                shareStatus: infoData.shareStatus,
-                shared: infoData.shared
-            }));
-        }
-    
-        if (infoError !== null) {
-            console.error("Error fetching travel data:", infoError);
-        }
-
-        
-    }, [infoData, infoError]);
 
     return (
         <PositionDiv>
             <CardDiv>
-                <TitleP>고래상어보러가자</TitleP>
-                <InfoP>2024년 9월 3일 ~ 9월 7일<br />일본 · 2명</InfoP>
-                <ProgressText>30%</ProgressText> {/* 진행률 텍스트 추가 */}
+                <TitleP>{title}</TitleP>
+                <InfoP> { startDate} ~
+                {endDate}<br />{country} · {memberCount}명</InfoP>
+                <ProgressText>{(usedBudget / totalBudgetWon * 100).toFixed(0)}%</ProgressText>
                 <ProgressContainer>
                     <ProgressBar />
                 </ProgressContainer>
-                <PriceInfo>600,000 <PriceInfoP>/ 2,000,000원</PriceInfoP></PriceInfo>
+                <PriceInfo>
+                    <PriceUsedP>
+                        {usedBudget} 
+                    </PriceUsedP>
+                        <PriceInfoP>/ {totalBudgetWon}원</PriceInfoP>
+                </PriceInfo>
             </CardDiv>
         </PositionDiv>
     );
 };
 
-export default OngoingTravelDetailCard;
+export default TravelDetailCard;

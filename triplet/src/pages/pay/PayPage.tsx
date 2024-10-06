@@ -172,36 +172,43 @@ const PayPage = () => {
 							nation='미국'
 							foreignCurrency={foreignAccountData?.data[6]?.accountBalance}
 							isExchange={false}
+							accountId={foreignAccountData?.data[6]?.accountId}
 						/>
 						<GlobalAccount
 							nation='유럽'
 							foreignCurrency={foreignAccountData?.data[3]?.accountBalance}
 							isExchange={false}
+							accountId={foreignAccountData?.data[3]?.accountId}
 						/>
 						<GlobalAccount
 							nation='일본'
 							foreignCurrency={foreignAccountData?.data[5]?.accountBalance}
 							isExchange={false}
+							accountId={foreignAccountData?.data[5]?.accountId}
 						/>
 						<GlobalAccount
 							nation='중국'
 							foreignCurrency={foreignAccountData?.data[2]?.accountBalance}
 							isExchange={false}
+							accountId={foreignAccountData?.data[2]?.accountId}
 						/>
 						<GlobalAccount
 							nation='영국'
 							foreignCurrency={foreignAccountData?.data[4]?.accountBalance}
 							isExchange={false}
+							accountId={foreignAccountData?.data[4]?.accountId}
 						/>
 						<GlobalAccount
 							nation='스위스'
 							foreignCurrency={foreignAccountData?.data[1]?.accountBalance}
 							isExchange={false}
+							accountId={foreignAccountData?.data[1]?.accountId}
 						/>
 						<GlobalAccount
 							nation='캐나다'
 							foreignCurrency={foreignAccountData?.data[0]?.accountBalance}
 							isExchange={false}
+							accountId={foreignAccountData?.data[0]?.accountId}
 						/>
 					</s.CurrencyArea>
 				</s.MyCard>
@@ -212,45 +219,45 @@ const PayPage = () => {
 					<s.CurrencyArea>
 						<ExchangeRate
 							nation='미국'
-							foreignCurrency={exchangeRateData?.data[5]?.exchangeRate || 1344.71}
-							isRise={1}
-							rate={exchangeRateData?.data[5]?.changePercentage || 0.20}
+							foreignCurrency={exchangeRateData?.data[5]?.exchangeRate}
+							isRise={exchangeRateData?.data[5]?.changeStatus}
+							rate={exchangeRateData?.data[5]?.changePercentage}
 						/>
 						<ExchangeRate
 							nation='유럽'
-							foreignCurrency={exchangeRateData?.data[3]?.exchangeRate || 1344.71}
-							isRise={1}
-							rate={exchangeRateData?.data[3]?.changePercentage || 0.20}
+							foreignCurrency={exchangeRateData?.data[3]?.exchangeRate}
+							isRise={exchangeRateData?.data[3]?.changeStatus}
+							rate={exchangeRateData?.data[3]?.changePercentage}
 						/>
 						<ExchangeRate
 							nation='일본'
-							foreignCurrency={exchangeRateData?.data[6]?.exchangeRate || 1344.71}
-							isRise={-1}
-							rate={exchangeRateData?.data[6]?.changePercentage || 0.20}
+							foreignCurrency={exchangeRateData?.data[6]?.exchangeRate}
+							isRise={exchangeRateData?.data[6]?.changeStatus}
+							rate={exchangeRateData?.data[6]?.changePercentage}
 						/>
 						<ExchangeRate
 							nation='중국'
-							foreignCurrency={exchangeRateData?.data[2]?.exchangeRate || 1344.71}
-							isRise={1}
-							rate={exchangeRateData?.data[2]?.changePercentage || 0.20}
+							foreignCurrency={exchangeRateData?.data[2]?.exchangeRate}
+							isRise={exchangeRateData?.data[2]?.changeStatus}
+							rate={exchangeRateData?.data[2]?.changePercentage}
 						/>
 						<ExchangeRate
 							nation='영국'
-							foreignCurrency={exchangeRateData?.data[0]?.exchangeRate || 1344.71}
-							isRise={1}
-							rate={exchangeRateData?.data[0]?.changePercentage || 0.20}
+							foreignCurrency={exchangeRateData?.data[0]?.exchangeRate}
+							isRise={exchangeRateData?.data[0]?.changeStatus}
+							rate={exchangeRateData?.data[0]?.changePercentage}
 						/>
 						<ExchangeRate
 							nation='스위스'
-							foreignCurrency={exchangeRateData?.data[4]?.exchangeRate || 1344.71}
-							isRise={1}
-							rate={exchangeRateData?.data[4]?.changePercentage || 0.20}
+							foreignCurrency={exchangeRateData?.data[4]?.exchangeRate}
+							isRise={exchangeRateData?.data[4]?.changeStatus}
+							rate={exchangeRateData?.data[4]?.changePercentage}
 						/>
 						<ExchangeRate
 							nation='캐나다'
-							foreignCurrency={exchangeRateData?.data[1]?.exchangeRate || 1344.71}
-							isRise={-1}
-							rate={exchangeRateData?.data[1]?.changePercentage || 0.20}
+							foreignCurrency={exchangeRateData?.data[1]?.exchangeRate}
+							isRise={exchangeRateData?.data[1]?.changeStatus}
+							rate={exchangeRateData?.data[1]?.changePercentage}
 						/>
 					</s.CurrencyArea>
 				</s.Card>

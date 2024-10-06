@@ -10,6 +10,7 @@ import useInput from '../../../hooks/useInput';
 import ErrorModal from '../../../components/modal/ErrorModal';
 import CompleteModal from '../../../components/modal/CompleteModal';
 
+import { requestNotificationPermission } from '../../../firebaseNotification/firebase';
 const TitleP = styled.p`
     font-size : 32px;
     font-weight : 800;
@@ -147,15 +148,18 @@ const LoginPage = () => {
     }, [loginData, loginError]);
 
     // 카카오 로그인 버튼 핸들러
-    const handleNaverLogin = () => {
+    const handleKakaoLogin = () => {
         window.location.href = 'https://j11b202.p.ssafy.io/api/v1/oauth2/authorization/kakao';
     };
 
     // 로그인 상태 변경 시 처리
     useEffect(() => {
         if (loginStatus === 200) {
+            
             dispatch(loginSuccess());
+            requestNotificationPermission();
             navigate('/');
+
         }
     }, [loginStatus, dispatch, navigate]);
 
@@ -232,11 +236,11 @@ const LoginPage = () => {
                 <TitleP>Triplet</TitleP>
             </TitleDiv>
             <LoginForm onSubmit={handleLogin}>
-                <LoginInput type="text" placeholder='아이디' {...id} />
-                <LoginInput type="password" placeholder='비밀번호' {...pw} />
-                <LoginBtn ref={loginBtnRef} type="submit" disabled={enterPressed}>로그인</LoginBtn> {/* 버튼에 참조 추가 */}
+                <LoginInput type="text" placeholder="아이디" value={id.value} onChange={id.onChange} />
+                <LoginInput type="password" placeholder="비밀번호" value={pw.value} onChange={pw.onChange} />
+                <LoginBtn ref={loginBtnRef} type="submit" disabled={enterPressed}>로그인</LoginBtn>
             </LoginForm>
-            <KakaoLoginBtn onClick={handleNaverLogin}>
+            <KakaoLoginBtn onClick={handleKakaoLogin}>
                 카카오 로그인
             </KakaoLoginBtn>
             <SignupDiv>

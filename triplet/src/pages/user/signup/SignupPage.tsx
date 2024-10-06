@@ -49,26 +49,26 @@ const ExplainDiv = styled.div`
 `;
 
 const StyledInput = styled.input`
-    background-color : #F9FAFC;
-    width: 100%;
+    background-color : ${ (props) => props.disabled ? '#A1A1A1' : 'white'};
+    color : ${ (props) => props.disabled ? 'white' : 'black'};
+    width:100%;
     height:44px;
-    margin-bottom : 10px;
     border-radius : 10px;
     border : 1px solid #F0F0F0;
-    box-sizing: border-box;
-    padding : 10px;
+    text-indent: 10px; 
 `;
 
 const StyledInputFront = styled.input`
-    background-color : #F9FAFC;
+    background-color : ${ (props) => props.disabled ? '#A1A1A1' : 'white'};
+    color : ${ (props) => props.disabled ? 'white' : 'black' };
     border-radius : 10px;
     border : 1px solid #F0F0F0;
     box-sizing: border-box;
     width : 50%;
     padding : 10px;
     height : 44px;
+    text-align:center;
 `;
-
 
 
 const CheckDiv = styled.div`
@@ -193,7 +193,7 @@ const SignupPage = () => {
         status: duplicatedStatus, refetch: duplicatedRefetch }
         = useAxios('/signup/is-duplicated', 'POST', {memberId : id.value});
 
-    const [ isDuplicated, setIsDuplicated ] = useState(false);
+    const [ isDuplicated, setIsDuplicated ] = useState(true);
 
     const idDuplicationCheck = () => {
         // 중복 체크 요청을 실행하기 위해 refetch 호출
@@ -332,56 +332,56 @@ const SignupPage = () => {
     }
 
     return(
-        <div>
-            <BackHeader title={title}/>
-            <InputDiv>
-                <ExplainDiv>
-                    <HowP>아이디</HowP>
-                    <ExplainP>(영문, 숫자 포함 5~16자)</ExplainP>
-                </ExplainDiv>
-                <CheckDiv>
-                    <StyledInput type="text" {...id} />
-                    <StyledBtn onClick={idDuplicationCheck} disabled={false}>중복확인</StyledBtn>
-                </CheckDiv>
-                <CheckP>{isDuplicated ? " " : "사용 가능한 아이디입니다."}</CheckP>
-                <ExplainDiv>
-                    <HowP>비밀번호</HowP>
-                    <ExplainP>(영문, 숫자, 특수문자 포함 8~15자)</ExplainP>
-                </ExplainDiv>
-                <StyledInput type="password" {...pw}/>
-                <HowP>비밀번호 확인</HowP>
-                <StyledInput type="password" {...pwCheck} />
-                <HowP>이름</HowP>
-                <StyledInput type="text" {...name}/>
-                <HowP>주민등록번호</HowP>
-                <RegistDiv>
-                    <StyledInputFront type="text" {...identificationNumFront}/>
-                    <NumP>-</NumP>
-                    <StyledInput type="text" {...identificationNumBack}/>
-                    <NumP>* * * * * *</NumP>
-                </RegistDiv>
-                <HowP>전화번호</HowP>
-                <PhoneDiv>
-                    <StyledInputFront type="text" {...phoneNumFront} disabled={isCheck} />
-                    <NumP>-</NumP>
-                    <StyledInput type="text" {...phoneNumMiddle} disabled={isCheck}/>
-                    <NumP>-</NumP>
-                    <StyledInput type="text" {...phoneNumBack} disabled={isCheck}/>
-                    <StyledBtn onClick={certificateSend} disabled={isSend}>인증번호 발송</StyledBtn>
-                </PhoneDiv>
-                <HowP>인증번호</HowP>
-                <CheckDiv>
-                    <StyledInput type="text" {...certificationNum} disabled={isCheck}/>
-                    <StyledBtn onClick={certificateCheck} disabled={isCheck}>확인</StyledBtn>
-                </CheckDiv>
-                <CheckP>{isCheck ? "인증되었습니다." : ""}</CheckP>
-                <ConfirmDiv>  
-                        <ConfirmBox onClick={signup}>회원 가입</ConfirmBox>
-                </ConfirmDiv>
-            </InputDiv>
-            <ErrorModal isOpen={isError} onClose={closeError} msg={errorMsg}></ErrorModal>
-            <CompleteModal isOpen={isModel} onClose={isModelClose} msg={msg} ></CompleteModal>
-        </div>
+    <div>
+        <BackHeader title={title}/>
+        <InputDiv>
+            <ExplainDiv>
+                <HowP>아이디</HowP>
+                <ExplainP>(영문, 숫자 포함 5~16자)</ExplainP>
+            </ExplainDiv>
+            <CheckDiv>
+                <StyledInput type="text" value={id.value} onChange={id.onChange} />
+                <StyledBtn onClick={idDuplicationCheck} disabled={false}>중복확인</StyledBtn>
+            </CheckDiv>
+            <CheckP>{isDuplicated ? " " : "사용 가능한 아이디입니다."}</CheckP>
+            <ExplainDiv>
+                <HowP>비밀번호</HowP>
+                <ExplainP>(영문, 숫자, 특수문자 포함 8~15자)</ExplainP>
+            </ExplainDiv>
+            <StyledInput type="password" value={pw.value} onChange={pw.onChange} />
+            <HowP>비밀번호 확인</HowP>
+            <StyledInput type="password" value={pwCheck.value} onChange={pwCheck.onChange} />
+            <HowP>이름</HowP>
+            <StyledInput type="text" value={name.value} onChange={name.onChange} />
+            <HowP>주민등록번호</HowP>
+            <RegistDiv>
+                <StyledInputFront type="text" value={identificationNumFront.value} onChange={identificationNumFront.onChange} />
+                <NumP>-</NumP>
+                <StyledInput type="text" value={identificationNumBack.value} onChange={identificationNumBack.onChange} />
+                <NumP>* * * * * *</NumP>
+            </RegistDiv>
+            <HowP>전화번호</HowP>
+            <PhoneDiv>
+                <StyledInputFront type="text" value={phoneNumFront.value} onChange={phoneNumFront.onChange} disabled={isCheck} />
+                <NumP>-</NumP>
+                <StyledInput type="text" value={phoneNumMiddle.value} onChange={phoneNumMiddle.onChange} disabled={isCheck} />
+                <NumP>-</NumP>
+                <StyledInput type="text" value={phoneNumBack.value} onChange={phoneNumBack.onChange} disabled={isCheck} />
+                <StyledBtn onClick={certificateSend} disabled={isSend}>인증번호 발송</StyledBtn>
+            </PhoneDiv>
+            <HowP>인증번호</HowP>
+            <CheckDiv>
+                <StyledInput type="text" value={certificationNum.value} onChange={certificationNum.onChange} disabled={isCheck} />
+                <StyledBtn onClick={certificateCheck} disabled={isCheck}>확인</StyledBtn>
+            </CheckDiv>
+            <CheckP>{isCheck ? "인증되었습니다." : ""}</CheckP>
+            <ConfirmDiv>  
+                <ConfirmBox onClick={signup}>회원 가입</ConfirmBox>
+            </ConfirmDiv>
+        </InputDiv>
+        <ErrorModal isOpen={isError} onClose={closeError} msg={errorMsg}></ErrorModal>
+        <CompleteModal isOpen={isModel} onClose={isModelClose} msg={msg}></CompleteModal>
+    </div>
     )
 }
 

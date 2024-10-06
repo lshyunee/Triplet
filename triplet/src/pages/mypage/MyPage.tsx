@@ -9,7 +9,14 @@ import useAxios from '../../hooks/useAxios';
 import { ReactComponent as RightArrow} from '../../assets/common/rightArrow.svg';
 
 import Logout from '../user/logout/LogoutModal';
+import Notification from '../user/notification/NotificationModal';
 import WithdrawalModal from '../user/withdrawal/WithdrawalModal';
+import ErrorModal from '../../components/modal/ErrorModal';
+
+import { useSelector } from 'react-redux';
+import { userInfo } from 'os';
+
+
 
 const PageDiv = styled.div`
     background-color : #F3F4F6;
@@ -29,14 +36,14 @@ const TitleP = styled.p`
 `;
 
 const InfoP = styled.p`
-    font-size : 14px;
-    height : 14px;
-    font-weight : 500;
-    color : #666666;
-    margin-left : 12px;
-    margin-top : 0px;
-    margin-bottom : 0px;
-`;
+        font-size : 14px;
+        height : 14px;
+        font-weight : 500;
+        color : #666666;
+        margin-left : 12px;
+        margin-top : 0px;
+        margin-bottom : 0px;
+    `;
 
 const CategoryP = styled.p`
     font-size : 14px;
@@ -104,31 +111,24 @@ const MyPage = () => {
 
     const title = "마이페이지"
     const dispatch = useDispatch();
-    const [ name, setName ] = useState('');
-    const [ birth, setBirth ] = useState('');
-    const [ phoneNum, setPhoneNum ] = useState('');
     const [ isLogOutOpen, setIsLogOutOpen ] = useState(false);
+    const [ isNotifictaionOpen, setIsNotifictaionOpen ] = useState(false);
+    const userData = useSelector((state:any) => state.userInfo);
+
+    const { memberId, name, birth, phoneNumber } = userData;
 
     useEffect(() => {
         dispatch(pageMove("mypage"));
+        console.log(memberId);
     }, [])
 
-    const { data: infoData, error: infoError, loading: infoLoading,
-        status: infoStatus, refetch: infoRefetch }
-        = useAxios('/user/my', 'GET');
+    const openNotifictaion = () => {
+        setIsNotifictaionOpen(true);
+    };
 
-    useEffect(() => {
-        infoRefetch();
-    },[])
-
-    useEffect(() => {
-        if(infoData!==null){
-            console.log(infoData);
-            setName(infoData.data.name);
-            setBirth(infoData.data.birth);
-            setPhoneNum(infoData.data.phoneNumber);
-        }
-    },[infoData]);
+    const closeNotifictaion = () => {
+        setIsNotifictaionOpen(false);
+    } 
 
     const openLogout = () => {
         setIsLogOutOpen(true);
@@ -142,6 +142,23 @@ const MyPage = () => {
     
     const withdrawal = () => {
         setIsWithdrawal(true);
+    }
+
+    const [ errorMsg, setErrorMsg] = useState('...');
+
+    const kakaoDontGoPassword = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+        console.log(memberId);
+        if(memberId.slice(0,5)==="kakao"){
+            event.preventDefault();
+        }
+        setErrorMsg("카카오 계정은 비밀번호를 변경할 수 없습니다.");
+        clickPassword();
+    }
+
+    const [ isError, setIsError ] = useState(false);
+
+    const clickPassword = () => {
+        setIsError(true);
     }
 
     return (
@@ -160,8 +177,9 @@ const MyPage = () => {
                     </InfoDiv>
                     <InfoDiv>
                         <InfoP>전화번호</InfoP>
-                        <CategoryP>{phoneNum}</CategoryP>
+                        <CategoryP>{phoneNumber}</CategoryP>
                     </InfoDiv>
+                    
                 </MyInfoDiv>
                 <MyInfoConfigDiv>
                     <TitleP>회원정보 설정</TitleP>
@@ -177,12 +195,16 @@ const MyPage = () => {
                             <RightArrow/>
                         </ConfigDiv>
                     </StyledLink>
-                    <StyledLink to="/mypage/password-edit">
+                    <StyledLink to="/mypage/password-edit" onClick={(event) => kakaoDontGoPassword(event)}>
                         <ConfigDiv>
                             <CategoryP>비밀번호 변경</CategoryP>
                             <RightArrow/>
                         </ConfigDiv>
                     </StyledLink>
+                    <ConfigDiv onClick={openNotifictaion}>
+                        <CategoryP>Push 알림 설정</CategoryP>
+                        <RightArrow/>
+                    </ConfigDiv>
                     <ConfigDiv onClick={openLogout}>
                         <CategoryP>로그아웃</CategoryP>
                         <RightArrow/>
@@ -193,8 +215,11 @@ const MyPage = () => {
                     </ConfigDiv>
                 </MyInfoConfigDiv>
                 <Logout isOpen={isLogOutOpen} onClose={closeLogout}></Logout>
+                <Notification isOpen={isNotifictaionOpen} onClose = {closeNotifictaion}></Notification>
                 <WithdrawalModal isOpen={isWithdrawal} onClose={()=>{setIsWithdrawal(false)}}/>
+                <ErrorModal isOpen={isError} onClose={() => {setIsError(false)}} msg={errorMsg}></ErrorModal>   
             </PageDiv>
+           
         </>
     );
 };

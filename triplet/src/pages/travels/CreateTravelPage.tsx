@@ -445,10 +445,6 @@ const CreateTravelPage = () => {
     console.log('에러메시지', testError)
   }, [tdata])
   
-  
-
-  
-
 
   return (
     <>

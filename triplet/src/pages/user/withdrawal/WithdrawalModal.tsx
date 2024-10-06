@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { logout } from '../../../features/auth/authSlice';
 import useAxios from '../../../hooks/useAxios';
+import ErrorModal from '../../../components/modal/ErrorModal';
 
 const ModalLayout = styled.div`
   position: fixed;
@@ -75,11 +76,53 @@ const WithdrawalModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   // Hook은 항상 호출되도록 한다.
   const { data: withdrawalData, error: withdrawalError, loading: withdrawalLoading,
     status: withdrawalStatus, refetch: withdrawalRefetch}
-    = useAxios('/my', 'DELETE', { manual: true });
+    = useAxios('/user/my', 'DELETE', { manual: true });
+
+  const { data: accountData, 
+    error: accountError, 
+    loading: accountLoading, 
+    status: accountStatus, 
+    refetch: accountRefetch } = useAxios('/account', 'GET');
+
+  const { data: foreignAccountData, 
+    error: foreignAccountError, 
+    loading: foreignAccountLoading, 
+    status: foreignAccountStatus, 
+    refetch: foreignAccountRefetch } = useAxios('/foreign-account', 'GET');
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+      await Promise.all([
+        accountRefetch(),     // 원화계좌 API 요청
+        foreignAccountRefetch(),  // 외화계좌 API 요청
+      ]);
+      } catch (error) {
+      console.error('Error fetching data:', error);
+      }
+    };
+  
+    fetchData();
+  }, []);
 
   const handleWithdrawal = () => {
-    // 로그아웃을 클릭했을 때만 실제 로그아웃 API 호출
-    withdrawalRefetch();
+
+
+    if(accountData && foreignAccountData){
+      console.log(accountData.data.accountBalance);
+      if(accountData.data.accountBalance === 0){
+        const foreignAccountBalance : number = 
+          foreignAccountData.data.reduce((total : number, account : any) => total + account.accountBalance, 0);
+        if(foreignAccountBalance===0){
+          withdrawalRefetch();
+          navigate("/login");
+        }
+      }
+    }
+
+    setErrorMsg("계좌에 잔액이 남아있어 회원탈퇴가 불가능 합니다.");
+    setIsError(true);
+
   };
 
   useEffect(() => {
@@ -89,22 +132,26 @@ const WithdrawalModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
     }
   }, [withdrawalData]);
 
+  const [ isError, setIsError ] = useState(false);
+  const [ errorMsg, setErrorMsg ] = useState("");
+
   // 조건부로 return 대신, 렌더링 부분에서 조건 제어
   if (!isOpen) {
     return null;
   }
 
   return (
-    <ModalLayout onClick={onClose}>
-      <ModalContentDiv>
-        <Title>회원 탈퇴</Title>
-        <Description>정말 회원탈퇴 하시겠습니까?</Description>
-        <ConfirmDiv>
-          <Button isCancel onClick={onClose}>취소</Button>
-          <Button onClick={handleWithdrawal}>확인</Button>
-        </ConfirmDiv>
-      </ModalContentDiv>
-    </ModalLayout>
+  <ModalLayout onClick={onClose}>
+    <ModalContentDiv onClick={(e) => e.stopPropagation()}>
+      <Title>회원 탈퇴</Title>
+      <Description>정말 회원탈퇴 하시겠습니까?</Description>
+      <ConfirmDiv>
+        <Button isCancel onClick={onClose}>취소</Button>
+        <Button onClick={handleWithdrawal}>확인</Button>
+      </ConfirmDiv>
+    </ModalContentDiv>
+    <ErrorModal isOpen={isError} onClose={() => {setIsError(false)}} msg={errorMsg} />
+  </ModalLayout>
   );
 };
 

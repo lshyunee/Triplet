@@ -4,8 +4,8 @@ import { RootState } from '../../store';
 interface TravelState {
     travelId: number;
     title: string;
-    startDate: Date;
-    endDate: Date;
+    startDate: string;
+    endDate: string;
     image: string;
     countryName: string;
     countryId: number;
@@ -30,19 +30,32 @@ const completedTravelSlice = createSlice({
     name: 'completedTravel',
     initialState,
     reducers: {
-        // 백엔드에서 배열로 여행 데이터를 받아 배열에 추가하는 액션
-        addTravels: (state, action: PayloadAction<TravelState[]>) => {
-            state.travels = [...state.travels, ...action.payload]; // 기존 배열에 새로운 배열을 추가
-        },
-        // 기존 배열을 새로운 배열로 교체하는 액션
-        setTravels: (state, action: PayloadAction<TravelState[]>) => {
+        addCompletedTravels: (state, action: PayloadAction<TravelState[]>) => {
+            if (!action.payload) {
+                return;
+              }
+
+              const newTravels = action.payload.filter(newTravel => 
+                !state.travels.some(existingTravel => existingTravel.travelId === newTravel.travelId)
+              );
+              
+              state.travels = [...state.travels, ...newTravels];
+          },
+        setCompletedTravels: (state, action: PayloadAction<TravelState[]>) => {
             state.travels = action.payload; // 기존 travels를 새로운 배열로 교체
         },
+        
     },
 });
 
-export const selectAllTravelIds = (state:RootState) : number[] => {
+
+export const selectCompletedTravelByTitleId = (state : RootState, titleId : number) : TravelState | undefined=> {
+    return state.completedTravel.travels.find(travel => travel.travelId === titleId);
+};
+
+
+export const selectAllCompletedTravelIds = (state:RootState) : number[] => {
     return state.completedTravel.travels.map(travel => travel.travelId);
 };
-export const { addTravels, setTravels } = completedTravelSlice.actions;
+export const { addCompletedTravels, setCompletedTravels } = completedTravelSlice.actions;
 export default completedTravelSlice.reducer;

@@ -87,22 +87,30 @@ const ExchangeRate = (props: GlobalAccountProps): JSX.Element => {
 
       <s.RightArea>
         <s.ForeignCurrency>{(foreignCurrency)}원</s.ForeignCurrency>
-        {isRise === 1 ? (
-        <s.RateArea>
-          <UpperArrow/>
-          {/* <s.RedRate>{rate.toFixed(2)}%</s.RedRate> */}
-        </s.RateArea>
-        ) : (
-        <s.RateArea>
-          <LowerArrow/>
-          {/* <s.BlueRate>{rate.toFixed(2)}%</s.BlueRate> */}
-        </s.RateArea>
-        )}
-        
+        {(() => {
+          switch (isRise) {
+            case 1:
+              return (
+                <s.RateArea>
+                  <UpperArrow />
+                  <s.RedRate>{rate}%</s.RedRate>
+                </s.RateArea>
+              );
+            case -1:
+              return (
+                <s.RateArea>
+                  <LowerArrow />
+                  <s.BlueRate>{rate}%</s.BlueRate>
+                </s.RateArea>
+              );
+            default:
+              return null; // 변동 없을경우 아무것도 안띄움
+          }
+        })()}
       </s.RightArea>
     </s.Containter>
     </>
   );
-}
+};
 
 export default ExchangeRate;

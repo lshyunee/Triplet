@@ -27,13 +27,13 @@ import UpcomingTravelDetailPage from '../pages/travels/UpcomingTravelDetailPage'
 import OngoingTravelDetailPage from '../pages/travels/OngoingTravelDetailPage';
 import CompletedTravelDetailPage from '../pages/travels/CompletedTravelDetailPage';
 import MyInfoSetPage from '../pages/mypage/MyInfoSetPage';
+import FeedDetailPage from '../pages/feed/FeedDetailPage';
 
 const AppRoutes: React.FC = () => (
         <Routes>
             <Route path="/" element={<Home/>}/>
             <Route path="/login" element={<Login/>}/>
             <Route path="/signup" element={<Signup/>}/>
-            <Route path="/feed" element={<FeedPage/>}/>
             <Route path="/mypage" element={<MyPage/>} />
             <Route path="/mypage/info-set" element={<MyInfoSetPage/>}/>
             <Route path="/mypage/info-edit" element={<MyInfoEditPage/>} />
@@ -47,12 +47,14 @@ const AppRoutes: React.FC = () => (
             <Route path="/pay/qr/complete" element={<QRCompletePage/>}/>
             <Route path="/pay/account-detail" element={<AccountDetailPage/>}/>
             <Route path="/pay/global-wallet" element={<GlobalWalletPage/>}/>
-            <Route path="/pay/exchange" element={<ExchangePage/>}/>
+            <Route path="/pay/exchange/:accountId" element={<ExchangePage/>}/>
             <Route path="/travels" element={<Travels/>}/>
             <Route path="/travels/create" element={<CreateTravelPage/>}/>
             <Route path="/travels/ongoing/detail" element={<OngoingTravelDetailPage/>}/>
             <Route path="/travels/upcoming/:id/detail" element={<UpcomingTravelDetailPage/>}/>
             <Route path="/travels/completed/:id/detail" element={<CompletedTravelDetailPage/>}/>
+            <Route path="/feed" element={<FeedPage/>}/>
+            <Route path="/feed/:id/detail" element={<FeedDetailPage/>}/>
             <Route path="/alarm" element={<Alarm/>}/>
         </Routes>
 );

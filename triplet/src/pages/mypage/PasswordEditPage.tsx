@@ -84,9 +84,9 @@ const PasswordEditPage = () => {
     const { data: pwData, error: pwError, loading: pwLoading,
         status: pwStatus, refetch: pwRefetch
     } = useAxios('/user/password', 'PUT',{
-        password : pw,
-        newPassword : newPw,
-        newPasswordConfirm : newPwCheck
+        password : pw.value,
+        newPassword : newPw.value,
+        newPasswordConfirm : newPwCheck.value
     });
 
     const changePassword = () => {
@@ -130,27 +130,28 @@ const PasswordEditPage = () => {
 
     return (
         <>
-            <BackHeader title={"비밀번호 변경"}/>
+            <BackHeader title="비밀번호 변경" />
             <PasswordDiv>
                 <CurrentDiv>
                     <HowP>현재 비밀번호</HowP>
-                    <StyledInput type="password" {...pw} />
+                    <StyledInput type="password" value={pw.value} onChange={pw.onChange} />
                 </CurrentDiv>
                 <NewDiv>
                     <ExplainDiv>
                         <HowP>새 비밀번호</HowP>
                         <ExplainP>(영문, 숫자, 특수문자 포함 8~15자)</ExplainP>
                     </ExplainDiv>
-                    <StyledInput type="password" {...newPw}/>
+                    <StyledInput type="password" value={newPw.value} onChange={newPw.onChange} />
                     <NewConfirmDiv>
                         <HowP>새 비밀번호 확인</HowP>
-                        <StyledInput type="password" {...newPwCheck} />
+                        <StyledInput type="password" value={newPwCheck.value} onChange={newPwCheck.onChange} />
                     </NewConfirmDiv>
                 </NewDiv>
                 <ConfirmBtn onClick={changePassword}>비밀번호 변경</ConfirmBtn>
             </PasswordDiv>
             <ErrorModal isOpen={isErrorModal} onClose={isErrorClose} msg={errorMsg}></ErrorModal>
-            <CompleteModal isOpen={isModel} onClose={isModelClose} msg={msg} ></CompleteModal>
+            <CompleteModal isOpen={isModel} onClose={isModelClose} msg={msg}></CompleteModal>
+
         </>
     );
 };

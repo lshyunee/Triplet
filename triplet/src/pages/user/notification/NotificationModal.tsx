@@ -1,12 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import useAxios from '../../../hooks/useAxios';
-
-import { logout } from '../../../features/auth/authSlice';
-import { resetInfo } from '../../../features/user/userInfoSlice';
-
+import { requestNotificationPermission,notificationPermissionDenined } from '../../../firebaseNotification/firebase';
 const ModalLayout = styled.div`
   position: fixed;
   top: 0;
@@ -69,30 +65,20 @@ interface ModalProps {
   onClose: () => void;
 }
 
-const LogoutModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
+const NotificationModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // Hook은 항상 호출되도록 한다.
-  const { data: logoutData, error: logoutError, loading: logoutLoading,
-    status: logoutStatus, refetch: logoutRefetch}
-    = useAxios('/logout', 'POST', { manual: true });
-
-  const handleLogout = () => {
-    // 로그아웃을 클릭했을 때만 실제 로그아웃 API 호출
-    logoutRefetch();
+  const handleAgree = () => {
+    // 알림 동의 
+    requestNotificationPermission();
+    onClose();
   };
 
-  useEffect(() => {
-    if (logoutData !== null) {
-      console.log(logoutData.message);
-      dispatch(resetInfo());
-      dispatch(logout());
-      navigate("/login");
-    }
-  }, [logoutData]);
-
-  // 조건부로 return 대신, 렌더링 부분에서 조건 제어
+  const handleDenined = () => {
+    notificationPermissionDenined();
+    onClose();
+  }
   if (!isOpen) {
     return null;
   }
@@ -100,15 +86,15 @@ const LogoutModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   return (
     <ModalLayout onClick={onClose}>
       <ModalContentDiv onClick={(e) => e.stopPropagation()}>
-        <Title>로그아웃</Title>
-        <Description>로그아웃 하시겠습니까?</Description>
+        <Title>Push 알림 동의</Title>
+        <Description>Push 알림에 동의하시겠습니까?</Description>
         <ConfirmDiv>
-          <Button isCancel onClick={onClose}>취소</Button>
-          <Button onClick={handleLogout}>확인</Button>
+          <Button isCancel onClick={handleDenined}>미동의</Button>
+          <Button onClick={handleAgree}>동의</Button>
         </ConfirmDiv>
       </ModalContentDiv>
     </ModalLayout>
   );
 };
 
-export default LogoutModal;
+export default NotificationModal;
