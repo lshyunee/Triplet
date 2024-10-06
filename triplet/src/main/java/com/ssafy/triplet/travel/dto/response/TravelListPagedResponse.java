@@ -8,10 +8,9 @@ import java.util.List;
 @Getter
 @Setter
 public class TravelListPagedResponse {
-    private List<TravelListResponse> content;
+    private List<TravelFeedListResponse> content;
     private int pageNumber;
     private boolean last;
     private int totalPages;
     private long totalElements;
-    private int number;
 }
