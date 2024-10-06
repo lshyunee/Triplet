@@ -96,6 +96,7 @@ const GlobalWalletPage = () => {
 					nation='미국'
 					foreignCurrency={foreignAccountData?.data[6]?.accountBalance}
 					isExchange={true}
+					accountId={foreignAccountData?.data[6]?.accountId}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard>
@@ -103,6 +104,7 @@ const GlobalWalletPage = () => {
 					nation='유럽'
 					foreignCurrency={foreignAccountData?.data[3]?.accountBalance}
 					isExchange={true}
+					accountId={foreignAccountData?.data[3]?.accountId}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard>
@@ -110,6 +112,7 @@ const GlobalWalletPage = () => {
 					nation='일본'
 					foreignCurrency={foreignAccountData?.data[5]?.accountBalance}
 					isExchange={true}
+					accountId={foreignAccountData?.data[5]?.accountId}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard>
@@ -117,6 +120,7 @@ const GlobalWalletPage = () => {
 					nation='중국'
 					foreignCurrency={foreignAccountData?.data[2]?.accountBalance}
 					isExchange={true}
+					accountId={foreignAccountData?.data[2]?.accountId}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard>
@@ -124,6 +128,7 @@ const GlobalWalletPage = () => {
 					nation='영국'
 					foreignCurrency={foreignAccountData?.data[4]?.accountBalance}
 					isExchange={true}
+					accountId={foreignAccountData?.data[4]?.accountId}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard>
@@ -131,6 +136,7 @@ const GlobalWalletPage = () => {
 					nation='스위스'
 					foreignCurrency={foreignAccountData?.data[1]?.accountBalance}
 					isExchange={true}
+					accountId={foreignAccountData?.data[1]?.accountId}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard>
@@ -138,6 +144,7 @@ const GlobalWalletPage = () => {
 					nation='캐나다'
 					foreignCurrency={foreignAccountData?.data[0]?.accountBalance}
 					isExchange={true}
+					accountId={foreignAccountData?.data[0]?.accountId}
 				/>
 			</s.GlobalAccountCard>
 			<s.Card>
