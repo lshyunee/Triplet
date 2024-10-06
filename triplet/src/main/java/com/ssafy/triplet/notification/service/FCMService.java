@@ -9,14 +9,13 @@ import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.notification.dto.FcmTokenDto;
+import com.ssafy.triplet.notification.dto.NotificationEnableDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Slf4j
 public class FCMService {
@@ -69,6 +68,23 @@ public class FCMService {
 
         return result;
     }
- 
-   
+
+
+    public boolean getNotificationEnabled(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId);
+        if(member == null){
+            throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
+        }
+        return member.getIsNotificationEnabled();
+    }
+
+    public boolean updateEnableNotification(String memberId, NotificationEnableDto enable) {
+        Member member = memberRepository.findByMemberId(memberId);
+        if(member == null){
+            throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
+        }
+        member.setIsNotificationEnabled(enable.isEnable());
+        memberRepository.save(member);
+        return true;
+    }
 }
