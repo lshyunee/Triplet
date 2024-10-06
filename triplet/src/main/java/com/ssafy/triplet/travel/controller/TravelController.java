@@ -4,7 +4,6 @@ import com.ssafy.triplet.auth.dto.CustomUserPrincipal;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.response.ApiResponse;
-import com.ssafy.triplet.travel.dto.request.TravelCreateRequest;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
 import com.ssafy.triplet.travel.dto.request.TravelShareRequest;
 import com.ssafy.triplet.travel.dto.response.*;
@@ -31,7 +30,7 @@ public class TravelController {
     @PostMapping("/create")
     public ResponseEntity<ApiResponse<TravelResponse>> createTravel(
             @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
-            @RequestPart("data") TravelCreateRequest requestDTO,
+            @RequestPart("data") TravelRequest requestDTO,
             @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
         try {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
