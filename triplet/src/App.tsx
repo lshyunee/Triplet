@@ -75,7 +75,7 @@ const App: React.FC = () => {
   // useEffect(() => {
   //   if ('serviceWorker' in navigator) {
   //     window.addEventListener('load', () => {
-  //       navigator.serviceWorker.register('/firebase-messaging-sw.js')
+  //       navigator.serviceWorker.register('/service-worker.js')
   //         .then((registration) => {
   //           console.log('서비스 워커 등록 성공 : ', registration.scope);
   //           setIsLoading(false); // 서비스 워커가 등록되면 로딩 완료
