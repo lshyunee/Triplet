@@ -10,12 +10,14 @@ import java.util.List;
 
 @Entity
 @Builder
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Member {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
@@ -31,12 +33,12 @@ public class Member {
 
     private Boolean isNotificationEnabled = false;
 
-    @OneToOne
+    @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "krw_account_id")
     private Account krwAccount;
 
-    @OneToMany(mappedBy = "member")
     @Builder.Default
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Account> foreignAccounts = new ArrayList<>();
 
     public void createMyKrwAccount(Account account) {

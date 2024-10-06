@@ -1,5 +1,6 @@
 package com.ssafy.triplet.travel.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -62,8 +63,10 @@ public class Travel {
     private Country country;
 
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<TravelMember> travelMembers;
 
     @OneToMany(mappedBy = "travel", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<TravelBudget> travelBudgets;
 }
