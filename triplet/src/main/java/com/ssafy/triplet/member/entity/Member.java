@@ -31,6 +31,8 @@ public class Member {
     private String phoneNumber;
     private String role;
 
+    private Boolean isNotificationEnabled = false;
+
     @OneToOne(cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "krw_account_id")
     private Account krwAccount;
