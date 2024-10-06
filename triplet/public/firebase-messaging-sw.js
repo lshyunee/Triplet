@@ -33,12 +33,12 @@ self.addEventListener("notificationclick", function (event) {
   event.waitUntil(clients.openWindow(url));
 });
 
-messaging.onBackgroundMessage(function(payload) {
-  console.log('background 푸시 알림 ->', payload);
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-  };
+// messaging.onBackgroundMessage(function(payload) {
+//   console.log('background 푸시 알림 ->', payload);
+//   const notificationTitle = payload.notification.title;
+//   const notificationOptions = {
+//     body: payload.notification.body,
+//   };
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
-});
+//   self.registration.showNotification(notificationTitle, notificationOptions);
+// });

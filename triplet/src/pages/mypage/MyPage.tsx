@@ -9,13 +9,13 @@ import useAxios from '../../hooks/useAxios';
 import { ReactComponent as RightArrow} from '../../assets/common/rightArrow.svg';
 
 import Logout from '../user/logout/LogoutModal';
+import Notification from '../user/notification/NotificationModal';
 import WithdrawalModal from '../user/withdrawal/WithdrawalModal';
 import ErrorModal from '../../components/modal/ErrorModal';
 
 import { useSelector } from 'react-redux';
 import { userInfo } from 'os';
-
-import { requestNotificationPermission } from '../../firebaseNotification/firebase';
+import {notificationPermissionDenined} from "../../firebaseNotification/firebase";
 
 
 
@@ -113,6 +113,7 @@ const MyPage = () => {
     const title = "마이페이지"
     const dispatch = useDispatch();
     const [ isLogOutOpen, setIsLogOutOpen ] = useState(false);
+    const [ isNotifictaionOpen, setIsNotifictaionOpen ] = useState(false);
     const userData = useSelector((state:any) => state.userInfo);
 
     const { memberId, name, birth, phoneNumber } = userData;
@@ -122,6 +123,14 @@ const MyPage = () => {
         console.log(memberId);
     }, [])
 
+    const openNotifictaion = () => {
+        setIsNotifictaionOpen(true);
+    };
+
+    const closeNotifictaion = () => {
+        notificationPermissionDenined();
+        setIsNotifictaionOpen(false);
+    } 
 
     const openLogout = () => {
         setIsLogOutOpen(true);
@@ -194,7 +203,7 @@ const MyPage = () => {
                             <RightArrow/>
                         </ConfigDiv>
                     </StyledLink>
-                    <ConfigDiv onClick={requestNotificationPermission}>
+                    <ConfigDiv onClick={openNotifictaion}>
                         <CategoryP>Push 알림 설정</CategoryP>
                         <RightArrow/>
                     </ConfigDiv>
@@ -208,6 +217,7 @@ const MyPage = () => {
                     </ConfigDiv>
                 </MyInfoConfigDiv>
                 <Logout isOpen={isLogOutOpen} onClose={closeLogout}></Logout>
+                <Notification isOpen={isNotifictaionOpen} onClose = {closeNotifictaion}></Notification>
                 <WithdrawalModal isOpen={isWithdrawal} onClose={()=>{setIsWithdrawal(false)}}/>
                 <ErrorModal isOpen={isError} onClose={() => {setIsError(false)}} msg={errorMsg}></ErrorModal>   
             </PageDiv>

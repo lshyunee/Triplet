@@ -25,7 +25,6 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
         return permission;
     }
 
-    console.log("알림 권한이 허용됨");
 
     try {
         const currentToken = await getToken(messaging, { vapidKey: process.env.REACT_APP_VAPID_KEY });
@@ -35,7 +34,9 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
             const storedToken = localStorage.getItem('fcmToken');
             if (!storedToken || currentToken !== storedToken) {
                 localStorage.setItem('fcmToken', currentToken);
-                await axios.post("https://j11b202.p.ssafy.io/api/v1/token", { "token": currentToken });
+                await axios.post("https://j11b202.p.ssafy.io/api/v1/token", { "token": currentToken }).then(()=>{
+                    axios.post("https://j11b202.p.ssafy.io/api/v1/agree", { "enable": true }).catch(e => console.log("동의 여부 수정 오류 " + e));
+                }).catch(e=> console.log("토큰 저장 오류" + e));
             }
 
             return permission;
@@ -47,4 +48,13 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
         console.log('토큰을 가져오는 중 오류가 발생했습니다:', err);
         return permission;
     }
+}
+
+export async function notificationPermissionDenined() {
+    
+    const storedToken = localStorage.getItem('fcmToken');
+    if(storedToken){
+        localStorage.removeItem('fcmToken');
+    }
+    await axios.post("https://j11b202.p.ssafy.io/api/v1/agree", { "enable": false });
 }
