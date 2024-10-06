@@ -3,7 +3,6 @@ package com.ssafy.triplet.travel.controller;
 import com.ssafy.triplet.auth.dto.CustomUserPrincipal;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.member.repository.MemberRepository;
-import com.ssafy.triplet.member.service.MemberService;
 import com.ssafy.triplet.response.ApiResponse;
 import com.ssafy.triplet.travel.dto.request.TravelCreateRequest;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
@@ -34,13 +33,13 @@ public class TravelController {
             @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
             @RequestPart("data") TravelCreateRequest requestDTO,
             @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
-        try {
+//        try {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             TravelResponse responseDTO = travelService.createTravel(userId, requestDTO, image);
             return ResponseEntity.ok(new ApiResponse<>("200", "여행이 생성되었습니다.", responseDTO));
-        } catch (Exception e) {
-            return handleException(e);
-        }
+//        } catch (Exception e) {
+//            return handleException(e);
+//        }
     }
 
     @PutMapping("/update")
