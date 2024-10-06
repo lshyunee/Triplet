@@ -33,13 +33,13 @@ public class TravelController {
             @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
             @RequestPart("data") TravelCreateRequest requestDTO,
             @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
-//        try {
+        try {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             TravelResponse responseDTO = travelService.createTravel(userId, requestDTO, image);
             return ResponseEntity.ok(new ApiResponse<>("200", "여행이 생성되었습니다.", responseDTO));
-//        } catch (Exception e) {
-//            return handleException(e);
-//        }
+        } catch (Exception e) {
+            return handleException(e);
+        }
     }
 
     @PutMapping("/update")
