@@ -3,22 +3,9 @@
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging-compat.js');
 
-// Initialize Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyB4x1cWZkZQgMaZa4HnVtDQVpuIwkpiCV8",
-  authDomain: "triplet-9eff1.firebaseapp.com",
-  projectId: "triplet-9eff1",
-  storageBucket: "triplet-9eff1.appspot.com",
-  messagingSenderId: "251492838185",
-  appId:"1:251492838185:web:db33b14e568c9b7e57a538",
-};
-firebase.initializeApp(firebaseConfig);
-
-const messaging = firebase.messaging();
 
 self.addEventListener("push", function (e) {
-  console.log(e.data.text())
-
+  console.log(e.data.json())
   const resultData = e.data.json().notification;
   const notificationTitle = resultData.title;
   const notificationOptions = {
