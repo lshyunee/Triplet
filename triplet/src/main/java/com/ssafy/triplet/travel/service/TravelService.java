@@ -26,6 +26,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.ElasticsearchTemplate;
+import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
+import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.IndexQuery;
@@ -69,8 +73,6 @@ public class TravelService {
     private final S3Service s3Service;
     private final InviteCodeGenerator inviteCodeGenerator;
     private final ElasticsearchTemplate elasticsearchTemplate;
-    private final ElasticsearchClient client;
-
 
     @Transactional
     public TravelResponse createTravel(Long userId, TravelCreateRequest request, MultipartFile image) throws IOException {
@@ -268,36 +270,6 @@ public class TravelService {
         resultMap.put("isComplete", isComplete);
         resultMap.put("budgetList", budgetList);
         return resultMap;
-    }
-
-    public Page<TravelListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
-                                                     Integer month, Integer minDays, Integer maxDays, int page, int kind, int size) {
-//        if (kind == 0) {
-//            List<String> recommendedCountries = getRecommendedCountriesFromElasticsearch(userId);
-//            return convertRecommendedTravelsToPage(recommendedCountries, page, size);
-//        } else {
-            Specification<Travel> spec = Specification.where(TravelSpecification.excludeCreator(userId))
-                    .and(countryName != null ? TravelSpecification.countryNameContains(countryName) : null)
-                    .and(memberCount != null ? TravelSpecification.memberCountEquals(memberCount) : null)
-                    .and(minBudget != null && maxBudget != null ? TravelSpecification.totalBudgetWonBetween(minBudget, maxBudget) : null)
-                    .and(month != null ? TravelSpecification.travelMonth(month) : null)
-                    .and(minDays != null && maxDays != null ? TravelSpecification.travelDurationBetween(minDays, maxDays) : null);
-
-            Pageable pageable = PageRequest.of(page, size);
-            return travelRepository.findAll(spec, pageable)
-                    .map(this::convertToTravelListResponse);
-//        }
-    }
-
-    public TravelListPagedResponse toPagedResponse(Page<TravelListResponse> page) {
-        TravelListPagedResponse response = new TravelListPagedResponse();
-        response.setContent(page.getContent());
-        response.setPageNumber(page.getNumber());
-        response.setLast(page.isLast());
-        response.setTotalPages(page.getTotalPages());
-        response.setTotalElements(page.getTotalElements());
-        response.setNumber(page.getNumber());
-        return response;
     }
 
     @Transactional
