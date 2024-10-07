@@ -14,6 +14,7 @@ import { ReactComponent as KRFlag } from '../../assets/pay/kr.svg';
 import { ReactComponent as DownArrow } from '../../assets/pay/downArrow.svg';
 import useAxios from '../../hooks/useAxios';
 import { useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 const s = {
@@ -106,6 +107,7 @@ const s = {
 }
 
   const ExchangePage = () => {
+    const navigate = useNavigate();
     const dispatch = useDispatch();
     // 외화지갑 페이지에서 넘어온 id 저장
     const { accountId } = useParams();
@@ -187,9 +189,9 @@ const s = {
       currentTarget: { value },
     } = e;
     setToAmount(value);
-    // 100단위인지 확인 (100의 배수인지 확인)
+    // 엔화만 100단위인지 확인 
     const numericValue = Number(value);
-    if (numericValue % 100 !== 0) {
+    if (foreignDetailData?.data?.currency === "JPY" && numericValue % 100 !== 0) {
       setIsInvalid(true);
     } else {
       setIsInvalid(false);
@@ -202,8 +204,14 @@ const s = {
     } else {
       setFromAmount(Number(fromAmount))
     }
-    if (Math.floor(Number(fromAmount)/exchangeRate) !== Number(toAmount)) {
-      setToAmount(Math.floor(Number(fromAmount)/exchangeRate))
+    if (foreignDetailData?.data?.currency === "JPY") {
+      if (Math.floor(Number(fromAmount)/exchangeRate*100) !== Number(toAmount)) {
+        setToAmount(Math.floor(Number(fromAmount)/exchangeRate*100))
+      }
+    } else {
+      if (Math.floor(Number(fromAmount)/exchangeRate) !== Number(toAmount)) {
+        setToAmount(Math.floor(Number(fromAmount)/exchangeRate))
+      }
     }
   }, [fromAmount])
 
@@ -213,8 +221,14 @@ const s = {
     } else {
       setToAmount(Number(toAmount))
     }
-    if (Math.floor(Number(fromAmount)/exchangeRate) !== Number(toAmount)) {
-      setFromAmount(Math.floor(Number(toAmount)*exchangeRate))
+    if (foreignDetailData?.data?.currency === "JPY") {
+      if (Math.floor(Number(fromAmount)/exchangeRate*100) !== Number(toAmount)) {
+        setFromAmount(Math.floor(Number(toAmount)*exchangeRate/100))
+      }
+    } else {
+      if (Math.floor(Number(fromAmount)/exchangeRate) !== Number(toAmount)) {
+        setFromAmount(Math.floor(Number(toAmount)*exchangeRate))
+      }
     }
   }, [toAmount])
 
@@ -295,7 +309,9 @@ const s = {
       )}
         <s.BtnArea>
           <s.PayBtn 
-          onClick={() => {if (!isInvalid) {exchangeRefetch();}}} disabled={isInvalid}>충전하기</s.PayBtn>
+          onClick={() => {if (!isInvalid) {exchangeRefetch();}
+          // 충전 성공 or 실패에 따라 모달?
+          navigate(`/pay/global-wallet`);}} disabled={isInvalid}>충전하기</s.PayBtn>
         </s.BtnArea>
     </s.Container>
     </>

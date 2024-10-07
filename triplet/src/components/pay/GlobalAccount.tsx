@@ -138,7 +138,8 @@ const GlobalAccount = (props: GlobalAccountProps): JSX.Element => {
             }
           }) ()}
         </s.CurrencyArea>
-        <s.ExchangeButton $isExchange={isExchange} onClick={() => {
+        <s.ExchangeButton $isExchange={isExchange} onClick={(event) => {
+          event.stopPropagation(); // 충전 버튼 클릭 이벤트가 바깥 영역으로 안 퍼지게 막음
           navigate(`/pay/exchange/${accountId}`); // 해당 계좌 환전 페이지로 이동
         }}>충전</s.ExchangeButton>
       </s.ButtonArea>
