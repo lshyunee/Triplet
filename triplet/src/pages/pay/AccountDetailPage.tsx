@@ -9,7 +9,26 @@ import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { isDate } from 'util/types';
 import { addDays } from 'react-datepicker/dist/date_utils';
+import useAxios from '../../hooks/useAxios';
 
+interface Transaction {
+  transactionId: number;
+  transactionDate: string;
+  transactionType: number;
+  transactionTypeName: string;
+  transactionAccountNumber: string;
+  price: number;
+  transactionAfterBalance: number;
+  transactionName: string;
+}
+
+interface TransactionsResponse {
+  code: string;
+  message: string;
+  data: {
+    [key: string]: Transaction[];
+  };
+}
 
 const s = {
   Container: styled.div`
@@ -159,14 +178,37 @@ const s = {
   PaymentLine: styled.hr`
     border: solid 0.1px #EFEFEF;
     margin: 0;
+  `,
+  EmptyMessage: styled.div`
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50vh;  
+    color: #666666;
   `
 }
 
 const AccountDetailPage = () => {
   const dispatch = useDispatch();
 
+  const { data: accountDetailData, 
+		error: accountDetailError, 
+		loading: accountDetailLoading, 
+		status: accountDetailStatus, 
+		refetch: accountDetailRefetch } = useAxios(`/account`, 'GET');
+
   useEffect(() => {
+    const fetchData = async () => {
+			try {
+        await Promise.all([
+          accountDetailRefetch(),  // 원화계좌 API 요청
+        ]);
+			} catch (error) {
+			  console.error('Error fetching data:', error);
+			}
+		};
     dispatch(pageMove("pay"));
+    fetchData();
   }, []);
 
   const today =  new Date();
@@ -178,6 +220,38 @@ const AccountDetailPage = () => {
   const dateInputRef = useRef<DatePicker>(null);
   
   const [isDateOpen, setIsDateOpen] = useState<boolean>(false);
+  const [transaction, setTransaction] = useState<TransactionsResponse | null>(null);
+
+  const { data: transactionData, 
+    error: transactionError, 
+    loading: transactionLoading, 
+    status: transactionStatus, 
+    refetch: transactionRefetch } = useAxios(`/transaction`, 'POST', {
+      accountId: accountDetailData?.data?.accountId,
+      startDate: start,
+      endDate: end
+    });
+
+  useEffect(() => {
+    if (accountDetailData) {
+      const fetchData = async () => {
+        try {
+          await Promise.all([
+            transactionRefetch() // 거래내역 조회
+          ]);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      fetchData();
+    }
+  }, [accountDetailData])
+
+  useEffect(() => {
+    if (transactionData) {
+      setTransaction(transactionData)
+    }
+  }, [transactionData])
 
   useEffect(() => {
     if (isDateOpen === true) {
@@ -196,9 +270,9 @@ const AccountDetailPage = () => {
           <Wallet/>
           <s.CardTitle>내 통장</s.CardTitle>
         </s.CardTitleArea>
-        <s.CardCaption>은행 312-9446-0093</s.CardCaption>
+        <s.CardCaption>{accountDetailData?.data?.bankName} {accountDetailData?.data?.accountNumber}</s.CardCaption>
         <s.ButtonArea>
-          <s.CardKrw>20,000,000원</s.CardKrw>
+          <s.CardKrw>{accountDetailData?.data?.accountBalance} 원</s.CardKrw>
           <s.CardButton>송금</s.CardButton>
         </s.ButtonArea>
       </s.Card>
@@ -216,33 +290,47 @@ const AccountDetailPage = () => {
           />
         </s.CalendarTextArea>
       </s.CalendarButton>
-      <s.DateText>2024.09.09</s.DateText>
-      <s.DateLine/>
-      <s.PaymentArea>
-        <s.PaymentTitleArea>
-          <s.PaymentTime>20:25:55</s.PaymentTime>
-          <s.PaymentTitle>김철수</s.PaymentTitle>
-        </s.PaymentTitleArea>
-        <s.PaymentAmountArea>
-          <s.PaymentTypeBlue>출금</s.PaymentTypeBlue>
-          <s.PaymentAmountBlue>4,290원</s.PaymentAmountBlue>
-          <s.BalanceText>잔액 118,309원</s.BalanceText>
-        </s.PaymentAmountArea>
-      </s.PaymentArea>
-      <s.PaymentLine/>
 
-      <s.PaymentArea>
-        <s.PaymentTitleArea>
-          <s.PaymentTime>20:25:55</s.PaymentTime>
-          <s.PaymentTitle>김철수</s.PaymentTitle>
-        </s.PaymentTitleArea>
-        <s.PaymentAmountArea>
-          <s.PaymentTypeRed>입금</s.PaymentTypeRed>
-          <s.PaymentAmountRed>4,290원</s.PaymentAmountRed>
-          <s.BalanceText>잔액 118,309원</s.BalanceText>
-        </s.PaymentAmountArea>
-      </s.PaymentArea>
-      <s.PaymentLine/>
+      {/* 거래 내역이 없을 때 문구 표시 */}
+      {transaction && Object.keys(transaction.data).length === 0 ? (
+        <s.EmptyMessage>거래 내역이 없습니다</s.EmptyMessage>
+      ) : (
+        /* 거래 내역을 날짜별로 반복 렌더링 */
+        transaction &&
+        Object.keys(transaction.data).map((date) => (
+          <React.Fragment key={date}>
+            <s.DateText>{date}</s.DateText>
+            <s.DateLine />
+
+            {/* 해당 날짜의 거래 내역 표시 */}
+            {transaction.data[date].map((transaction) => (
+              <React.Fragment key={transaction.transactionId}>
+                <s.PaymentArea>
+                  <s.PaymentTitleArea>
+                    <s.PaymentTime>{new Date(transaction.transactionDate).toLocaleTimeString()}</s.PaymentTime>
+                    <s.PaymentTitle>{transaction.transactionName}</s.PaymentTitle>
+                  </s.PaymentTitleArea>
+
+                  <s.PaymentAmountArea>
+                    {transaction.transactionType === 1 ? (
+                      <s.PaymentTypeBlue>입금</s.PaymentTypeBlue>
+                    ) : (
+                      <s.PaymentTypeRed>출금</s.PaymentTypeRed>
+                    )}
+                    {transaction.transactionType === 1 ? (
+                      <s.PaymentAmountBlue>{transaction.price.toLocaleString()}원</s.PaymentAmountBlue>
+                    ) : (
+                      <s.PaymentAmountRed>{transaction.price.toLocaleString()}원</s.PaymentAmountRed>
+                    )}
+                    <s.BalanceText>잔액 {transaction.transactionAfterBalance.toLocaleString()}원</s.BalanceText>
+                  </s.PaymentAmountArea>
+                </s.PaymentArea>
+                <s.PaymentLine />
+              </React.Fragment>
+            ))}
+          </React.Fragment>
+        ))
+      )}
     </s.Container>
     </>
   );

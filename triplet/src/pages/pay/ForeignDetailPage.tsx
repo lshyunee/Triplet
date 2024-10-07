@@ -185,7 +185,8 @@ const s = {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;  // 화면 높이 전체를 사용하여 중앙 정렬
+    height: 50vh;  
+    color: #666666;
   `
 }
 
@@ -250,7 +251,6 @@ const ForeignDetailPage = () => {
         try {
           await Promise.all([
             exchangeRefetch(),  // 잔액 원화로 조회
-            console.log(start, end),
             transactionRefetch() // 거래내역 조회
           ]);
         } catch (error) {
@@ -284,7 +284,9 @@ const ForeignDetailPage = () => {
           <s.CardTitle>{foreignDetailData?.data?.accountName} / </s.CardTitle>
         </s.CardTitleArea>
         <s.CardKrw>{foreignDetailData?.data?.accountBalance} {foreignDetailData?.data?.currency}</s.CardKrw>
-        <s.CardCaption>{exchangeData?.data?.targetAmount} 원</s.CardCaption>
+        <s.CardCaption>
+          {foreignDetailData?.data?.accountBalance === 0 ? `0 원` : `${exchangeData?.data?.targetAmount} 원`}
+        </s.CardCaption>
         <s.ButtonArea>
           <s.CardButton>충전</s.CardButton>
           <s.CardButton>환급</s.CardButton>
