@@ -6,7 +6,6 @@ import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
 import co.elastic.clients.elasticsearch.core.UpdateRequest;
-import co.elastic.clients.elasticsearch.core.UpdateResponse;
 import co.elastic.clients.json.JsonData;
 import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.exception.CustomException;
@@ -330,11 +329,8 @@ public class ElasticsearchService {
     // 엘라스틱서치 업데이트 메서드
     void updateTravelInElasticsearch(Travel travel) throws IOException {
         Map<String, Object> updates = new HashMap<>();
-        updates.put("isShared", travel.isShared());
+        updates.put("is_shared", travel.isShared());
         updates.put("status", travel.isStatus());
-
-        System.out.println("isShared: " + updates.get("isShared"));
-        System.out.println("status: " + updates.get("status"));
 
         UpdateRequest updateRequest = new UpdateRequest.Builder()
                 .index("travel")
@@ -343,7 +339,5 @@ public class ElasticsearchService {
                 .build();
 
         elasticsearchClient.update(updateRequest, TravelFeedListResponse.class);
-
-        elasticsearchClient.indices().refresh(r -> r.index("travel"));
     }
 }
