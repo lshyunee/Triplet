@@ -85,14 +85,14 @@ public class TravelService {
         validateTravelRequest(request, userId, 0L);
         String inviteCode = inviteCodeGenerator.generateInviteCode(request.getEndDate());
         Travel travel = buildTravel(userId, request, image, inviteCode);
+        String countryName = countryRepository.findNameById(request.getCountry());
+        String countryImg = getDefaultImg().get("defaultImages").get(countryName).asText();
+        travel.setImage(countryImg);
         Travel savedTravel = travelRepository.save(travel);
         insertTravelMembers(userId, travel.getId());
         manageTravelBudgets(request, savedTravel, false);
         travelWalletService.makeTravelWallet(savedTravel, userId);
         insertGroupAccountStake(userId, savedTravel);
-        String countryName = countryRepository.findNameById(request.getCountry());
-        String countryImg = getDefaultImg().get("defaultImages").get(countryName).asText();
-        travel.setImage(countryImg);
         return buildTravelResponse(savedTravel, inviteCode);
     }
 
