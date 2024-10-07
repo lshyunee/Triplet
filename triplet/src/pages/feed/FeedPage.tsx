@@ -164,7 +164,8 @@ const FeedPage = () => {
                         <FilterWrapper>
                             <Filter width={16} height={16}/>
                         </FilterWrapper>
-                        상세검색</FilterBtn>
+                        상세검색
+                        </FilterBtn>
                     </FilterDownDiv>
                 </FilterDiv>
                 <TravelDiv>
