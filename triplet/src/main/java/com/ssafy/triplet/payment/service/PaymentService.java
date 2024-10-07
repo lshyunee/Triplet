@@ -160,7 +160,6 @@ public class PaymentService {
         }
     }
 
-
     private void webPush(Long travelId, String title, String message){
         List<Member> travelMembers = travelMemberRepository.findMembersByTravelIdAndNotificationEnabled(travelId);
         if(!travelMembers.isEmpty()){
