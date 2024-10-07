@@ -1,9 +1,11 @@
 package com.ssafy.triplet.travel.service;
 
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
+import co.elastic.clients.elasticsearch.core.UpdateRequest;
 import co.elastic.clients.json.JsonData;
 import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.exception.CustomException;
@@ -12,7 +14,6 @@ import com.ssafy.triplet.travel.dto.response.TravelFeedListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelListPagedResponse;
 import com.ssafy.triplet.travel.entity.Travel;
 import com.ssafy.triplet.travel.repository.CountryRepository;
-import com.ssafy.triplet.travel.repository.ElasticSearchRepository;
 import com.ssafy.triplet.travel.repository.TravelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,10 +26,8 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -39,7 +38,7 @@ public class ElasticsearchService {
     private final ElasticsearchOperations elasticsearchOperations;
     private final CountryRepository countryRepository;
     private final TravelRepository travelRepository;
-    private final ElasticSearchRepository elasticSearchRepository;
+    private ElasticsearchClient elasticsearchClient;
 
     public Page<TravelFeedListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                          Integer minDays, Integer maxDays, int page, int kind, int pageSize) {
@@ -326,14 +325,19 @@ public class ElasticsearchService {
     }
 
     // 엘라스틱서치 업데이트 메서드
-    void updateTravelInElasticsearch(Travel travel) {
-        TravelFeedListResponse travelDocument = elasticSearchRepository.findById(travel.getId())
-                .orElseThrow(() -> new CustomException(CustomErrorCode.ELASTICSEARCH_DOCUMENT_NOT_FOUND));
+    void updateTravelInElasticsearch(Travel travel) throws IOException {
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("isShared", travel.isShared());
+        updates.put("status", travel.isStatus());
 
-        travelDocument.setShared(travel.isShared());
-        travelDocument.setStatus(travel.isStatus());
+        UpdateRequest updateRequest = new UpdateRequest.Builder()
+                .index("travel")
+                .id(travel.getId().toString())
+                .doc(updates)
+                .build();
 
-        elasticSearchRepository.save(travelDocument);
+        // 엘라스틱서치에 업데이트 요청
+        elasticsearchClient.update(updateRequest, TravelFeedListResponse.class);
     }
 
 }
