@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -244,46 +245,13 @@ public class AccountService {
     // 형식 유효성검사, 날짜 유효성검사
     private LocalDate extractDateFromString(String dateString, CustomErrorCode errorCode) {
         // 반환할 날짜
-        LocalDate returnDate;
-
-        Map<String, Integer> monthMap = Map.ofEntries(
-                Map.entry("Jan", 1),
-                Map.entry("Feb", 2),
-                Map.entry("Mar", 3),
-                Map.entry("Apr", 4),
-                Map.entry("May", 5),
-                Map.entry("Jun", 6),
-                Map.entry("Jul", 7),
-                Map.entry("Aug", 8),
-                Map.entry("Sep", 9),
-                Map.entry("Oct", 10),
-                Map.entry("Nov", 11),
-                Map.entry("Dec", 12)
-        );
-
-        // 월, 일, 년 추출 / 시작일 유효성 검사
-        String regex = "\\w+\\s(\\w{3})\\s(\\d{2})\\s(\\d{4})";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher startDateMatcher = pattern.matcher(dateString);
-
-        // 올바른 날짜 형식이 있는지 확인
-        if (startDateMatcher.find()) {
-            String month = startDateMatcher.group(1);
-            String day = startDateMatcher.group(2);
-            String year = startDateMatcher.group(3);
-
-            // LocalDate 로 변환
-            returnDate = LocalDate.of(Integer.parseInt(year), monthMap.get(month), Integer.parseInt(day));
-            // 오늘 날짜 가져오기
-            LocalDate today = LocalDate.now();
-            // 오늘 이후의 날짜인지 확인
-            if (returnDate.isAfter(today)) {
-                throw new CustomException(CustomErrorCode.DATE_EXCEEDS_TODAY);
-            }
-        } else {
+        LocalDate localDate;
+        try {
+            localDate = LocalDate.parse(dateString, DateTimeFormatter.ISO_INSTANT);
+        } catch (Exception e) {
             throw new CustomException(errorCode);
         }
-        return returnDate;
+        return localDate;
     }
 
     // 날짜별 그룹화된 거래내역 Dto 로 변환
