@@ -126,7 +126,7 @@ interface Budget {
 interface Expenditure {
   categoryId: number;
   categoryName: string;
-  usedBudget: number;
+  used: number;
 }
 
 const SharedTravelDetailPage = () => {
@@ -203,7 +203,7 @@ const SharedTravelDetailPage = () => {
   };
   
   const calculateUsed = (): number => {
-    const used = expenditureData ? expenditureData.reduce((acc, item) => acc + item.usedBudget, 0) : 0;
+    const used = expenditureData ? expenditureData.reduce((acc, item) => acc + item.used, 0) : 0;
     return isNaN(used) ? 0 : used; // NaN 체크 추가
   };
 
@@ -261,7 +261,7 @@ const SharedTravelDetailPage = () => {
     const expenditure = expenditureData.find(
       (exp) => exp.categoryId === budget.categoryId
     );
-    const used = expenditure?.usedBudget || 0;
+    const used = expenditure?.used || 0;
     const percentageUsed = calculatePercentage(budget.budget, used);
 
     return (
