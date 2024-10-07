@@ -12,11 +12,16 @@ import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.travel.dto.request.MemberDocument;
 import com.ssafy.triplet.travel.dto.response.TravelFeedListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelListPagedResponse;
+import com.ssafy.triplet.travel.dto.response.TravelListResponse;
+import com.ssafy.triplet.travel.entity.Travel;
 import com.ssafy.triplet.travel.repository.CountryRepository;
+import com.ssafy.triplet.travel.repository.TravelBudgetRepository;
+import com.ssafy.triplet.travel.repository.TravelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -37,6 +42,8 @@ import java.util.stream.Stream;
 public class ElasticsearchService {
     private final ElasticsearchOperations elasticsearchOperations;
     private final CountryRepository countryRepository;
+    private final TravelRepository travelRepository;
+    private final TravelBudgetRepository travelBudgetRepository;
 
 //    public Page<TravelFeedListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
 //                                                         Integer minDays, Integer maxDays, int page, int kind, int pageSize) {
@@ -105,15 +112,17 @@ public class ElasticsearchService {
 
         if (kind == 0) {
             recommendedTravel(boolQueryBuilder, userId);
+        return executeSearch(boolQueryBuilder, page, pageSize);
         } else if (kind == 1) {
-            latestTravel(boolQueryBuilder);
+//            return latestTravel(userId, page, pageSize);
+            return null;
         } else if (kind == 2) {
             searchTravel(boolQueryBuilder, countryName, memberCount, minBudget, maxBudget, minDays, maxDays);
+            return executeSearch(boolQueryBuilder, page, pageSize);
         } else {
             throw new CustomException(CustomErrorCode.INVALID_KIND_ERROR);
         }
 
-        return executeSearch(boolQueryBuilder, page, pageSize);
 //        } catch (Exception e) {
 //            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
 //        }
@@ -247,10 +256,23 @@ public class ElasticsearchService {
     }
 
 
-    // kind = 1 (최근)
-    public void latestTravel(BoolQuery.Builder boolQueryBuilder) {
+    // kind = 1 (최근) (elasticsearch X)
+//    public Page<TravelFeedListResponse> latestTravel(Long userId, int page, int size) {
+//        Pageable pageable = PageRequest.of(page, size);
+//
+//        // travelRepository에서 페이지로 조회한 결과를 가져옴 (Page<Travel>)
+//        Page<Travel> travelPage = travelRepository.findAllTravel(userId, pageable);
+//
+//        // Travel을 TravelFeedListResponse로 변환
+//        List<TravelFeedListResponse> responseList = travelPage.getContent().stream()
+//                .map(this::convertToTravelFeedListResponse)  // 변환 메서드
+//                .collect(Collectors.toList());
+//
+//        // Page<TravelFeedListResponse>로 반환
+//        return new PageImpl<>(responseList, pageable, travelPage.getTotalElements());
+//    }
 
-    }
+
 
     // kind = 2 (검색)
     private void searchTravel(BoolQuery.Builder boolQueryBuilder, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
@@ -317,4 +339,5 @@ public class ElasticsearchService {
         response.setTotalElements(page.getTotalElements());
         return response;
     }
+
 }
