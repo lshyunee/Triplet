@@ -105,20 +105,58 @@ public class PaymentService {
 
     private void updateBudgetUsageRate(TravelBudget travelBudget) {
 
+        String categoryName = travelBudget.getCategory().getCategoryName();
+        String messageFifty = getFiftyPercentMessage(categoryName);
+        String messageEighty = getEightyPercentMessage(categoryName);
+
         if (!travelBudget.isOverFifty() && travelBudget.getFiftyBudget() <= travelBudget.getUsedBudget()) {
             travelBudget.setOverFifty(true);
             // 50% 초과 푸시알림
-            webPush(travelBudget.getTravel().getId(),"Triplet 알림 🔔","이번 여행에서 " +
-                    travelBudget.getCategory().getCategoryName() + "에 설정한 예산💰의 절반을 사용하셨어요!💳 앞으로 남은 여행을 더 알차게 즐기실 수 있도록, 남은 예산을 잘 관리해보시는 건 어떨까요?💸" );
-
+            webPush(travelBudget.getTravel().getId(), "여행 예산 알림 🔔", messageFifty);
         } else if (travelBudget.isOverFifty() && !travelBudget.isOverEight()) {
             if (travelBudget.getEightyBudget() <= travelBudget.getUsedBudget()) {
                 travelBudget.setOverEight(true);
                 // 80% 초과 푸시알림
-                webPush(travelBudget.getTravel().getId(),"Triplet 알림🔔","이번 여행에서 " +
-                        travelBudget.getCategory().getCategoryName() + "에 설정한 예산💰의 80%를 사용하셨어요!💳 남은 여행 동안 예산을 조금 더 신경 써서 계획적으로 사용하시면 ✨, 마지막까지 걱정 없이 즐기실 수 있을 거예요😎");
-
+                webPush(travelBudget.getTravel().getId(), "여행 예산 알림🔔", messageEighty);
             }
+        }
+    }
+
+    private String getFiftyPercentMessage(String categoryName) {
+        switch (categoryName) {
+            case "식비":
+                return "식비의 50%가 사용됐네요! 식사가 좋았다면 여행을 공유하고 맛집 추천을 해주세요! 남은 여행도 즐겁게 보내요! 🍽️";
+            case "쇼핑":
+                return "쇼핑 예산의 절반을 썼어요! 멋진 아이템을 건졌나요? 이제 예산을 잘 관리해서 남은 여행도 즐겨보세요! 🛍️";
+            case "교통":
+                return "교통비의 50%를 썼습니다! 여행지를 이동할 때는 예산을 고려해 경로를 잘 계획해보세요! 🚗";
+            case "관광":
+                return "관광비의 절반을 사용했어요! 아직 가볼 곳이 많이 남았나요? 예산을 고려해 알차게 즐겨보세요! 🏰";
+            case "숙박":
+                return "숙박비의 50%가 사용됐습니다! 남은 일정 동안은 예산을 신중하게 사용해보세요! 🛏️";
+            case "기타":
+                return "기타 비용의 50%를 사용했어요! 남은 예산으로는 예상치 못한 지출을 잘 관리해봐요! 💡";
+            default:
+                return categoryName + "의 50%를 사용하셨습니다! 남은 여행도 즐겁게 보내세요!";
+        }
+    }
+
+    private String getEightyPercentMessage(String categoryName) {
+        switch (categoryName) {
+            case "식비":
+                return "헉! 식비의 80%가 사라졌어요! 이제 남은 예산은 20%뿐! 알뜰하게 마무리해봐요! 🍕";
+            case "쇼핑":
+                return "쇼핑 예산의 80%가 날아갔네요! 남은 예산은 20%! 조금 더 신중하게 쇼핑해봐요! 🛒";
+            case "교통":
+                return "교통비의 80%가 소진됐어요! 남은 예산으로 마지막 목적지도 잘 다녀오길 바라요! 🚌";
+            case "관광":
+                return "관광 예산의 80%가 소진됐어요! 이제 남은 예산은 20%! 계획을 다시 점검해보세요! 🎢";
+            case "숙박":
+                return "숙박 예산의 80%가 사라졌어요! 이제 남은 숙박 일정을 잘 관리해야겠어요! 🏨";
+            case "기타":
+                return "기타 비용의 80%가 소진됐습니다! 이제 남은 예산은 20%예요! 남은 일정도 잘 준비해봐요! 🔧";
+            default:
+                return categoryName + "의 80%를 사용하셨습니다! 남은 예산을 잘 관리하세요!";
         }
     }
 
