@@ -23,6 +23,8 @@ import com.ssafy.triplet.travel.util.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -44,6 +46,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
@@ -550,7 +553,9 @@ public class TravelService {
 
     public JsonNode getDefaultImg() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(new File("defaultImages.json"));
+        Resource resource = new ClassPathResource("defaultImages.json");
+        InputStream inputStream = resource.getInputStream();
+        JsonNode jsonNode = objectMapper.readTree(inputStream);
         return jsonNode;
     }
 }
