@@ -21,6 +21,7 @@ public class TravelRequest {
     private double airportCost;
     private double totalBudgetWon;
     private List<BudgetDTO> budgets;
+    private String imgUrl;
 
     @Getter
     @Setter

@@ -3,6 +3,8 @@ package com.ssafy.triplet.travel.service;
 import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.*;
 import co.elastic.clients.json.JsonData;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.triplet.account.dto.response.AccountRechargeResponse;
 import com.ssafy.triplet.account.repository.AccountRepository;
 import com.ssafy.triplet.account.service.AccountService;
@@ -19,6 +21,7 @@ import com.ssafy.triplet.travel.specification.TravelSpecification;
 import com.ssafy.triplet.travel.util.InviteCodeGenerator;
 import com.ssafy.triplet.travel.util.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -39,6 +42,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.Period;
@@ -80,9 +84,12 @@ public class TravelService {
         Travel travel = buildTravel(userId, request, image, inviteCode);
         Travel savedTravel = travelRepository.save(travel);
         insertTravelMembers(userId, travel.getId());
-        saveTravelBudgets(request, savedTravel);
+        manageTravelBudgets(request, savedTravel, false);
         travelWalletService.makeTravelWallet(savedTravel, userId);
         insertGroupAccountStake(userId, savedTravel);
+        String countryName = countryRepository.findNameById(request.getCountry());
+        String countryImg = getDefaultImg().get("defaultImages").get(countryName).asText();
+        travel.setImage(countryImg);
         return buildTravelResponse(savedTravel, inviteCode);
     }
 
@@ -114,13 +121,20 @@ public class TravelService {
             }
             String fileUrl = s3Service.uploadFile(image);
             travel.setImage(fileUrl);
+        } else {
+            if (request.getImgUrl() == null) {
+                s3Service.deleteFile(travel.getImage());
+                String countryName = travel.getCountry().getName();
+                String countryImg = getDefaultImg().get("defaultImages").get(countryName).asText();
+                travel.setImage(countryImg);
+            }
         }
 
         Country country = countryRepository.findById(request.getCountry())
                 .orElseThrow(() -> new CustomException(CustomErrorCode.COUNTRY_NOT_FOUND));
         travel.setCountry(country);
         Travel updatedTravel = travelRepository.save(travel);
-        updateTravelBudgets(request, updatedTravel);
+        manageTravelBudgets(request, updatedTravel, true);
         return buildTravelResponse(updatedTravel, travel.getInviteCode());
     }
 
@@ -134,6 +148,9 @@ public class TravelService {
         }
         if (!userId.equals(travel.getCreatorId())) {
             throw new CustomException(CustomErrorCode.NOT_TRAVEL_CREATOR);
+        }
+        if (travel.getImage().contains("triplet-vteam.s3")) {
+            s3Service.deleteFile(travel.getImage());
         }
         elasticsearchService.removeTravelInElasticsearch(travelId);
         travelRepository.deleteById(travelId);
@@ -426,20 +443,34 @@ public class TravelService {
         return travel;
     }
 
-    // TravelBudget 저장 메서드 (여행 생성)
-    private void saveTravelBudgets(TravelRequest request, Travel travel) {
+    private void manageTravelBudgets(TravelRequest request, Travel travel, boolean isUpdate) {
+        List<TravelBudget> existingBudgets = isUpdate ? travelBudgetRepository.findByTravel(travel) : new ArrayList<>();
+
         for (TravelRequest.BudgetDTO budgetDTO : request.getBudgets()) {
-            TravelBudget travelBudget = new TravelBudget();
-            travelBudget.setCategory(categoryRepository.findById(budgetDTO.getCategoryId())
-                    .orElseThrow(() -> new CustomException(CustomErrorCode.CATEGORY_NOT_FOUND)));
+            TravelBudget travelBudget;
+
+            if (isUpdate) {
+                travelBudget = existingBudgets.stream()
+                        .filter(budget -> budget.getCategory() != null &&
+                                budget.getCategory().getCategoryId() == budgetDTO.getCategoryId())
+                        .findFirst()
+                        .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_SCHEDULE_CONFLICT));
+            } else {
+                travelBudget = new TravelBudget();
+                travelBudget.setCategory(categoryRepository.findById(budgetDTO.getCategoryId())
+                        .orElseThrow(() -> new CustomException(CustomErrorCode.CATEGORY_NOT_FOUND)));
+                travelBudget.setTravel(travel);
+            }
+
             travelBudget.setCategoryBudget(budgetDTO.getBudget());
             travelBudget.setBudgetWon(budgetDTO.getBudgetWon());
-            travelBudget.setTravel(travel);
-            travelBudget.setFiftyBudget((budgetDTO.getBudget() / 2));
-            travelBudget.setEightyBudget((budgetDTO.getBudget() * 0.8));
+            travelBudget.setFiftyBudget(budgetDTO.getBudget() / 2);
+            travelBudget.setEightyBudget(budgetDTO.getBudget() * 0.8);
+
             travelBudgetRepository.save(travelBudget);
         }
     }
+
 
     // 응답 생성 메서드 (여행 생성, 여행 수정)
     private TravelResponse buildTravelResponse(Travel travel, String inviteCode) {
@@ -475,24 +506,6 @@ public class TravelService {
         return response;
     }
 
-    // 여행 예산 테이블 수정
-    private void updateTravelBudgets(TravelRequest request, Travel travel) {
-        List<TravelBudget> existingBudgets = travelBudgetRepository.findByTravel(travel);
-        for (TravelRequest.BudgetDTO budgetDTO : request.getBudgets()) {
-            TravelBudget existingBudget = existingBudgets.stream()
-                    .filter(budget -> budget.getCategory() != null &&
-                            budget.getCategory().getCategoryId() == budgetDTO.getCategoryId())
-                    .findFirst()
-                    .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_SCHEDULE_CONFLICT));
-
-            existingBudget.setCategoryBudget(budgetDTO.getBudget());
-            existingBudget.setBudgetWon(budgetDTO.getBudgetWon());
-            existingBudget.setFiftyBudget((budgetDTO.getBudget() / 2));
-            existingBudget.setEightyBudget((budgetDTO.getBudget() * 0.8));
-
-            travelBudgetRepository.save(existingBudget);
-        }
-    }
 
     // 여행 멤버 테이블에 추가
     private void insertTravelMembers(Long userId, Long travelId) {
@@ -535,4 +548,9 @@ public class TravelService {
         groupAccountStakeRepostory.save(groupAccountStake);
     }
 
+    public JsonNode getDefaultImg() throws IOException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(new File("static/defaultImages.json"));
+        return jsonNode;
+    }
 }

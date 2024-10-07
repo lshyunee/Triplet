@@ -27,7 +27,6 @@ public class TravelWalletService {
     private final AccountService accountService;
     private final TravelTransactionListRepository transactionListRepository;
     private final CategoryRepository categoryRepository;
-    private final MerchantRepository merchantRepository;
     private final GroupAccountStakeRepostory groupAccountStakeRepostory;
 
     @Transactional
