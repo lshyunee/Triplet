@@ -58,7 +58,7 @@ public class S3Service {
                     .key(fileName)
                     .build());
         } catch (S3Exception e) {
-            throw new RuntimeException("Failed to delete file from S3", e);
+            throw new RuntimeException("s3 버킷에서 이미지 삭제에 실패하였습니다.", e);
         }
     }
 
