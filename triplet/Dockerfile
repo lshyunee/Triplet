@@ -4,6 +4,7 @@ COPY    ./package* /usr/src/app/
 WORKDIR /usr/src/app
 RUN     npm install
 COPY . /usr/src/app
+RUN apk add tzdata && ln -snf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
 RUN npm run build
 
 # step 2 실행 스테이지를 위한 과정
