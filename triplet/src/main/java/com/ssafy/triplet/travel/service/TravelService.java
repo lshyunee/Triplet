@@ -550,7 +550,7 @@ public class TravelService {
 
     public JsonNode getDefaultImg() throws IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        JsonNode jsonNode = objectMapper.readTree(new File("static/defaultImages.json"));
+        JsonNode jsonNode = objectMapper.readTree(new File("defaultImages.json"));
         return jsonNode;
     }
 }
