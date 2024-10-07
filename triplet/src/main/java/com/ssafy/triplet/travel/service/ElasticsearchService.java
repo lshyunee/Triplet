@@ -16,6 +16,7 @@ import com.ssafy.triplet.travel.entity.Travel;
 import com.ssafy.triplet.travel.repository.CountryRepository;
 import com.ssafy.triplet.travel.repository.TravelRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -38,6 +39,8 @@ public class ElasticsearchService {
     private final ElasticsearchOperations elasticsearchOperations;
     private final CountryRepository countryRepository;
     private final TravelRepository travelRepository;
+
+    @Autowired
     private ElasticsearchClient elasticsearchClient;
 
     public Page<TravelFeedListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
