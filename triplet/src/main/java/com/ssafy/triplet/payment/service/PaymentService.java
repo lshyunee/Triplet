@@ -6,7 +6,9 @@ import com.ssafy.triplet.account.repository.AccountRepository;
 import com.ssafy.triplet.account.repository.TransactionListRepository;
 import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.exception.CustomException;
+import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
+import com.ssafy.triplet.notification.service.FCMService;
 import com.ssafy.triplet.payment.dto.request.PaymentRequest;
 import com.ssafy.triplet.payment.dto.response.PaymentResponse;
 import com.ssafy.triplet.travel.entity.*;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class PaymentService {
     private final MemberRepository memberRepository;
     private final TravelMemberRepository travelMemberRepository;
 
+    private final FCMService fcmService;
 
     public Merchant getMerchantById(Long id) {
         return merchantRepository.findById(id).orElse(null);
@@ -104,16 +108,32 @@ public class PaymentService {
         if (!travelBudget.isOverFifty() && travelBudget.getFiftyBudget() <= travelBudget.getUsedBudget()) {
             travelBudget.setOverFifty(true);
             // 50% 초과 푸시알림
+            webPush(travelBudget.getTravel().getId(),"Triplet 알림 🔔","이번 여행에서 " +
+                    travelBudget.getCategory().getCategoryName() + "에 설정한 예산💰의 절반을 사용하셨어요!💳 앞으로 남은 여행을 더 알차게 즐기실 수 있도록, 남은 예산을 잘 관리해보시는 건 어떨까요?💸" );
 
         } else if (travelBudget.isOverFifty() && !travelBudget.isOverEight()) {
             if (travelBudget.getEightyBudget() <= travelBudget.getUsedBudget()) {
                 travelBudget.setOverEight(true);
                 // 80% 초과 푸시알림
+                webPush(travelBudget.getTravel().getId(),"Triplet 알림🔔","이번 여행에서 " +
+                        travelBudget.getCategory().getCategoryName() + "에 설정한 예산💰의 80%를 사용하셨어요!💳 남은 여행 동안 예산을 조금 더 신경 써서 계획적으로 사용하시면 ✨, 마지막까지 걱정 없이 즐기실 수 있을 거예요😎");
 
             }
         }
     }
 
+    private void webPush(Long travelId, String title, String message){
+        List<Member> travelMembers = travelMemberRepository.findMembersByTravelIdAndNotificationEnabled(travelId);
+        if(!travelMembers.isEmpty()){
+            for(Member member : travelMembers) {
+                fcmService.pushNotificationPay(member.getMemberId(),title,message);
+            }
+        }
+
+
+
+
+    }
     private void processTransaction(TravelWallet travelWallet, Merchant merchant, Double price) {
         updateAccountBalance(travelWallet, price);
         Category category = merchant.getCategory();
