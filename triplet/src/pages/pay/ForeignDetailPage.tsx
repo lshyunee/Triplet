@@ -11,6 +11,7 @@ import { isDate } from 'util/types';
 import { addDays } from 'react-datepicker/dist/date_utils';
 import { useParams } from 'react-router-dom';
 import useAxios from '../../hooks/useAxios';
+import { useNavigate } from 'react-router-dom';
 
 interface Transaction {
   transactionId: number;
@@ -192,6 +193,7 @@ const s = {
 
 const ForeignDetailPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { accountId } = useParams();
 
   const { data: foreignDetailData, 
@@ -288,8 +290,8 @@ const ForeignDetailPage = () => {
           {foreignDetailData?.data?.accountBalance === 0 ? `0 원` : `${exchangeData?.data?.targetAmount} 원`}
         </s.CardCaption>
         <s.ButtonArea>
-          <s.CardButton>충전</s.CardButton>
-          <s.CardButton>환급</s.CardButton>
+          <s.CardButton onClick={() => {navigate(`/pay/exchange/${accountId}`);}}>충전</s.CardButton>
+          <s.CardButton onClick={() => {navigate(`/pay/refund/${accountId}`);}}>환급</s.CardButton>
         </s.ButtonArea>
       </s.Card>
       <s.CalendarButton>
