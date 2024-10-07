@@ -96,7 +96,7 @@ const ErrorModal: React.FC<ModalProps> = ({ isOpen, onClose, msg }) => {
 
   return (
     <ModalLayout onClick={handleClickOutside}>
-      <ModalContentDiv>
+      <ModalContentDiv onClick={(e) => e.stopPropagation()} >
         <Title>오류</Title>
         <Description>{msg}</Description>
         <ConfirmDiv>

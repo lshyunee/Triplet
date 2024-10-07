@@ -136,7 +136,6 @@ const MyPage = () => {
     const [ errorMsg, setErrorMsg] = useState('...');
 
     const kakaoDontGoPassword = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-        console.log(memberId);
         if(memberId.slice(0,5)==="kakao"){
             event.preventDefault();
         }
