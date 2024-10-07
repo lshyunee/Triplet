@@ -33,7 +33,7 @@ public interface TravelRepository extends JpaRepository<Travel, Long>, JpaSpecif
     @Query("SELECT t FROM Travel t JOIN t.travelMembers tm WHERE tm.member.id = :userId")
     List<Travel> findAllTravelByUserId(Long userId);
 
-    @Query("SELECT t FROM Travel t JOIN t.travelMembers tm WHERE :userId IS NULL OR tm.member.id != :userId")
+    @Query("SELECT t FROM Travel t JOIN t.travelMembers tm WHERE t.isShared = true AND (:userId IS NULL OR tm.member.id != :userId) ORDER BY t.startDate DESC")
     Page<Travel> findAllTravel(Long userId, Pageable pageable);
 
     @Query("SELECT t FROM Travel t WHERE t.inviteCode = :inviteCode")

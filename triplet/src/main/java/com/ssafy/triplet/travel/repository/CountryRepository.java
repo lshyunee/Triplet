@@ -15,4 +15,7 @@ public interface CountryRepository extends JpaRepository<Country, Integer> {
 
     @Query("SELECT c.id FROM Country c WHERE c.name = :name")
     int findIdByCountryName(String name);
+
+    @Query("SELECT c.name FROM Country c WHERE c.id = :id")
+    String findNameById(int id);
 }
