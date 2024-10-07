@@ -46,24 +46,24 @@ public class ElasticsearchService {
 
     public Page<TravelFeedListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                          Integer minDays, Integer maxDays, int page, int kind, int pageSize) {
-        try {
-            BoolQuery.Builder boolQueryBuilder = buildCommonQuery(userId);
+//        try {
+        BoolQuery.Builder boolQueryBuilder = buildCommonQuery(userId);
 
-            if (kind == 0) {
-                recommendedTravel(boolQueryBuilder, userId);
-                return executeSearch(boolQueryBuilder, page, pageSize);
-            } else if (kind == 1) {
-                return latestTravel(userId, page, pageSize);
-            } else if (kind == 2) {
-                searchTravel(boolQueryBuilder, countryName, memberCount, minBudget, maxBudget, minDays, maxDays);
-                return executeSearch(boolQueryBuilder, page, pageSize);
-            } else {
-                throw new CustomException(CustomErrorCode.INVALID_KIND_ERROR);
-            }
-
-        } catch (Exception e) {
-            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
+        if (kind == 0) {
+            recommendedTravel(boolQueryBuilder, userId);
+            return executeSearch(boolQueryBuilder, page, pageSize);
+        } else if (kind == 1) {
+            return latestTravel(userId, page, pageSize);
+        } else if (kind == 2) {
+            searchTravel(boolQueryBuilder, countryName, memberCount, minBudget, maxBudget, minDays, maxDays);
+            return executeSearch(boolQueryBuilder, page, pageSize);
+        } else {
+            throw new CustomException(CustomErrorCode.INVALID_KIND_ERROR);
         }
+
+//        } catch (Exception e) {
+//            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
+//        }
     }
 
     // 빌드 메서드
@@ -101,16 +101,16 @@ public class ElasticsearchService {
         return userTravels;
     }
 
-
     // kind = 0 (추천)
     private void recommendedTravel(BoolQuery.Builder boolQueryBuilder, Long userId) {
+        // 유저 정보 조회
         Query userQuery = Query.of(q -> q.term(t -> t.field("id").value(userId)));
         SearchHits<MemberDocument> userSearchHits = elasticsearchOperations.search(
                 NativeQuery.builder().withQuery(userQuery).build(),
                 MemberDocument.class
         );
 
-        // 유저 정보
+        // 유저 정보 처리
         if (!userSearchHits.getSearchHits().isEmpty()) {
             MemberDocument user = userSearchHits.getSearchHits().get(0).getContent();
             int age = user.getAge();
@@ -118,27 +118,8 @@ public class ElasticsearchService {
 
             // 사용자가 이미 다녀온 travelId 리스트
             List<String> userTravels = user.getTravels() != null ? user.getTravels() : new ArrayList<>();
-            List<Integer> excludedCountryIds = new ArrayList<>();
 
-            if (!userTravels.isEmpty()) {
-                List<FieldValue> travelIdValues = userTravels.stream()
-                        .map(travelId -> FieldValue.of(Long.parseLong(travelId)))
-                        .collect(Collectors.toList());
-
-                SearchHits<TravelFeedListResponse> travelDocuments = elasticsearchOperations.search(
-                        NativeQuery.builder().withQuery(Query.of(q -> q.terms(t -> t.field("id").terms(terms -> terms.value(travelIdValues))))).build(),
-                        TravelFeedListResponse.class
-                );
-
-                Map<Long, Integer> travelIdToCountryIdMap = travelDocuments.getSearchHits().stream()
-                        .collect(Collectors.toMap(hit -> hit.getContent().getId(), hit -> hit.getContent().getCountryId()));
-
-                // 제외할 country_id 리스트 업데이트
-                travelIdToCountryIdMap.values().forEach(excludedCountryIds::add);
-            }
-
-
-            // 나이와 성별로 유사한 사용자 검색
+            // 사용자 정보로 유사한 사용자 검색
             BoolQuery.Builder similarUserQueryBuilder = new BoolQuery.Builder();
             int ageLowerBound = (age / 10) * 10;
             int ageUpperBound = ageLowerBound + 9;
@@ -150,67 +131,79 @@ public class ElasticsearchService {
                     MemberDocument.class
             );
 
-            List<FieldValue> allTravelIds = similarUsersSearchHits.getSearchHits().stream()
+            // 유사한 사용자들이 다녀온 여행지
+            List<FieldValue> similarUserTravelIds = similarUsersSearchHits.getSearchHits().stream()
                     .flatMap(hit -> {
                         List<String> travels = hit.getContent().getTravels();
                         return travels != null ? travels.stream() : Stream.empty();
                     })
-                    .map(travelId -> {
-                        try {
-                            Long travelIdLong = Long.parseLong(travelId);
-                            return FieldValue.of(travelIdLong);
-                        } catch (NumberFormatException e) {
-                            System.out.println("변환 오류: " + travelId);
-                            return null;
-                        }
-                    })
-                    .filter(Objects::nonNull)
+                    .map(travelId -> FieldValue.of(Long.parseLong(travelId)))
                     .collect(Collectors.toList());
 
-            SearchHits<TravelFeedListResponse> travelDocuments = elasticsearchOperations.search(
-                    NativeQuery.builder().withQuery(Query.of(q -> q.terms(t -> t.field("id").terms(terms -> terms.value(allTravelIds))))).build(),
+            // 내가 다녀온 여행지를 다녀온 다른 사용자들이 방문한 여행지들
+            BoolQuery.Builder travelBySimilarUsersQueryBuilder = new BoolQuery.Builder();
+            if (!userTravels.isEmpty()) {
+                List<FieldValue> userTravelIds = userTravels.stream()
+                        .map(travelId -> FieldValue.of(Long.parseLong(travelId)))
+                        .collect(Collectors.toList());
+
+                // 사용자가 다녀온 여행지로 유사한 사용자들의 다른 여행지 찾기
+                travelBySimilarUsersQueryBuilder.must(Query.of(q -> q.terms(t -> t.field("id").terms(terms -> terms.value(similarUserTravelIds)))));
+                travelBySimilarUsersQueryBuilder.mustNot(Query.of(q -> q.terms(t -> t.field("id").terms(terms -> terms.value(userTravelIds)))));
+            }
+
+            SearchHits<TravelFeedListResponse> similarTravelHits = elasticsearchOperations.search(
+                    NativeQuery.builder().withQuery(Query.of(q -> q.bool(travelBySimilarUsersQueryBuilder.build()))).build(),
                     TravelFeedListResponse.class
             );
 
-            Map<Long, Integer> travelIdToCountryIdMap = travelDocuments.getSearchHits().stream()
-                    .collect(Collectors.toMap(hit -> hit.getContent().getId(), hit -> hit.getContent().getCountryId()));
+            // 추천 유사도 계산
+            Map<Long, Double> travelScores = new HashMap<>();
 
-            // 유사한 사용자들의 travels 필드에서 겹치는 여행지 필터링 및 그룹화
-            Map<FieldValue, Long> travelFrequency = allTravelIds.stream()
-                    // 제외할 country_id가 포함된 여행지 필터링
-                    .filter(travelId -> {
-                        Integer countryId = travelIdToCountryIdMap.get(travelId);
-                        return countryId != null && !excludedCountryIds.contains(countryId);
-                    })
-                    .collect(Collectors.groupingBy(travelId -> travelId, Collectors.counting()));
+            // 유사한 사용자의 여행지에 높은 점수 부여
+            similarTravelHits.getSearchHits().forEach(hit -> {
+                Long travelId = hit.getContent().getId();
+                travelScores.put(travelId, travelScores.getOrDefault(travelId, 0.0) + 1.0);
+            });
 
-            // 겹치는 여행지 순으로 정렬 (빈도수가 높은 순서대로)
-            List<FieldValue> recommendedTravels = travelFrequency.entrySet().stream()
-                    .sorted(Map.Entry.<FieldValue, Long>comparingByValue().reversed())
-                    .map(entry -> FieldValue.of(entry.getKey()))
-                    .collect(Collectors.toList());
-
-            // 추천된 여행지 travel 인덱스에서 검색
-            if (!recommendedTravels.isEmpty()) {
-                BoolQuery.Builder travelSearchQuery = new BoolQuery.Builder();
-                travelSearchQuery.must(Query.of(q -> q.terms(t -> t.field("id").terms(terms -> terms.value(recommendedTravels)))));
-
-                SearchHits<TravelFeedListResponse> travelSearchHits = elasticsearchOperations.search(
-                        NativeQuery.builder().withQuery(Query.of(q -> q.bool(travelSearchQuery.build()))).build(),
-                        TravelFeedListResponse.class
-                );
-
-                List<FieldValue> foundTravelIds = travelSearchHits.getSearchHits().stream()
-                        .map(hit -> FieldValue.of(hit.getContent().getId().toString()))
+            // 사용자가 이미 방문한 여행지는 유사도 점수 low
+            if (!userTravels.isEmpty()) {
+                List<Long> userTravelIds = userTravels.stream()
+                        .map(Long::parseLong)
                         .collect(Collectors.toList());
 
-                if (!foundTravelIds.isEmpty()) {
-                    boolQueryBuilder.must(Query.of(q -> q.terms(t -> t.field("id").terms(terms -> terms.value(foundTravelIds)))));
-                }
+                userTravelIds.forEach(travelId -> travelScores.put(travelId, travelScores.getOrDefault(travelId, 0.0) * 0.5));
+            }
+
+            // 추천 점수 순으로 정렬
+            List<Long> recommendedTravelIds = travelScores.entrySet().stream()
+                    .sorted(Map.Entry.<Long, Double>comparingByValue().reversed()) // 점수 높은 순으로 정렬
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toList());
+
+            // 테스트 코드 (유사도 출력)
+            travelScores.forEach((travelId, score) -> System.out.println("Travel ID: " + travelId + ", 유사도 점수: " + score));
+
+            // 검색된 유사 사용자들이 다녀온 여행지 확인
+            System.out.println("Similar user travel IDs: " + similarUserTravelIds);
+
+            // 사용자가 다녀온 여행지 확인
+            System.out.println("User travel IDs: " + userTravels);
+
+            // 유사도 점수 계산 결과 확인
+            System.out.println("Travel Scores: " + travelScores.size());
+
+
+            // 추천된 여행지로 업데이트
+            if (!recommendedTravelIds.isEmpty()) {
+                List<FieldValue> recommendedFieldValues = recommendedTravelIds.stream()
+                        .map(FieldValue::of)
+                        .collect(Collectors.toList());
+
+                boolQueryBuilder.must(Query.of(q -> q.terms(t -> t.field("id").terms(terms -> terms.value(recommendedFieldValues)))));
             }
         }
     }
-
 
     // kind = 1 (최근) (elasticsearch X)
     public Page<TravelFeedListResponse> latestTravel(Long userId, int page, int size) {
