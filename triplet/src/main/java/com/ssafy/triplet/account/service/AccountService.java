@@ -243,11 +243,12 @@ public class AccountService {
 
     // 요청 문자열에서 날짜 추출
     // 형식 유효성검사, 날짜 유효성검사
-    private LocalDate extractDateFromString(String dateString, CustomErrorCode errorCode) {
+    private LocalDate extractDateFromString(String dateTimeString, CustomErrorCode errorCode) {
         // 반환할 날짜
         LocalDate localDate;
         try {
-            localDate = LocalDate.parse(dateString, DateTimeFormatter.ISO_INSTANT);
+            String dateString = dateTimeString.substring(0, 10);
+            localDate = LocalDate.parse(dateString);
         } catch (Exception e) {
             throw new CustomException(errorCode);
         }
