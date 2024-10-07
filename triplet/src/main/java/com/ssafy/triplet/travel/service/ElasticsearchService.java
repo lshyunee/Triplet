@@ -334,4 +334,11 @@ public class ElasticsearchService {
         return response;
     }
 
+    private TravelFeedListResponse convertToTravelFeedListResponse(Travel travel) {
+        return new TravelFeedListResponse(
+                travel.
+        );
+    }
+
+
 }
