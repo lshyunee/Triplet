@@ -46,24 +46,24 @@ public class ElasticsearchService {
 
     public Page<TravelFeedListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                          Integer minDays, Integer maxDays, int page, int kind, int pageSize) {
-//        try {
-        BoolQuery.Builder boolQueryBuilder = buildCommonQuery(userId);
+        try {
+            BoolQuery.Builder boolQueryBuilder = buildCommonQuery(userId);
 
-        if (kind == 0) {
-            recommendedTravel(boolQueryBuilder, userId);
-            return executeSearch(boolQueryBuilder, page, pageSize);
-        } else if (kind == 1) {
-            return latestTravel(userId, page, pageSize);
-        } else if (kind == 2) {
-            searchTravel(boolQueryBuilder, countryName, memberCount, minBudget, maxBudget, minDays, maxDays);
-            return executeSearch(boolQueryBuilder, page, pageSize);
-        } else {
-            throw new CustomException(CustomErrorCode.INVALID_KIND_ERROR);
+            if (kind == 0) {
+                recommendedTravel(boolQueryBuilder, userId);
+                return executeSearch(boolQueryBuilder, page, pageSize);
+            } else if (kind == 1) {
+                return latestTravel(userId, page, pageSize);
+            } else if (kind == 2) {
+                searchTravel(boolQueryBuilder, countryName, memberCount, minBudget, maxBudget, minDays, maxDays);
+                return executeSearch(boolQueryBuilder, page, pageSize);
+            } else {
+                throw new CustomException(CustomErrorCode.INVALID_KIND_ERROR);
+            }
+
+        } catch (Exception e) {
+            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
         }
-
-//        } catch (Exception e) {
-//            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
-//        }
     }
 
     // 빌드 메서드
@@ -98,7 +98,7 @@ public class ElasticsearchService {
             MemberDocument user = userSearchHits.getSearchHits().get(0).getContent();
             userTravels = user.getTravels() != null ? user.getTravels() : new ArrayList<>();
         }
-        return userTravels; // userId에 해당하는 travels 필드 값
+        return userTravels;
     }
 
 
@@ -118,25 +118,28 @@ public class ElasticsearchService {
 
             // travels 필드에서 사용자가 이미 다녀온 travelId 리스트 가져오기
             List<String> userTravels = user.getTravels() != null ? user.getTravels() : new ArrayList<>();
-
-            // travels의 travelId에 해당하는 country_id 조회
             List<Integer> excludedCountryIds = new ArrayList<>();
-            for (String travelId : userTravels) {
-                // travelId로 travel 인덱스에서 country_id 조회
-                Query travelQuery = Query.of(q -> q.term(t -> t.field("id").value(travelId)));
-                SearchHits<TravelFeedListResponse> travelSearchHits = elasticsearchOperations.search(
-                        NativeQuery.builder().withQuery(travelQuery).build(),
+
+            // 사용자의 travelId 리스트를 한 번의 쿼리로 조회
+            if (!userTravels.isEmpty()) {
+                List<FieldValue> travelIdValues = userTravels.stream()
+                        .map(travelId -> FieldValue.of(Long.parseLong(travelId)))
+                        .collect(Collectors.toList());
+
+                // 한 번의 쿼리로 모든 travelId에 해당하는 country_id 조회
+                SearchHits<TravelFeedListResponse> travelDocuments = elasticsearchOperations.search(
+                        NativeQuery.builder().withQuery(Query.of(q -> q.terms(t -> t.field("id").terms(terms -> terms.value(travelIdValues))))).build(),
                         TravelFeedListResponse.class
                 );
 
-                // 조회된 country_id 저장
-                travelSearchHits.getSearchHits().forEach(hit -> {
-                    Integer countryId = hit.getContent().getCountryId();
-                    if (countryId != null) {
-                        excludedCountryIds.add(countryId);
-                    }
-                });
+                // travelId와 해당하는 country_id 매핑
+                Map<Long, Integer> travelIdToCountryIdMap = travelDocuments.getSearchHits().stream()
+                        .collect(Collectors.toMap(hit -> hit.getContent().getId(), hit -> hit.getContent().getCountryId()));
+
+                // 제외할 country_id 리스트 업데이트
+                travelIdToCountryIdMap.values().forEach(excludedCountryIds::add);
             }
+
 
             // 나이와 성별로 유사한 사용자 검색
             BoolQuery.Builder similarUserQueryBuilder = new BoolQuery.Builder();
@@ -288,7 +291,6 @@ public class ElasticsearchService {
                 })
                 .collect(Collectors.toList());
 
-        // 결과 페이지네이션 처리
         return new PageImpl<>(searchResults, PageRequest.of(page - 1, pageSize), searchHits.getTotalHits());
     }
 
@@ -339,6 +341,7 @@ public class ElasticsearchService {
         elasticsearchClient.update(updateRequest, TravelFeedListResponse.class);
     }
 
+    // 여행 삭제시 엘라스틱서치에서도 삭제
     void removeTravelInElasticsearch(Long travelId) throws IOException {
         DeleteRequest deleteRequest = new DeleteRequest.Builder()
                 .index("travel")
