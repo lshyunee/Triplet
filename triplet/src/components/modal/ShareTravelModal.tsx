@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import useAxios from '../../hooks/useAxios';
+import CompleteModal from './CompleteModal';
 
 const ModalLayout = styled.div`
   position: fixed;
@@ -35,7 +37,7 @@ const Title = styled.div`
 
 const ShareItemDiv = styled.div`
     display: flex;
-    width: 80%;
+    width: 90%;
     align-items: center;
     justify-content : flex-start;
     margin : 15px 0 0 0;
@@ -43,7 +45,7 @@ const ShareItemDiv = styled.div`
 `;
 
 const ShareItemTitleP = styled.p`
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 500;
   margin: 0 0 0 0;
   line-height: 1.5;
@@ -69,9 +71,6 @@ const StyledCheckbox = styled.div<{ checked: boolean }>`
 `;
 
 const CheckboxLabel = styled.label`
-  font-size: 16px;
-  font-weight: 400;
-  margin-left: 10px;
 `;
 
 const ConfirmDiv = styled.div`
@@ -109,47 +108,82 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   travelId: number;
+  share : boolean;
+  shareDetail : boolean;
 }
 
-const ShareTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId }) => {
+const ShareTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, share, shareDetail }) => {
+  
+  const [isShared, setIsShared] = useState(share ? 1 : 0);
+  const [isDetailShared, setIsDetailShared] = useState(shareDetail ? 1 : 0);
+  
+  const [ completedMsg, setCompletedMSg ] = useState("");
+  const [ isCompleted, setIsCompleted ] = useState(false);
+
+  const { data : shareData, error : shareError, status : shareStatus, refetch : shareRefetch }
+    = useAxios("/travels/share","POST", {
+      travelId : travelId,
+      isShared : isShared,
+      shareStatus : isDetailShared,
+    });
+
+  useEffect(()=>{
+    
+    if(shareData && shareStatus === 200) {
+      setCompletedMSg(shareData.message);
+      setIsCompleted(true);
+      return;
+    }
+
+    if(shareError){
+
+    }
+
+  },[shareData, shareError])
+  
   const handleClickOutside = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       onClose();
     }
   };
-
-  const [isShared, setIsShared] = useState(false);
-  const [isDetailShared, setIsDetailShared] = useState(false);
-
+  
   const handleTravelShared = () => {
-    setIsShared(!isShared);
+    setIsShared(isShared === 1 ? 0 : 1);
   };
-
+  
   const handleDetailShared = () => {
-    setIsDetailShared(!isDetailShared);
+    setIsDetailShared(isDetailShared === 1 ? 0 : 1);
   };
-
+  
   if (!isOpen) {
     return null;
   }
+  
+
+
+  const handleShareComplete = () => {
+    shareRefetch();
+  }
+
 
   return (
     <ModalLayout onClick={handleClickOutside}>
       <ModalContentDiv onClick={(e) => e.stopPropagation()}>
         <Title>여행 공유 설정</Title>
         <ShareItemDiv>
-            <CustomCheckbox label="" checked={isShared} onChange={handleTravelShared} />
+            <CustomCheckbox label="" checked={isShared? true : false} onChange={handleTravelShared} />
             <ShareItemTitleP>여행 공유</ShareItemTitleP>
         </ShareItemDiv>
         <ShareItemDiv>
-            <CustomCheckbox label="" checked={isDetailShared} onChange={handleDetailShared} />
+            <CustomCheckbox label="" checked={isDetailShared ? true : false} onChange={handleDetailShared} />
             <ShareItemTitleP>여행 상세지출내역 공유</ShareItemTitleP>
         </ShareItemDiv>
         <ConfirmDiv>
-          <Button isCancel onClick={onClose}>취소</Button>
-          <Button >확인</Button>
+          <Button isCancel={true} onClick={onClose}>취소</Button>
+          <Button onClick={handleShareComplete}>확인</Button>
         </ConfirmDiv>
       </ModalContentDiv>
+      <CompleteModal isOpen={isCompleted} onClose={() => setIsCompleted(false)} msg={completedMsg} />
     </ModalLayout>
   );
 };
