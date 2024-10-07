@@ -124,10 +124,12 @@ public class PaymentService {
 
     private void webPush(Long travelId, String title, String message){
         List<Member> travelMembers = travelMemberRepository.findMembersByTravelIdAndNotificationEnabled(travelId);
-
-        for(Member member : travelMembers) {
-            fcmService.pushNotificationPay(member.getMemberId(),title,message);
+        if(!travelMembers.isEmpty()){
+            for(Member member : travelMembers) {
+                fcmService.pushNotificationPay(member.getMemberId(),title,message);
+            }
         }
+
 
 
 
