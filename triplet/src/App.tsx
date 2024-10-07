@@ -50,7 +50,6 @@ const App: React.FC = () => {
       "/mypage/info-set"
     ];
 
-    console.log(new Date())
     const loginSuccessPages = ["/login", "/signup"];
 
     if (offPages.includes(location.pathname)) {
