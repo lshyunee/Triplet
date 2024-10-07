@@ -7,6 +7,7 @@ import Header from '../../components/header/Header';
 import ExchangeRate from '../../components/pay/ExchangeRate';
 import GlobalAccount from '../../components/pay/GlobalAccount';
 import useAxios from '../../hooks/useAxios';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -57,6 +58,7 @@ const s = {
 
 const GlobalWalletPage = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { data: foreignAccountData, 
     error: foreignAccountError, 
@@ -85,13 +87,16 @@ const GlobalWalletPage = () => {
     fetchData();
   }, []);
 
+  const handleCardClick = (accountId: number) => {
+    navigate(`/pay/foreign-detail/${accountId}`); 
+  };
 
   return (
     <>
     <Header/>
     <s.Container>
 			<s.TitleText>내 외화 지갑</s.TitleText>
-			<s.GlobalAccountCard>
+			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[6]?.accountId)}>
 				<GlobalAccount
 					nation='미국'
 					foreignCurrency={foreignAccountData?.data[6]?.accountBalance}
@@ -99,7 +104,7 @@ const GlobalWalletPage = () => {
 					accountId={foreignAccountData?.data[6]?.accountId}
 				/>
 			</s.GlobalAccountCard>
-			<s.GlobalAccountCard>
+			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[3]?.accountId)}>
 				<GlobalAccount
 					nation='유럽'
 					foreignCurrency={foreignAccountData?.data[3]?.accountBalance}
@@ -107,7 +112,7 @@ const GlobalWalletPage = () => {
 					accountId={foreignAccountData?.data[3]?.accountId}
 				/>
 			</s.GlobalAccountCard>
-			<s.GlobalAccountCard>
+			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[5]?.accountId)}>
 				<GlobalAccount
 					nation='일본'
 					foreignCurrency={foreignAccountData?.data[5]?.accountBalance}
@@ -115,7 +120,7 @@ const GlobalWalletPage = () => {
 					accountId={foreignAccountData?.data[5]?.accountId}
 				/>
 			</s.GlobalAccountCard>
-			<s.GlobalAccountCard>
+			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[2]?.accountId)}>
 				<GlobalAccount
 					nation='중국'
 					foreignCurrency={foreignAccountData?.data[2]?.accountBalance}
@@ -123,7 +128,7 @@ const GlobalWalletPage = () => {
 					accountId={foreignAccountData?.data[2]?.accountId}
 				/>
 			</s.GlobalAccountCard>
-			<s.GlobalAccountCard>
+			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[4]?.accountId)}>
 				<GlobalAccount
 					nation='영국'
 					foreignCurrency={foreignAccountData?.data[4]?.accountBalance}
@@ -131,7 +136,7 @@ const GlobalWalletPage = () => {
 					accountId={foreignAccountData?.data[4]?.accountId}
 				/>
 			</s.GlobalAccountCard>
-			<s.GlobalAccountCard>
+			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[1]?.accountId)}>
 				<GlobalAccount
 					nation='스위스'
 					foreignCurrency={foreignAccountData?.data[1]?.accountBalance}
@@ -139,7 +144,7 @@ const GlobalWalletPage = () => {
 					accountId={foreignAccountData?.data[1]?.accountId}
 				/>
 			</s.GlobalAccountCard>
-			<s.GlobalAccountCard>
+			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[0]?.accountId)}>
 				<GlobalAccount
 					nation='캐나다'
 					foreignCurrency={foreignAccountData?.data[0]?.accountBalance}
