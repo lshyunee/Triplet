@@ -13,6 +13,7 @@ import { ReactComponent as Minus } from '../../assets/common/minus.svg';
 import useAxios from '../../hooks/useAxios';
 import { count } from 'console';
 import axios from 'axios';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 
 const s = {
@@ -284,6 +285,9 @@ const CreateTravelPage = () => {
     status: countryStatus,
     refetch: countryRefetch } = useAxios('/travels/countries', 'GET');
 
+  
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -294,25 +298,31 @@ const CreateTravelPage = () => {
         console.error('Error fetching data:', error);
       }
     };
-
     fetchData();
   }, []);
 
   useEffect(() => {
     if (countryData) {
       setCountry(countryData.data)
+      console.log(countryData.data)
     }
   }, [countryData]);
 
   // 국가선택
-  const [travelCountry, setTravelCountry] = useState<number>(9);
+  const [travelCountry, setTravelCountry] = useState<number>(1);
+  const [countryCurrency, setCountryCurrency] = useState<string>('KRW');
   const handleCountryChange = (e: React.FormEvent<HTMLSelectElement>) => {
     const {
       currentTarget: {value},
     } = e;
-    setTravelCountry(Number(value))
-    console.log(Number(value))
+    const countryParse = JSON.parse(value)
+    setTravelCountry(countryParse.countryId)
+    setCountryCurrency(countryParse.currency)
   };
+
+  useEffect(() => {
+    console.log(countryCurrency)
+  }, [countryCurrency])
 
   // 예산설정
   const [flight, setFlight] = useState<number>(0);
@@ -323,6 +333,22 @@ const CreateTravelPage = () => {
   const [accommodation, setAccommodation] = useState<number>(0);
   const [etc, setEtc] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
+
+  const [foreignFlight, setForeignFlight] = useState<number>(0);
+  const [foreignMeal, setForeignMeal] = useState<number>(0);
+  const [foreignShopping, setForeignShopping] = useState<number>(0);
+  const [foreignTransport, setForeignTransport] = useState<number>(0);
+  const [foreignTour, setForeignTour] = useState<number>(0);
+  const [foreignAccommodation, setForeignAccommodation] = useState<number>(0);
+  const [foreignEtc, setForeignEtc] = useState<number>(0);
+  const [foreignTotal, setForeignTotal] = useState<number>(0);
+
+  const [won, setWon] = useState<number>(0);
+  const { data: currencyData,
+    error: currencyError,
+    loading: currencyLoading,
+    status: currencyStatus,
+    refetch: currencyRefetch } = useAxios('/exchange-cal', 'POST', {"sourceCurrency": "KRW", "targetCurrency": countryCurrency, "sourceAmount": won});
   
   const handleBudget = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target;
@@ -356,8 +382,16 @@ const CreateTravelPage = () => {
     };
   };
 
+
   const [tdata, settdata] = useState<any>();
   
+
+  const { data: testData,
+    error: testError,
+    loading: testLoading,
+    status: testStatus,
+    refetch: testRefetch } = useAxios('/travels/create', 'POST', tdata, {'Content-Type': 'multipart/form-data'})
+
   // axios
   const submitTravelData = async () => {
     if (!title) {
@@ -402,49 +436,30 @@ const CreateTravelPage = () => {
     formData.forEach((value, key) => {
       console.log(`${key}:`, value);
     });
+
     settdata(formData)
-
-    try {
-      const response = await axios.post('/api/v1/travels/create', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      // const response = await axios.post('/travels/create', formData)
-
-      console.log(response.data);
-      alert("여행등록");
-
-    } catch (error) {
-      console.error('Error:', error);
-      alert("오류발생");
-      
-    }
   };
 
-  const { data: testData,
-    error: testError,
-    loading: testLoading,
-    status: testStatus,
-    refetch: testRefetch } = useAxios('/travels/create', 'POST', tdata)
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(tdata)
-    const fetchData = async () => {
-      try {
-        await Promise.all([
-          testRefetch(),
-        ]);
-      } catch (error) {
-        console.error('error fetching data:', error)
-      }
-    };
-    fetchData();
-    console.log('테스트11')
-    console.log('데이터메시지', testData)
-    console.log('에러메시지', testError)
+    if (tdata) {
+      console.log('실행')
+      const fetchData = async () => {
+        try {
+          await Promise.all([
+            testRefetch(),
+            navigate('/travels')
+          ]);
+        } catch (error) {
+          console.error('error fetching data:', error);
+        }
+      };
+    
+      fetchData();
+    }
   }, [tdata])
-  
+
 
   return (
     <>
@@ -472,7 +487,7 @@ const CreateTravelPage = () => {
         
         <s.DropDown onChange={handleCountryChange}>
           {country.map((data) => (
-            <option value={data.countryId}>{data.countryName}</option>
+            <option key={data.countryId} value={JSON.stringify(data)}>{data.countryName}</option>
           ))}
         </s.DropDown>
         <s.InputText>여행 인원</s.InputText>
