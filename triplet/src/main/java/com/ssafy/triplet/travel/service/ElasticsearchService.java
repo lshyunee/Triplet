@@ -329,40 +329,18 @@ public class ElasticsearchService {
 
     // 엘라스틱서치 업데이트 메서드
     void updateTravelInElasticsearch(Travel travel) throws IOException {
-        // 업데이트할 필드 정보
         Map<String, Object> updates = new HashMap<>();
         updates.put("isShared", travel.isShared());
         updates.put("status", travel.isStatus());
 
-        // 로그로 travel의 정보 출력
-        System.out.println("Travel ID: " + travel.getId());
-        System.out.println("isShared: " + travel.isShared());
-        System.out.println("status: " + travel.isStatus());
-
-        // UpdateRequest 생성
         UpdateRequest updateRequest = new UpdateRequest.Builder()
                 .index("travel")
                 .id(travel.getId().toString())
                 .doc(updates)
                 .build();
 
-        System.out.println("UpdateRequest ID: " + updateRequest.id());
-        System.out.println("Index: " + updateRequest.index());
-        System.out.println("Document updates: " + updates);
+        elasticsearchClient.update(updateRequest, TravelFeedListResponse.class);
 
-        // 엘라스틱서치에 업데이트 요청
-        UpdateResponse response = elasticsearchClient.update(updateRequest, TravelFeedListResponse.class);
-
-        // 응답 결과 출력
-        System.out.println("Elasticsearch Update Response: " + response.result());
-        if (response.result().jsonValue().equals("updated")) {
-            System.out.println("Document updated successfully");
-        } else if (response.result().jsonValue().equals("noop")) {
-            System.out.println("No changes made to the document");
-        } else {
-            System.out.println("Document update failed");
-        }
-
-
+        elasticsearchClient.indices().refresh(r -> r.index("travel"));
     }
 }
