@@ -194,7 +194,7 @@ public class TravelService {
     }
 
     @Transactional
-    public void postTravel(Long userId, TravelShareRequest request) {
+    public void postTravel(Long userId, TravelShareRequest request) throws IOException {
         Travel travel = travelRepository.findById(request.getTravelId())
                 .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
         TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
