@@ -98,6 +98,7 @@ const MoneyDiv = styled.div`
     display : flex;
     flex-direction : column;
     padding : 20px;
+    margin-bottom : 24px;
 `
 
 const MoneyCategoryDiv = styled.div`
@@ -193,7 +194,7 @@ const CompletedTravelDetailPage = () => {
 
   const { data : travelData, error : travelError, status : travelStatus,
     refetch : travelRefetch
-  } = useAxios("/travels/${id}", "GET");
+  } = useAxios(`/travels/${id}`, "GET");
 
   const { data: budgetData, error: budgetError,
     status: budgetStatus, refetch: budgetRefetch
@@ -219,7 +220,6 @@ useEffect(()=> {
     if(travel && travel.travelId !== 0){
         budgetRefetch();
     }
-        
   },[travel])
 
 interface BudgetDetails {
@@ -301,15 +301,6 @@ useEffect(() => {
           totalBudgetWon={travel?.totalBudget||0}/>
           </TravelCardDiv>
           <TravelDetailPay/>
-          <CategoryBudgetDiv>
-              <CategoryTitleDiv>
-                  <CategoryTitleFontDiv>
-                      <PayIcon/>
-                      <TitleP>여행 지출 내역</TitleP>
-                  </CategoryTitleFontDiv>
-                  <RightArrow/>
-              </CategoryTitleDiv>
-          </CategoryBudgetDiv>
             <MoneyDiv>
                 <MoneyCategoryDiv>
                     <MoneyCategoryP>항공</MoneyCategoryP>
@@ -418,15 +409,6 @@ useEffect(() => {
                     <MoneyChartBar paid="30%" color='#008DE7'/>
                 </MoneyChartConsumpBar>
             </MoneyDiv>
-          <CategoryShareDiv>
-              <CategoryTitleDiv>
-                  <CategoryTitleFontDiv>
-                      <ShareIcon/>
-                      <TitleP>여행 공유 옵션</TitleP>
-                  </CategoryTitleFontDiv>
-                  <RightArrow/>
-              </CategoryTitleDiv>
-          </CategoryShareDiv>
       </ContentDiv>
     </DetailDiv>
   </>
