@@ -68,8 +68,9 @@ const MyInfoConfigDiv = styled.div`
     display : flex;
     flex-direction : column;
     width: 100%;
-    height : 370px;
+    height : 100%;
     background-color : white;
+    margin-bottom : 24px;
 
     ${TitleP} {
         margin-bottom:24px;
