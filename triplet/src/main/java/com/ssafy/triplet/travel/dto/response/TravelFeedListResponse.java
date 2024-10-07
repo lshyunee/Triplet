@@ -51,5 +51,6 @@ public class TravelFeedListResponse {
     @Field(name = "total_budget_won",type = FieldType.Double)
     private double totalBudgetWon;
 
+    @Field(name = "country_name", type = FieldType.Text)
     private String countryName;
 }

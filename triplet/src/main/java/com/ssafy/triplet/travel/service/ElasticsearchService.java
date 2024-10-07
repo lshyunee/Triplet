@@ -237,8 +237,7 @@ public class ElasticsearchService {
     private void searchTravel(BoolQuery.Builder boolQueryBuilder, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                               Integer minDays, Integer maxDays) {
         if (countryName != null && !countryName.isEmpty()) {
-            int countryId = countryRepository.findIdByCountryName(countryName);
-            boolQueryBuilder.must(Query.of(q -> q.term(t -> t.field("country_id").value(countryId))));
+            boolQueryBuilder.must(Query.of(q -> q.fuzzy(f -> f.field("country_name").value(countryName).fuzziness("AUTO"))));
         }
         if (memberCount != null) {
             boolQueryBuilder.must(Query.of(q -> q.term(t -> t.field("member_count").value(memberCount))));
