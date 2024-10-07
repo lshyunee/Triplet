@@ -116,10 +116,6 @@ const MoneyBudgetComsumpP = styled.p<{ color: string }>`
 
 
 
-
-
-
-
 interface Budget {
   categoryId: number;
   categoryName: string;
@@ -130,7 +126,7 @@ interface Budget {
 interface Expenditure {
   categoryId: number;
   categoryName: string;
-  used: number;
+  usedBudget: number;
 }
 
 const SharedTravelDetailPage = () => {
@@ -207,7 +203,7 @@ const SharedTravelDetailPage = () => {
   };
   
   const calculateUsed = (): number => {
-    const used = expenditureData ? expenditureData.reduce((acc, item) => acc + item.used, 0) : 0;
+    const used = expenditureData ? expenditureData.reduce((acc, item) => acc + item.usedBudget, 0) : 0;
     return isNaN(used) ? 0 : used; // NaN 체크 추가
   };
 
@@ -229,12 +225,11 @@ const SharedTravelDetailPage = () => {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   };
   const rgbaToRgb = (rgb:string) => {
-    // hex 코드에서 # 제거
     const strippedHex = rgb.split(',').slice(0,3);
     
-        console.log(strippedHex.reduce((acc,item)=> acc + item,""))
+        console.log(strippedHex.reduce((acc,item)=> acc + item + ",","")+"30%)")
     // rgba 문자열 생성
-    return strippedHex.reduce((acc,item)=> acc + item,"");
+    return strippedHex.reduce((acc,item)=> acc + item + ",","")+"30%)";
   };
   return (
     <>
@@ -266,7 +261,7 @@ const SharedTravelDetailPage = () => {
     const expenditure = expenditureData.find(
       (exp) => exp.categoryId === budget.categoryId
     );
-    const used = expenditure?.used || 0;
+    const used = expenditure?.usedBudget || 0;
     const percentageUsed = calculatePercentage(budget.budget, used);
 
     return (

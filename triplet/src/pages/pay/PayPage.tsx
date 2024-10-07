@@ -261,7 +261,6 @@ const PayPage = () => {
 						/>
 					</s.CurrencyArea>
 				</s.Card>
-			
 			</s.Container>
 		</>
 	);

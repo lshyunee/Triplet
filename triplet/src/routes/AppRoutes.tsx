@@ -28,6 +28,7 @@ import OngoingTravelDetailPage from '../pages/travels/OngoingTravelDetailPage';
 import CompletedTravelDetailPage from '../pages/travels/CompletedTravelDetailPage';
 import MyInfoSetPage from '../pages/mypage/MyInfoSetPage';
 import FeedDetailPage from '../pages/feed/FeedDetailPage';
+import ForeignDetailPage from '../pages/pay/ForeignDetailPage';
 
 const AppRoutes: React.FC = () => (
         <Routes>
@@ -46,6 +47,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/pay/qr/payment" element={<QRPayPage/>}/>
             <Route path="/pay/qr/complete" element={<QRCompletePage/>}/>
             <Route path="/pay/account-detail" element={<AccountDetailPage/>}/>
+            <Route path="/pay/foreign-detail/:accountId" element={<ForeignDetailPage/>}/>
             <Route path="/pay/global-wallet" element={<GlobalWalletPage/>}/>
             <Route path="/pay/exchange/:accountId" element={<ExchangePage/>}/>
             <Route path="/travels" element={<Travels/>}/>
