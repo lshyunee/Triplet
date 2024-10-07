@@ -335,10 +335,28 @@ public class ElasticsearchService {
     }
 
     private TravelFeedListResponse convertToTravelFeedListResponse(Travel travel) {
-        return new TravelFeedListResponse(
-                travel.
-        );
+        TravelFeedListResponse response = new TravelFeedListResponse();
+        response.setCountryId(travel.getCountry().getId());
+        response.setCreatorId(travel.getCreatorId());
+        if (travel.getStartDate() != null && travel.getEndDate() != null) {
+            long days = java.time.temporal.ChronoUnit.DAYS.between(travel.getStartDate(), travel.getEndDate()) + 1;
+            response.setDays((int) days);
+        } else {
+            response.setDays(0);
+        }
+        response.setId(travel.getId());
+        response.setImage(travel.getImage());
+        response.setShared(travel.isShared());
+        response.setMemberCount(travel.getMemberCount());
+        response.setShareStatus(travel.isShareStatus());
+        response.setStatus(travel.isStatus());
+        response.setTitle(travel.getTitle());
+        response.setTotalBudget(travel.getTotalBudget());
+        response.setTotalBudgetWon(travel.getTotalBudgetWon());
+        response.setCountryName(travel.getCountry().getName());
+        return response;
     }
+
 
 
 }
