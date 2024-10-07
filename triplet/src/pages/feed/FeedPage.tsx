@@ -12,6 +12,10 @@ import { ReactComponent as Filter } from '../../assets/common/filter.svg';
 
 import SnsTravelCardMini from '../../components/travel/SnsTravelCardMini';
 import DetailSearchBottomSheet from '../../components/travel/DetailSearchBottomSheet';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store';
+import { addFeedTravels } from '../../features/travel/snsTravelSlice';
+import useIntersectionObserver from '../../hooks/useIntersectionObserver';
 
 const FeedDiv = styled.div`
     background-color : #F3F4F6;
@@ -126,10 +130,57 @@ const TravelDiv = styled.div`
 const FeedPage = () => {
 
     const dispatch = useDispatch();
+    const selector = useSelector;
+    const filter = selector((state : RootState) => state.filterTravel);
+    const travels = selector((state : RootState) => state.snsTravel);
+
+    const [page, setPage] = useState<number>(1);
+    const [hasMore, setHasMore] = useState<boolean>(true);
 
     useEffect(() => {
         dispatch(pageMove("feed"));
     }, [])
+
+    const { data : searchData, error : searchError, status : searchStatus,
+        loading : searchLoading, refetch : searchRefetch
+       } = useAxios("travels/shared", "GET",
+        {
+          countryName : filter.countryName === '' ? null : filter.countryName,
+          memberCount : filter.memberCount,
+          minBudget : filter.minBudget === 0 ? null : filter.minBudget,
+          maxBudget : filter.maxBudget === 0 ? null : filter.maxBudget,
+          minPeriod : filter.minDays === 0 ? null : filter.minDays,
+          maxPeriod : filter.maxDays === 0 ? null : filter.maxDays,
+          page : page,
+          kind : filter.kind
+    });
+
+    useEffect(() => {
+        if (hasMore && !searchLoading) {
+            searchRefetch();
+        }
+    }, [page, hasMore]);
+
+    useEffect(() => {
+        if (searchData && searchData.data.content.length > 0) {
+            dispatch(addFeedTravels(searchData.data.content));
+            console.log(searchData.data.content);
+        } else {
+            setHasMore(false); // 더 이상 데이터가 없으면 로딩을 중단
+        }
+    }, [searchData, searchError]);
+
+    const loadMore = () => {
+        if (!searchLoading && hasMore) {
+            setPage((prevPage) => prevPage + 1);
+        }
+    };
+
+    const targetRef = useIntersectionObserver(loadMore, {
+        root: null,
+        rootMargin: '0px',
+        threshold: 1.0,
+    });
 
     const valid = (value:string) => {
         const regex = /^[가-힣]*$/;
@@ -169,12 +220,16 @@ const FeedPage = () => {
                     </FilterDownDiv>
                 </FilterDiv>
                 <TravelDiv>
-                    <SnsTravelCardMini></SnsTravelCardMini>
-                    <SnsTravelCardMini></SnsTravelCardMini>
-                    <SnsTravelCardMini></SnsTravelCardMini>
-                    <SnsTravelCardMini></SnsTravelCardMini>
-                    <SnsTravelCardMini></SnsTravelCardMini>
-                    <SnsTravelCardMini></SnsTravelCardMini>
+                    {travels?.travelData.map((travel, index) => (
+                        <SnsTravelCardMini
+                            key={travel.id}
+                            title={travel.title}
+                            days={travel.days}
+                            totalBudgetWon={travel.totalBudgetWon}
+                            memberCount={travel.memberCount}
+                        />
+                    ))}
+                    <div ref={targetRef} style={{ height: '20px', backgroundColor: 'transparent' }} />
                 </TravelDiv>
                 <DetailSearchBottomSheet isOpen={isBottomSheetOpen} 
             onClose={() => setIsBottomSheetOpen(false)}></DetailSearchBottomSheet>
