@@ -303,7 +303,8 @@ useEffect(() => {
       <Overlay />
       <ContentDiv>
           <TravelCardDiv>
-          <TravelDetailCard title={travel?.title||""}
+          <TravelDetailCard 
+          title={travel?.title||""}
           startDate={travel?.startDate||""} endDate={travel?.endDate||""}
           country={travel?.countryName||""}
           memberCount={travel?.memberCount||0}

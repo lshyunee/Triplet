@@ -107,7 +107,16 @@ const CountryP = styled.p`
 
 `
 
-const SnsTravelCardMini = () => {
+interface TravelDataProps {
+  title : string,
+  days : number,
+  totalBudgetWon : number,
+  memberCount : number,
+}
+
+const SnsTravelCardMini : React.FC<TravelDataProps> = ({
+  title, days, totalBudgetWon, memberCount 
+ }) => {
   return (
     <CardDiv>
       <TravelImg src={SampleImg} alt="Travel" />
@@ -115,10 +124,10 @@ const SnsTravelCardMini = () => {
       <BottomOverlay>
         <ContentDiv>
             <ContentTitleDiv>
-                <CountryP>일본</CountryP>
-                <PriceInfoP>5일</PriceInfoP>
+                <CountryP>{title}</CountryP>
+                <PriceInfoP>{days}일</PriceInfoP>
             </ContentTitleDiv>
-            <DayInfoP>2,000,000원/3인</DayInfoP>
+            <DayInfoP>{totalBudgetWon}원/{memberCount}인</DayInfoP>
         </ContentDiv>
       </BottomOverlay>
     </CardDiv>

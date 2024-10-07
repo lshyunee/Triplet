@@ -4,10 +4,15 @@ import useInput from "../../hooks/useInput";
 
 import { ReactComponent as Plus } from '../../assets/common/plus.svg';
 import { ReactComponent as Minus } from '../../assets/common/minus.svg';
-import  { ReactComponent as ArrowDown }  from '../../assets/common/arrowDownBlack.svg';
 import { ReactComponent as CloseButton } from '../../assets/common/closeBtn.svg';
 
 import ErrorModal from "../modal/ErrorModal";
+
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store";
+import useAxios from "../../hooks/useAxios";
+import { setFilter, setPages } from "../../features/travel/snsTravelFilterSlice";
+import { setFeedTravels } from "../../features/travel/snsTravelSlice";
 
 // styled-components 정의
 const Overlay = styled.div`
@@ -161,60 +166,6 @@ const PeriodInput = styled.input`
 const PeriodDiv = styled.div`
   display : flex;
   gap : 8px;
-`
-const DropdownWrapper = styled.div`
-  position: relative;
-  width: 80px;
-`;
-
-const DropdownButton = styled.button`
-  width: 100%;
-  height: 44px;
-  font-size: 14px;
-  background-color: #F9FAFC;
-  border: 1px solid #F0F0F0;
-  border-radius: 10px;
-  cursor: pointer;
-  text-align: center;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 16px;
-  
-  &:focus {
-    outline: none;
-    border-color: #008de7;
-  }
-`;
-
-const DropdownIcon = styled(ArrowDown)`
-  width: 16px;
-  height: 16px;
-`;
-
-const DropdownMenu = styled.ul`
-  position: absolute;
-  bottom: 48px; /* 버튼 위로 위치 */
-  width: 100%;
-  max-height: 88px; /* 최대 2개의 항목만 보이도록 높이 제한 (각 항목의 높이가 44px인 경우) */
-  background-color: white;
-  border: 1px solid #F0F0F0;
-  border-radius: 10px;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  overflow-y: auto; /* 스크롤 활성화 */
-  z-index: 100;
-`;
-
-
-const DropdownItem = styled.li`
-  padding: 8px 16px;
-  cursor: pointer;
-  
-  &:hover {
-    background-color: #f1f1f1;
-  }
 `;
 
 
@@ -223,17 +174,28 @@ interface BottomSheetProps {
   onClose: () => void;
 }
 
-const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({
-  isOpen,
-  onClose,
-}) => {
+const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }) => {
+  
   const [visible, setVisible] = useState(isOpen);
+
+  const selector = useSelector;
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (isOpen) {
       setVisible(true);
     }
   }, [isOpen]);
+
+  const filter = selector((state : RootState) => state.filterTravel);
+
+  useEffect(()=> {
+    setPerson(filter.memberCount);
+    minBudget.changeData(filter.minBudget);
+    maxBudget.changeData(filter.maxBudget);
+    minPeriod.changeData(filter.minDays);
+    maxPeriod.changeData(filter.maxDays);
+  }, [isOpen, filter]);
 
   const handleClose = () => {
     setVisible(false);
@@ -280,17 +242,44 @@ const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({
   const minPeriod = useInput(periodValid);
   const maxPeriod = useInput(periodValid);
 
-  const [selectedMonth, setSelectedMonth] = useState('1');
-  const [dropDownOpen, setdropDownOpen] = useState(false);
+  const { data : searchData, error : searchError, status : searchStatus,
+    refetch : searchRefetch
+   } = useAxios("travels/shared", "GET",
+    {
+      countryName : filter.countryName === '' ? null : filter.countryName,
+      memberCount : person,
+      minBudget : minBudget.value === '0' ? null : Number(minBudget.value),
+      maxBudget : maxBudget.value === '0' ? null : Number(maxBudget.value),
+      minPeriod : minPeriod.value === '0' ? null : Number(minPeriod.value),
+      maxPeriod : maxPeriod.value === '0' ? null : Number(maxPeriod.value),
+      page : 1,
+      kind : filter.kind
+    });
 
-  const months = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+  const saveFilter = () => {
+    searchRefetch();
+  }
 
-  const toggleDropdown = () => setdropDownOpen(!dropDownOpen);
+  useEffect(()=>{
 
-  const selectMonth = (month:any) => {
-    setSelectedMonth(month);
-    setdropDownOpen(false); // 선택 후 드롭다운 닫기
-  };
+    console.log(searchData);
+    
+    if(searchData && searchStatus === 200){
+      dispatch(setFeedTravels(searchData.data.content));
+      dispatch(setPages(searchData.data.pageNumber));
+      dispatch(setFilter({
+        countryName : filter.countryName,
+        memberCount : person,
+        minBudget: Number(minBudget.value),
+        maxBudget: Number(maxBudget.value),
+        minDays: Number(minPeriod.value),
+        maxDays: Number(maxPeriod.value)
+      }))
+      onClose();
+    }
+
+  },[searchData, searchError])
+
 
   return (
     <Overlay
@@ -335,28 +324,7 @@ const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({
                   </PeriodDiv>
                 </ContentDiv>
             </CategoryDiv>
-            <CategoryDiv>
-          <CategoryP>여행 시기</CategoryP>
-          <ContentDiv>
-            <DropdownWrapper>
-              <DropdownButton onClick={toggleDropdown}>
-                {selectedMonth}
-                <DropdownIcon />
-              </DropdownButton>
-              {dropDownOpen && (
-                <DropdownMenu>
-                  {months.map((month) => (
-                    <DropdownItem key={month} onClick={() => selectMonth(month)}>
-                      {month}
-                    </DropdownItem>
-                  ))}
-                </DropdownMenu>
-              )}  
-            </DropdownWrapper>
-            <UnitP>월</UnitP>
-          </ContentDiv>
-        </CategoryDiv>
-        <SaveButton>저장</SaveButton>
+        <SaveButton onClick={saveFilter}>저장</SaveButton>
       </Sheet>
       <ErrorModal isOpen={isErrorOpen} onClose={() => {setIsErrorOpen(false)}} msg={errorMsg}></ErrorModal>
     </Overlay>

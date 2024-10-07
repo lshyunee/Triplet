@@ -68,8 +68,9 @@ const MyInfoConfigDiv = styled.div`
     display : flex;
     flex-direction : column;
     width: 100%;
-    height : 370px;
+    height : 100%;
     background-color : white;
+    margin-bottom : 24px;
 
     ${TitleP} {
         margin-bottom:24px;
@@ -147,7 +148,6 @@ const MyPage = () => {
     const [ errorMsg, setErrorMsg] = useState('...');
 
     const kakaoDontGoPassword = (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-        console.log(memberId);
         if(memberId.slice(0,5)==="kakao"){
             event.preventDefault();
         }

@@ -243,9 +243,8 @@ const HomePage = () => {
     
         if(userInfoStatus&&userInfoStatus!==200){
             console.log(userInfoStatus);
-            // userInfoData가 없거나 필드가 null/undefined일 때 '/mypage/info-set'으로 이동
             if (!userInfoData || !userInfoData.data) {
-                navigate('/mypage/info-set');
+                navigate('/login');
             } else if (userInfoData.data){
                 const { memberId, name, birth, gender, phoneNumber } = userInfoData.data;
                 if (

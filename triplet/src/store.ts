@@ -5,7 +5,9 @@ import ongoingTravelSlice from './features/travel/ongoingTravelSlice';
 import upcomingTravelSlice from './features/travel/upcomingTravelSlice';
 import completedTravelSlice from './features/travel/completedTravelSlice';
 import snsTravelSlice from './features/travel/snsTravelSlice';
+import sharedTravelSlice from './features/travel/shareTravelSlice';
 import userInfoSlice from './features/user/userInfoSlice';
+import snsTravelFilterSlice from './features/travel/snsTravelFilterSlice';
 
 // 스토어 생성
 const store = configureStore({
@@ -17,6 +19,8 @@ const store = configureStore({
     completedTravel : completedTravelSlice,
     snsTravel : snsTravelSlice,
     userInfo : userInfoSlice,
+    sharedTravel : sharedTravelSlice,
+    filterTravel : snsTravelFilterSlice,
   },
 });
 

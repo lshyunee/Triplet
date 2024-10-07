@@ -1,21 +1,19 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import { useParams } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
 
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
 import BackHeader from '../../components/header/BackHeader';
-import TravelDetailCard from '../../components/travel/TravelDetailCard';
 import TravelDetailPay from '../../components/travel/TravelDetailPay';
 
 import { ReactComponent as RightArrow } from '../../assets/common/rightArrow.svg';
 import { ReactComponent as PayIcon } from '../../assets/common/payIcon.svg';
 import { ReactComponent as ShareIcon } from '../../assets/common/shareIcon.svg';
-import { selectUpcomingTravelByTitleId } from '../../features/travel/upcomingTravelSlice';
-import { RootState } from '../../store';
 import useAxios from '../../hooks/useAxios';
 import ShareTravelModal from '../../components/modal/ShareTravelModal';
+import CompletedTravelDetailCard from '../../components/travel/CompletedTravelDetailCard';
 
 const DetailDiv = styled.div`
     padding : 56px 0 0 0;
@@ -98,121 +96,66 @@ const MoneyDiv = styled.div`
     display : flex;
     flex-direction : column;
     padding : 20px;
-`
+`;
 
 const MoneyCategoryDiv = styled.div`
     display : flex;
     flex-direction : row;
     justify-content : space-between;
-`
+`;
 
 const MoneyCategoryProgressDiv = styled.div`
     display : flex;
     flex-direction : row;
     justify-content : space-between;
-    margin : 24px 0 8px 0;
-`
-
-interface MonyeProgressProps {
-    paid : string;
-    color : string;
-}
-
-const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
-    width: 100%;
-    background-color: ${props => props.color};
-    border-radius: 50px;
-    overflow: hidden;
-    height: 12px;
+    margin : 24px 0 0 0;
 `;
 
-const MoneyChartBar = styled.div<MonyeProgressProps>`
-    height : 100%;
-    background-color : ${props => props.color};
-    width : ${props => props.paid || '50%'};
-    border-radius : 50px;
-`
-
 const MoneyCategoryP = styled.p`
-    color : #666666;
-    font-size : 14px;
-    font-weight : 600;
+    color : black;
+    font-size : 16px;
+    font-weight : 400;
     margin : 0;
     margin-left : 2px;
-`
+`;
 
 const MoneyTitleDiv = styled.div`
     display : flex;
     flex-direction: row;
-`
-
-interface MoneyCategoryProps {
-    color : string;
-}
-
-const MoneyComsumpP = styled.p<MoneyCategoryProps>`
-    font-size : 16px;
-    font-weight : 700;
-    color : ${props => props.color || "#666666"};
-    margin : 0px;
-    margin-left : 8px;
-`
+`;
 
 const BudgetDiv = styled.div`
     display : flex;
     flex-direction: row;
     margin-right : 2px;
-`
-
-const MoneyBudgetP = styled.p<MoneyCategoryProps>`
-    margin : 0px;
-    font-size : 14px;
-    font-weight : 500;
-    color : ${props => props.color || "#666666"}
 `;
 
-const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
+const MoneyBudgetP = styled.p`
     margin : 0px;
-    font-size : 14px;
-    font-weight : 600;
-    margin-right : 4px;
-    color : ${props => props.color || "#666666"}
+    font-size : 16px;
+    font-weight : 400;
+    color : black;
 `;
 
-interface TravelDetails {
+interface Travel {
     travelId: number;
-    inviteCode: string;
+    title: string;
+    startDate: string;
+    endDate: string;
+    image: string;
     country: string;
     countryId: number;
     currency: string;
-    startDate: string;  // Date 타입
-    endDate: string;    // Date 타입
-    title: string;
-    image: string;
-    creatorId: number;
-    myTravel: boolean;
     memberCount: number;
-    totalBudget: number;
-    airportCost: number;
     totalBudgetWon: number;
+    usedBudget: number;
     status: boolean;
     shareStatus: boolean;
-    budgets: any[];
-}
-
-interface Budget {
-    categoryId: number;
-    categoryName: string;
-    categoryBudget: number;
-    usedBudget: number;
-    fiftyBudget: number;
-    eightyBudget: number;
-    budgetWon: number;
-}
-
-interface BudgetDetails {
-    isComplete: boolean;
-    budgetList: Budget[];
+    shared: boolean;
+    airportCost : number;
+    myTravel : boolean;
+    creatorId : number;
+    finishTravel : boolean;
 }
 
 const CompletedTravelDetailPage = () => {
@@ -221,8 +164,9 @@ const CompletedTravelDetailPage = () => {
     useEffect(() => {
         dispatch(pageMove("travels"));
     }, [dispatch]);
-
+    
     const { id } = useParams();
+    const [travel, setTravel] = useState<Travel>();
 
     const { data: travelData, error: travelError, 
         status: travelStatus, refetch: travelRefetch    
@@ -230,268 +174,188 @@ const CompletedTravelDetailPage = () => {
 
     const { data: budgetData, error: budgetError,
         status: budgetStatus, refetch: budgetRefetch
-    } = useAxios(`/expenditure-expenses/${id}`, "GET");
-
-    const [travelDetails, setTravelDetails] = useState<TravelDetails | null>(null);
+    } = useAxios(`/travels/expenditure-expenses/${id}`, "GET");
+    
+    useEffect(()=> {
+        travelRefetch();
+    }, []);
 
     useEffect(() => {
         if (travelData) {
-            const {
-                travelId, inviteCode, country, countryId,
-                currency, startDate, endDate, title, image,
-                creatorId, myTravel, memberCount, totalBudget,
-                airportCost, totalBudgetWon, status,
-                shareStatus, budgets
-            } = travelData;
-
-            // startDate와 endDate가 문자열로 들어온다면, Date 객체로 변환
-            setTravelDetails({
-                travelId,
-                inviteCode,
-                country,
-                countryId,
-                currency,
-                startDate,
-                endDate,     
-                title,
-                image,
-                creatorId,
-                myTravel,
-                memberCount,
-                totalBudget,
-                airportCost,
-                totalBudgetWon,
-                status,
-                shareStatus,
-                budgets,
-            });
+            setTravel(travelData.data);
+            console.log(travelData.data);
         }
     }, [travelData, travelError]);
 
-    let travelId: number = 0;
-    let inviteCode: string = '';
-    let country: string = '';
-    let countryId: number = 0;
-    let currency: string = '';
-    let startDate: string = "";
-    let endDate: string = ""; 
-    let title: string = '';
-    let image: string = '';
-    let creatorId: number = 0;
-    let myTravel: boolean = false;
-    let memberCount: number = 0;
-    let totalBudget: number = 0;
-    let airportCost: number = 0;
-    let totalBudgetWon: number = 0;
-    let status: boolean = false;
-    let shareStatus: boolean = false;
-    let budgets: any[] = [];  // 빈 배열로 초기화
+    useEffect(()=>{
+        if(travel && travel.travelId !== 0){
+            budgetRefetch();
+        }
+      },[travel])
 
-    if (travelDetails) {
-        ({
-            travelId, inviteCode, country, countryId, currency, startDate, endDate, title, image, 
-            creatorId, myTravel, memberCount, totalBudget, airportCost, totalBudgetWon, status, 
-            shareStatus, budgets
-        } = travelDetails);
+    interface BudgetDetails {
+        isComplete: boolean;
+        budgetList: Budget[];
     }
-
-    const [budgetDetails, setBudgetDetails] = useState<BudgetDetails | null>(null);
-
-    const [ useBudget, setUseBudget ] = useState(0);
-
-    let categoryId: number = 0;
-    let categoryName: string = '';
-    let categoryBudget: number = 0;
-    let usedBudget: number = 0;
-    let fiftyBudget: number = 0;
-    let eightyBudget: number = 0;
-    let budgetWon: number = 0;
+    
+    const [budgetDetails, setBudgetDetails] = useState<BudgetDetails|null>(null);
+    
+    interface Budget {
+        categoryId: number;
+        categoryName: string;
+        used: number;
+    }
+    
+    const [ usedBudget, setUsedBudget ] = useState(0);
 
     useEffect(() => {
         if (budgetData) {
-             const { isComplete, budgetList } = budgetData;
-      
-              setBudgetDetails({
-                  isComplete,
-                  budgetList: budgetList.map((budget: Budget) => ({
-                      categoryId: budget.categoryId,
-                      categoryName: budget.categoryName,
-                      categoryBudget: budget.categoryBudget,
-                      usedBudget: budget.usedBudget,
-                      fiftyBudget: budget.fiftyBudget,
-                      eightyBudget: budget.eightyBudget,
-                      budgetWon: budget.budgetWon
-                  }))
-              });
-            
-                budgetList.forEach((budget: any) => {
-                    categoryId = budget.categoryId;
-                    categoryName = budget.categoryName;
-                    categoryBudget = budget.categoryBudget;
-                    usedBudget = budget.usedBudget;
-                    fiftyBudget = budget.fiftyBudget;
-                    eightyBudget = budget.eightyBudget;
-                    budgetWon = budget.budgetWon;
-            
-                    console.log(categoryId, categoryName, categoryBudget, usedBudget);
-                });
-                
-          }
-      
-          if (budgetError) {
-          }
-    
-      }, [budgetData, budgetError]);
+            const { isComplete, budgetList } = budgetData.data;
 
-    const totalUsedBudget = useMemo(() => 
-    budgetDetails?.budgetList.reduce((total, budget) => total + budget.usedBudget, 0), 
-    [budgetDetails]
-    );
-    
+            console.log(budgetData);
+        
+            setBudgetDetails({
+                isComplete,
+                budgetList: budgetList?.map((budget: Budget) => ({
+                    categoryId: budget.categoryId,
+                    categoryName: budget.categoryName,
+                    used: budget.used,
+                })) || []
+            });
+
+            
+            setUsedBudget(
+                budgetList.reduce((total: number, budget: any) => total + budget.used, 0)
+            );
+        
+        }
+    }, [budgetData, budgetError]);
+
     
     const [ isShareModal, setShareModal ] = useState(false);
-    
-    const openShareModal = () => {
-        setShareModal(true);
-    }
 
-    const hexToRgba = (hex:string, alpha:string) => {
-    // hex 코드에서 # 제거
-    const strippedHex = hex.replace('#', '');
+    return (
+        <>
+            <BackHeader title={travel?.title || ""}></BackHeader>
+            <DetailDiv>
+                <Img src={SampleImg}></Img>
+                <Overlay />
+                <ContentDiv>
+                    <TravelCardDiv>
+                        <CompletedTravelDetailCard title={travel?.title || ""}
+                            startDate={travel?.startDate || ""} 
+                            endDate={travel?.endDate || ""}
+                            country={travel?.country || ""}
+                            memberCount={travel?.memberCount || 0}
+                            usedBudget={usedBudget || 0}/>
+                    </TravelCardDiv>
+                    <TravelDetailPay />
+                    <CategoryBudgetDiv>
+                        <CategoryTitleDiv>
+                            <CategoryTitleFontDiv>
+                                <PayIcon />
+                                <TitleP>여행 지출 내역</TitleP>
+                            </CategoryTitleFontDiv>
+                            <RightArrow />
+                        </CategoryTitleDiv>
+                    </CategoryBudgetDiv>
+                    <MoneyDiv>
+                        <MoneyCategoryDiv>
+                            <MoneyCategoryP>항공</MoneyCategoryP>
+                            <MoneyCategoryP>600,000원</MoneyCategoryP>
+                        </MoneyCategoryDiv>
+                        {/* 항목이 있는지 확인 후 조건부 렌더링 */}
+                        {budgetDetails?.budgetList?.[0] && (
+                            <>
+                                <MoneyCategoryProgressDiv>
+                                    <MoneyTitleDiv>
+                                        <MoneyCategoryP>식사</MoneyCategoryP>
+                                    </MoneyTitleDiv>
+                                    <BudgetDiv>
+                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[0]?.used || 0}원</MoneyBudgetP>
+                                    </BudgetDiv>
+                                </MoneyCategoryProgressDiv>
+                            </>
+                        )}
+                        {budgetDetails?.budgetList?.[1] && (
+                            <>
+                                <MoneyCategoryProgressDiv>
+                                    <MoneyTitleDiv>
+                                        <MoneyCategoryP>식사</MoneyCategoryP>
+                                    </MoneyTitleDiv>
+                                    <BudgetDiv>
+                                    <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[1]?.used || 0}원</MoneyBudgetP>
+                                    </BudgetDiv>
+                                </MoneyCategoryProgressDiv>
+                            </>
+                        )}
+                        {budgetDetails?.budgetList?.[2] && (
+                            <>
+                                <MoneyCategoryProgressDiv>
+                                    <MoneyTitleDiv>
+                                        <MoneyCategoryP>식사</MoneyCategoryP>
+                                    </MoneyTitleDiv>
+                                    <BudgetDiv>
+                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[2]?.used || 0}원</MoneyBudgetP>
+                                    </BudgetDiv>
+                                </MoneyCategoryProgressDiv>
+                            </>
+                        )}
 
-    // 16진수 값으로 변환
-    const r = parseInt(strippedHex.substring(0, 2), 16);
-    const g = parseInt(strippedHex.substring(2, 4), 16);
-    const b = parseInt(strippedHex.substring(4, 6), 16);
+                        {budgetDetails?.budgetList?.[3] && (
+                            <>
+                                <MoneyCategoryProgressDiv>
+                                    <MoneyTitleDiv>
+                                        <MoneyCategoryP>식사</MoneyCategoryP>
+                                    </MoneyTitleDiv>
+                                    <BudgetDiv>
+                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[3]?.used || 0}원</MoneyBudgetP>
+                                    </BudgetDiv>
+                                </MoneyCategoryProgressDiv>
+                            </>
+                        )}
 
-    // rgba 문자열 생성
-    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-  };
+                        {budgetDetails?.budgetList?.[4] && (
+                            <>
+                                <MoneyCategoryProgressDiv>
+                                    <MoneyTitleDiv>
+                                        <MoneyCategoryP>식사</MoneyCategoryP>
+                                    </MoneyTitleDiv>
+                                    <BudgetDiv>
+                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[4]?.used || 0}원</MoneyBudgetP>
+                                    </BudgetDiv>
+                                </MoneyCategoryProgressDiv>
+                            </>
+                        )}
 
-  return (
-    <>
-    <BackHeader title="고래상어보러가자"></BackHeader>
-    <DetailDiv>
-      <Img src={SampleImg}></Img>
-      <Overlay />
-      <ContentDiv>
-          <TravelCardDiv>
-          <TravelDetailCard 
-          title={title} 
-          startDate={startDate} 
-          endDate={endDate} country={country} 
-          memberCount={memberCount} 
-          usedBudget={useBudget}
-          totalBudgetWon={totalBudgetWon} />
-          </TravelCardDiv>
-          <TravelDetailPay/>
-          <CategoryBudgetDiv>
-              <CategoryTitleDiv>
-                  <CategoryTitleFontDiv>
-                      <PayIcon/>
-                      <TitleP>여행 지출 내역</TitleP>
-                  </CategoryTitleFontDiv>
-                  <RightArrow/>
-              </CategoryTitleDiv>
-          </CategoryBudgetDiv>
-            <MoneyDiv>
-                <MoneyCategoryDiv>
-                    <MoneyCategoryP>항공</MoneyCategoryP>
-                    <MoneyCategoryP>600,000원</MoneyCategoryP>
-                </MoneyCategoryDiv>
-                <MoneyCategoryProgressDiv>
-                    <MoneyTitleDiv>
-                        <MoneyCategoryP>식사</MoneyCategoryP>
-                        <MoneyComsumpP color="#00D5FF">30%</MoneyComsumpP>
-                    </MoneyTitleDiv>
-                    <BudgetDiv>
-                        <MoneyBudgetComsumpP color='#00D5FF'>600,000</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
-                    </BudgetDiv>
-                </MoneyCategoryProgressDiv>
-                <MoneyChartConsumpBar color={hexToRgba("#00D5FF","0.3")}>
-                    <MoneyChartBar paid="80%" color="#00D5FF"/>
-                </MoneyChartConsumpBar>
-                <MoneyCategoryProgressDiv>
-                    <MoneyTitleDiv>
-                        <MoneyCategoryP>교통</MoneyCategoryP>
-                        <MoneyComsumpP color="#00C8FB">30%</MoneyComsumpP>
-                    </MoneyTitleDiv>
-                    <BudgetDiv>
-                        <MoneyBudgetComsumpP color='#00C8FB'>600,000</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
-                    </BudgetDiv>
-                </MoneyCategoryProgressDiv>
-                <MoneyChartConsumpBar color={hexToRgba("#00C8FB","0.3")}>
-                    <MoneyChartBar paid="30%" color="#00C8FB"/>
-                </MoneyChartConsumpBar>
-                <MoneyCategoryProgressDiv>
-                    <MoneyTitleDiv>
-                        <MoneyCategoryP>관광</MoneyCategoryP>
-                        <MoneyComsumpP color="#00B8F5">30%</MoneyComsumpP>
-                    </MoneyTitleDiv>
-                    <BudgetDiv>
-                        <MoneyBudgetComsumpP color='#00B8F5'>600,000</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
-                    </BudgetDiv>
-                </MoneyCategoryProgressDiv>
-                <MoneyChartConsumpBar  color={hexToRgba("#00B8F5","0.3")}>
-                    <MoneyChartBar paid="30%" color="#00B8F5"/>
-                </MoneyChartConsumpBar>
-                <MoneyCategoryProgressDiv>
-                    <MoneyTitleDiv>
-                        <MoneyCategoryP>쇼핑</MoneyCategoryP>
-                        <MoneyComsumpP color="#00ACF1">30%</MoneyComsumpP>
-                    </MoneyTitleDiv>
-                    <BudgetDiv>
-                        <MoneyBudgetComsumpP color='#00ACF1'>600,000</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
-                    </BudgetDiv>
-                </MoneyCategoryProgressDiv>
-                <MoneyChartConsumpBar  color={hexToRgba("#00ACF1","0.3")}>
-                    <MoneyChartBar paid="30%" color='#00ACF1'/>
-                </MoneyChartConsumpBar>
-                <MoneyCategoryProgressDiv>
-                    <MoneyTitleDiv>
-                        <MoneyCategoryP>숙박</MoneyCategoryP>
-                        <MoneyComsumpP color="#009BEB">30%</MoneyComsumpP>
-                    </MoneyTitleDiv>
-                    <BudgetDiv>
-                        <MoneyBudgetComsumpP color='#009BEB'>600,000</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
-                    </BudgetDiv>
-                </MoneyCategoryProgressDiv>
-                <MoneyChartConsumpBar color={hexToRgba("#009BEB","0.3")}>
-                    <MoneyChartBar paid="30%"  color='#009BEB'/>
-                </MoneyChartConsumpBar>
-                <MoneyCategoryProgressDiv>
-                    <MoneyTitleDiv>
-                        <MoneyCategoryP>기타</MoneyCategoryP>
-                        <MoneyComsumpP color="#008DE7">30%</MoneyComsumpP>
-                    </MoneyTitleDiv>
-                    <BudgetDiv>
-                        <MoneyBudgetComsumpP color='#008DE7'>600,000</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ 2,000,000원</MoneyBudgetP>
-                    </BudgetDiv>
-                </MoneyCategoryProgressDiv>
-                <MoneyChartConsumpBar color={hexToRgba("#008DE7","0.3")}>
-                    <MoneyChartBar paid="30%" color='#008DE7'/>
-                </MoneyChartConsumpBar>
-            </MoneyDiv>
-          <CategoryShareDiv>
-              <CategoryTitleDiv onClick={openShareModal}>
-                  <CategoryTitleFontDiv>
-                      <ShareIcon/>
-                      <TitleP>여행 공유 옵션</TitleP>
-                  </CategoryTitleFontDiv>
-                  <RightArrow/>
-              </CategoryTitleDiv>
-          </CategoryShareDiv>
-      </ContentDiv>
-    </DetailDiv>
-    <ShareTravelModal isOpen={isShareModal} onClose={() => {setShareModal(false)}} travelId={travelId} />
-  </>
-  );
-}
+                        {budgetDetails?.budgetList?.[5] && (
+                            <>
+                                <MoneyCategoryProgressDiv>
+                                    <MoneyTitleDiv>
+                                        <MoneyCategoryP>식사</MoneyCategoryP>
+                                    </MoneyTitleDiv>
+                                    <BudgetDiv>
+                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[5]?.used || 0}원</MoneyBudgetP>
+                                    </BudgetDiv>
+                                </MoneyCategoryProgressDiv>
+                            </>
+                        )}
+                    </MoneyDiv>
+                    <CategoryShareDiv>
+                        <CategoryTitleDiv  onClick={()=>{setShareModal(true)}}>
+                            <CategoryTitleFontDiv>
+                                <ShareIcon />
+                                <TitleP>여행 공유 옵션</TitleP>
+                            </CategoryTitleFontDiv>
+                            <RightArrow />
+                        </CategoryTitleDiv>
+                    </CategoryShareDiv>
+                </ContentDiv>
+            </DetailDiv>
+            <ShareTravelModal isOpen={isShareModal} onClose={() => { setShareModal(false) }} travelId={travel?.travelId || 0} 
+                share={travel?.shared || false} shareDetail={travel?.shareStatus || false}/>
+        </>
+    );
+};
 
 export default CompletedTravelDetailPage;
