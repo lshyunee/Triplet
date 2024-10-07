@@ -333,6 +333,9 @@ public class ElasticsearchService {
         updates.put("isShared", travel.isShared());
         updates.put("status", travel.isStatus());
 
+        System.out.println("isShared: " + updates.get("isShared"));
+        System.out.println("status: " + updates.get("status"));
+
         UpdateRequest updateRequest = new UpdateRequest.Builder()
                 .index("travel")
                 .id(travel.getId().toString())
