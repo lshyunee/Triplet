@@ -75,7 +75,7 @@ public class AccountService {
         currencyCodeMap.put("001", "USD");
         currencyCodeMap.put("002", "EUR");
         currencyCodeMap.put("003", "JPY");
-        currencyCodeMap.put("004", "CHY");
+        currencyCodeMap.put("004", "CNY");
         currencyCodeMap.put("005", "GBP");
         currencyCodeMap.put("006", "CHF");
         currencyCodeMap.put("007", "CAD");
