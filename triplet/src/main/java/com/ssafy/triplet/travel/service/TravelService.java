@@ -85,9 +85,6 @@ public class TravelService {
         validateTravelRequest(request, userId, 0L);
         String inviteCode = inviteCodeGenerator.generateInviteCode(request.getEndDate());
         Travel travel = buildTravel(userId, request, image, inviteCode);
-        String countryName = countryRepository.findNameById(request.getCountry());
-        String countryImg = getDefaultImg().get("defaultImages").get(countryName).asText();
-        travel.setImage(countryImg);
         Travel savedTravel = travelRepository.save(travel);
         insertTravelMembers(userId, travel.getId());
         manageTravelBudgets(request, savedTravel, false);
@@ -124,13 +121,14 @@ public class TravelService {
             }
             String fileUrl = s3Service.uploadFile(image);
             travel.setImage(fileUrl);
-        } else {
-            if (request.getImgUrl() == null) {
+        } else if (request.getImgUrl().equals("")) {
+            if (travel.getImage().contains("triplet-vteam.s3")) {
+                System.out.println(travel.getImage() + "=======================");
                 s3Service.deleteFile(travel.getImage());
-                String countryName = travel.getCountry().getName();
-                String countryImg = getDefaultImg().get("defaultImages").get(countryName).asText();
-                travel.setImage(countryImg);
             }
+            String countryName = countryRepository.findNameById(request.getCountry());
+            String countryImg = getDefaultImg().get("defaultImages").get(countryName).asText();
+            travel.setImage(countryImg);
         }
 
         Country country = countryRepository.findById(request.getCountry())
@@ -437,6 +435,10 @@ public class TravelService {
             }
             String fileUrl = s3Service.uploadFile(image);
             travel.setImage(fileUrl);
+        } else {
+            String countryName = countryRepository.findNameById(request.getCountry());
+            String countryImg = getDefaultImg().get("defaultImages").get(countryName).asText();
+            travel.setImage(countryImg);
         }
 
         Country country = countryRepository.findById(request.getCountry())
