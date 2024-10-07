@@ -4,22 +4,23 @@ import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
-import co.elastic.clients.elasticsearch._types.query_dsl.TermsQueryField;
 import co.elastic.clients.json.JsonData;
-import co.elastic.clients.util.ObjectBuilder;
 import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.exception.CustomException;
 import com.ssafy.triplet.travel.dto.request.MemberDocument;
 import com.ssafy.triplet.travel.dto.response.TravelFeedListResponse;
 import com.ssafy.triplet.travel.dto.response.TravelListPagedResponse;
+import com.ssafy.triplet.travel.entity.Travel;
 import com.ssafy.triplet.travel.repository.CountryRepository;
+import com.ssafy.triplet.travel.repository.ElasticSearchRepository;
+import com.ssafy.triplet.travel.repository.TravelRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,95 +38,67 @@ import java.util.stream.Stream;
 public class ElasticsearchService {
     private final ElasticsearchOperations elasticsearchOperations;
     private final CountryRepository countryRepository;
-
-//    public Page<TravelFeedListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
-//                                                         Integer minDays, Integer maxDays, int page, int kind, int pageSize) {
-//        try {
-//            BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-//
-//            if (countryName != null && !countryName.isEmpty()) {
-//                int countryId = countryRepository.findIdByCountryName(countryName);
-//                boolQueryBuilder.must(Query.of(q -> q.term(t -> t.field("country_id").value(countryId))));
-//            }
-//            if (memberCount != null) {
-//                boolQueryBuilder.must(Query.of(q -> q.term(t -> t.field("member_count").value(memberCount))));
-//            }
-//            if (minBudget != null || maxBudget != null) {
-//                RangeQuery.Builder budgetRangeQuery = new RangeQuery.Builder().field("total_budget_won");
-//                if (minBudget != null) {
-//                    budgetRangeQuery.gte(JsonData.of(minBudget));
-//                }
-//                if (maxBudget != null) {
-//                    budgetRangeQuery.lte(JsonData.of(maxBudget));
-//                }
-//                boolQueryBuilder.must(Query.of(q -> q.range(budgetRangeQuery.build())));
-//            }
-//            if (minDays != null || maxDays != null) {
-//                RangeQuery.Builder daysRangeQuery = new RangeQuery.Builder().field("days");
-//                if (minDays != null) {
-//                    daysRangeQuery.gte(JsonData.of(minDays));
-//                }
-//                if (maxDays != null) {
-//                    daysRangeQuery.lte(JsonData.of(maxDays));
-//                }
-//                boolQueryBuilder.must(Query.of(q -> q.range(daysRangeQuery.build())));
-//            }
-//
-//            // shared 필터링
-//            boolQueryBuilder.must(Query.of(q -> q.term(t -> t.field("shared").value(true))));
-//
-//
-//            // BoolQuery를 빌드하여 Query로 변환
-//            Query boolQuery = Query.of(q -> q.bool(boolQueryBuilder.build()));
-//            // Elasticsearch 검색 요청 생성
-//            NativeQuery searchQuery = NativeQuery.builder()
-//                    .withQuery(boolQuery)
-//                    .withPageable(PageRequest.of(page - 1, pageSize))
-//                    .build();
-//
-//            // Elasticsearch 검색 실행
-//            SearchHits<TravelFeedListResponse> searchHits = elasticsearchOperations.search(searchQuery, TravelFeedListResponse.class);
-//            // 결과 파싱
-//            List<TravelFeedListResponse> searchResults = searchHits.getSearchHits().stream()
-//                    .map(SearchHit::getContent)
-//                    .collect(Collectors.toList());
-//
-//            // 결과 페이지네이션 처리
-//            Page<TravelFeedListResponse> result = new PageImpl<>(searchResults, PageRequest.of((page - 1), pageSize), searchHits.getTotalHits());
-//            return result;
-//        } catch (Exception e) {
-//            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
-//        }
-//    }
+    private final TravelRepository travelRepository;
+    private final ElasticSearchRepository elasticSearchRepository;
 
     public Page<TravelFeedListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                          Integer minDays, Integer maxDays, int page, int kind, int pageSize) {
 //        try {
-        BoolQuery.Builder boolQueryBuilder = buildCommonQuery();
+        BoolQuery.Builder boolQueryBuilder = buildCommonQuery(userId);
 
         if (kind == 0) {
             recommendedTravel(boolQueryBuilder, userId);
+            return executeSearch(boolQueryBuilder, page, pageSize);
         } else if (kind == 1) {
-            latestTravel(boolQueryBuilder);
+            return latestTravel(userId, page, pageSize);
         } else if (kind == 2) {
             searchTravel(boolQueryBuilder, countryName, memberCount, minBudget, maxBudget, minDays, maxDays);
+            return executeSearch(boolQueryBuilder, page, pageSize);
         } else {
             throw new CustomException(CustomErrorCode.INVALID_KIND_ERROR);
         }
 
-        return executeSearch(boolQueryBuilder, page, pageSize);
 //        } catch (Exception e) {
 //            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
 //        }
     }
 
     // 빌드 메서드
-    private BoolQuery.Builder buildCommonQuery() {
+    private BoolQuery.Builder buildCommonQuery(Long userId) {
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
-//        boolQueryBuilder.must(Query.of(q -> q.term(t -> t.field("shared").value(true))));
-        // 자기 여행은 안 보이게 필터링 처리 필요
+
+        List<String> userTravelIds = getUserTravelIds(userId); // 사용자의 travelId 목록을 가져오는 메서드
+
+        List<FieldValue> userTravelIdFieldValues = userTravelIds.stream()
+                .map(Long::valueOf)
+                .map(FieldValue::of)
+                .collect(Collectors.toList());
+
+        boolQueryBuilder.must(Query.of(q -> q.term(t -> t.field("status").value(true))));
+        boolQueryBuilder.must(Query.of(q -> q.term(t -> t.field("is_shared").value(true))));
+        if (!userTravelIdFieldValues.isEmpty()) {
+            boolQueryBuilder.mustNot(Query.of(q -> q.terms(t -> t.field("id").terms(v -> v.value(userTravelIdFieldValues)))));
+        }
+
         return boolQueryBuilder;
     }
+
+    private List<String> getUserTravelIds(Long userId) {
+        List<String> userTravels = new ArrayList<>();
+
+        Query userQuery = Query.of(q -> q.term(t -> t.field("id").value(userId)));
+        SearchHits<MemberDocument> userSearchHits = elasticsearchOperations.search(
+                NativeQuery.builder().withQuery(userQuery).build(),
+                MemberDocument.class
+        );
+        if (!userSearchHits.getSearchHits().isEmpty()) {
+            MemberDocument user = userSearchHits.getSearchHits().get(0).getContent();
+            userTravels = user.getTravels() != null ? user.getTravels() : new ArrayList<>();
+        }
+        return userTravels; // userId에 해당하는 travels 필드 값
+    }
+
+
 
     // kind = 0 (추천)
     private void recommendedTravel(BoolQuery.Builder boolQueryBuilder, Long userId) {
@@ -243,10 +216,20 @@ public class ElasticsearchService {
     }
 
 
-    // kind = 1 (최근)
-    public void latestTravel(BoolQuery.Builder boolQueryBuilder) {
+    // kind = 1 (최근) (elasticsearch X)
+    public Page<TravelFeedListResponse> latestTravel(Long userId, int page, int size) {
+        Pageable pageable = PageRequest.of((page - 1), size);
 
+        Page<Travel> travel = travelRepository.findAllTravel(userId, pageable);
+        System.out.println(travel.getSize());
+
+        List<TravelFeedListResponse> responseList = travel.getContent().stream()
+                .map(this::convertToTravelFeedListResponse)
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(responseList, pageable, travel.getTotalElements());
     }
+
 
     // kind = 2 (검색)
     private void searchTravel(BoolQuery.Builder boolQueryBuilder, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
@@ -280,9 +263,8 @@ public class ElasticsearchService {
         }
     }
 
-    // Elasticsearch 검색 실행 메서드
+    // Elasticsearch 검색 실행
     private Page<TravelFeedListResponse> executeSearch(BoolQuery.Builder boolQueryBuilder, int page, int pageSize) {
-        // BoolQuery를 빌드하여 Query로 변환
         Query boolQuery = Query.of(q -> q.bool(boolQueryBuilder.build()));
 
         // Elasticsearch 검색 요청 생성
@@ -294,9 +276,15 @@ public class ElasticsearchService {
         // Elasticsearch 검색 실행
         SearchHits<TravelFeedListResponse> searchHits = elasticsearchOperations.search(searchQuery, TravelFeedListResponse.class);
 
-        // 결과 파싱
         List<TravelFeedListResponse> searchResults = searchHits.getSearchHits().stream()
-                .map(SearchHit::getContent)
+                .map(hit -> {
+                    TravelFeedListResponse response = hit.getContent();
+                    if (response.getCountryId() != 0) {
+                        String countryName = countryRepository.findNameById(response.getCountryId());
+                        response.setCountryName(countryName);
+                    }
+                    return response;
+                })
                 .collect(Collectors.toList());
 
         // 결과 페이지네이션 처리
@@ -313,4 +301,39 @@ public class ElasticsearchService {
         response.setTotalElements(page.getTotalElements());
         return response;
     }
+
+    private TravelFeedListResponse convertToTravelFeedListResponse(Travel travel) {
+        TravelFeedListResponse response = new TravelFeedListResponse();
+        response.setCountryId(travel.getCountry().getId());
+        response.setCreatorId(travel.getCreatorId());
+        if (travel.getStartDate() != null && travel.getEndDate() != null) {
+            long days = java.time.temporal.ChronoUnit.DAYS.between(travel.getStartDate(), travel.getEndDate()) + 1;
+            response.setDays((int) days);
+        } else {
+            response.setDays(0);
+        }
+        response.setId(travel.getId());
+        response.setImage(travel.getImage());
+        response.setShared(travel.isShared());
+        response.setMemberCount(travel.getMemberCount());
+        response.setShareStatus(travel.isShareStatus());
+        response.setStatus(travel.isStatus());
+        response.setTitle(travel.getTitle());
+        response.setTotalBudget(travel.getTotalBudget());
+        response.setTotalBudgetWon(travel.getTotalBudgetWon());
+        response.setCountryName(travel.getCountry().getName());
+        return response;
+    }
+
+    // 엘라스틱서치 업데이트 메서드
+    void updateTravelInElasticsearch(Travel travel) {
+        TravelFeedListResponse travelDocument = elasticSearchRepository.findById(travel.getId())
+                .orElseThrow(() -> new CustomException(CustomErrorCode.ELASTICSEARCH_DOCUMENT_NOT_FOUND));
+
+        travelDocument.setShared(travel.isShared());
+        travelDocument.setStatus(travel.isStatus());
+
+        elasticSearchRepository.save(travelDocument);
+    }
+
 }

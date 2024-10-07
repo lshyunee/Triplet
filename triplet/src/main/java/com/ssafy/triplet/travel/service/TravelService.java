@@ -72,6 +72,7 @@ public class TravelService {
     private final S3Service s3Service;
     private final InviteCodeGenerator inviteCodeGenerator;
     private final ElasticsearchTemplate elasticsearchTemplate;
+    private final ElasticsearchService elasticsearchService;
 
     @Transactional
     public TravelResponse createTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
@@ -224,6 +225,7 @@ public class TravelService {
             travelWallet.setShare(false);
         }
         travelRepository.save(travel);
+        elasticsearchService.updateTravelInElasticsearch(travel);
     }
 
 

@@ -1,6 +1,6 @@
 package com.ssafy.triplet.travel.dto.response;
 
-import jakarta.persistence.Id;
+import org.springframework.data.annotation.Id;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.elasticsearch.annotations.Document;
@@ -50,4 +50,6 @@ public class TravelFeedListResponse {
 
     @Field(name = "total_budget_won",type = FieldType.Double)
     private double totalBudgetWon;
+
+    private String countryName;
 }
