@@ -71,7 +71,6 @@ public class TravelService {
     private final AccountService accountService;
     private final S3Service s3Service;
     private final InviteCodeGenerator inviteCodeGenerator;
-    private final ElasticsearchTemplate elasticsearchTemplate;
     private final ElasticsearchService elasticsearchService;
 
     @Transactional
@@ -126,7 +125,7 @@ public class TravelService {
     }
 
     @Transactional
-    public void deleteTravel(Long travelId, Long userId) {
+    public void deleteTravel(Long travelId, Long userId) throws IOException {
         Travel travel = travelRepository.findById(travelId)
                 .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
         TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
@@ -136,9 +135,7 @@ public class TravelService {
         if (!userId.equals(travel.getCreatorId())) {
             throw new CustomException(CustomErrorCode.NOT_TRAVEL_CREATOR);
         }
-        if (travel.isStatus()) {
-            elasticsearchTemplate.delete(travelId.toString(), Travel.class);
-        }
+        elasticsearchService.removeTravelInElasticsearch(travelId);
         travelRepository.deleteById(travelId);
     }
 

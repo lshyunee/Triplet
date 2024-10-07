@@ -5,6 +5,7 @@ import co.elastic.clients.elasticsearch._types.FieldValue;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
+import co.elastic.clients.elasticsearch.core.DeleteRequest;
 import co.elastic.clients.elasticsearch.core.UpdateRequest;
 import co.elastic.clients.json.JsonData;
 import com.ssafy.triplet.exception.CustomErrorCode;
@@ -326,18 +327,25 @@ public class ElasticsearchService {
         return response;
     }
 
-    // 엘라스틱서치 업데이트 메서드
+    // 여행 공유시 엘라스틱서치 업데이트 메서드
     void updateTravelInElasticsearch(Travel travel) throws IOException {
         Map<String, Object> updates = new HashMap<>();
         updates.put("is_shared", travel.isShared());
         updates.put("status", travel.isStatus());
-
         UpdateRequest updateRequest = new UpdateRequest.Builder()
                 .index("travel")
                 .id(travel.getId().toString())
                 .doc(updates)
                 .build();
-
         elasticsearchClient.update(updateRequest, TravelFeedListResponse.class);
+    }
+
+    void removeTravelInElasticsearch(Long travelId) throws IOException {
+        DeleteRequest deleteRequest = new DeleteRequest.Builder()
+                .index("travel")
+                .id(travelId.toString())
+                .build();
+
+        elasticsearchClient.delete(deleteRequest);
     }
 }
