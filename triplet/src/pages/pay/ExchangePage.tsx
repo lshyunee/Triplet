@@ -93,13 +93,23 @@ const s = {
     box-sizing: border-box;
     margin: 0 16px;
     padding : 14px;
+    &:disabled {
+    background-color: #888888;
+    cursor: not-allowed;
+  }
+  `,
+    ErrorMessage: styled.div`
+    color: #008DE7;
+    font-size: 12px;
+    margin-top: 5px;
   `,
 }
 
-const ExchangePage = () => {
-  const dispatch = useDispatch();
-  // 외화지갑 페이지에서 넘어온 id 저장
-  const { accountId } = useParams();
+  const ExchangePage = () => {
+    const dispatch = useDispatch();
+    // 외화지갑 페이지에서 넘어온 id 저장
+    const { accountId } = useParams();
+    const [ exchangeRate, setExchangeRate ] = useState<number>(1);
 
   const { data: foreignDetailData, 
 		error: foreignDetailError, 
@@ -112,6 +122,35 @@ const ExchangePage = () => {
     loading: accountLoading, 
     status: accountStatus, 
     refetch: accountRefetch } = useAxios(`/account`, 'GET');
+  
+  const { data: exchangeRateData, 
+    error: exchangeRateError, 
+    loading: exchangeRateLoading, 
+    status: exchangeRateStatus, 
+    refetch: exchangeRateRefetch } = useAxios(`/exchange-rate/${foreignDetailData?.data?.currency}`, 'GET');
+  
+  useEffect(() => {
+    if (foreignDetailData) {
+      const fetchData = async () => {
+        try {
+          await Promise.all([
+            exchangeRateRefetch()
+          ]);
+        } catch (error) {
+          console.error('Error fetching data:', error);
+        }
+      };
+      fetchData();
+      // setExchangeRate(exchangeRateData?.data?.exchangeRate)
+    }
+  }, [foreignDetailData])
+
+  useEffect(() => {
+    if (exchangeRateData) {
+
+      setExchangeRate(exchangeRateData?.data?.exchangeRate)
+    }
+  }, [exchangeRateData])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -124,11 +163,8 @@ const ExchangePage = () => {
 			  console.error('Error fetching data:', error);
 			}
 		};
-    fetchData();
-  }, []);
-
-  useEffect(() => {
     dispatch(pageMove("pay"));
+    fetchData();
   }, []);
 
   const nation:string = "대한민국"
@@ -137,6 +173,7 @@ const ExchangePage = () => {
 
   const [ fromAmount, setFromAmount ] = useState<any>('0');
   const [ toAmount, setToAmount ] = useState<any>('0');
+  const [isInvalid, setIsInvalid] = useState(false);
 
   const fromOnChange = (e: React.FormEvent<HTMLInputElement>) => {
     const {
@@ -150,29 +187,40 @@ const ExchangePage = () => {
       currentTarget: { value },
     } = e;
     setToAmount(value);
+    // 100단위인지 확인 (100의 배수인지 확인)
+    const numericValue = Number(value);
+    if (numericValue % 100 !== 0) {
+      setIsInvalid(true);
+    } else {
+      setIsInvalid(false);
+    }
   };
 
   useEffect(() => {
-    if (fromAmount === '' || isNaN(fromAmount)) {
+    if (!Number(fromAmount)) {
       setFromAmount('0')
     } else {
       setFromAmount(Number(fromAmount))
     }
-    if (Number(fromAmount)*10 !== Number(toAmount)) {
-      setToAmount(Number(fromAmount)*10)
+    if (Math.floor(Number(fromAmount)/exchangeRate) !== Number(toAmount)) {
+      setToAmount(Math.floor(Number(fromAmount)/exchangeRate))
     }
   }, [fromAmount])
 
   useEffect(() => {
-    if (toAmount === '' || isNaN(toAmount)) {
+    if (!Number(toAmount)) {
       setToAmount('0')
     } else {
       setToAmount(Number(toAmount))
     }
-    if (Number(fromAmount)*10 !== Number(toAmount)) {
-      setFromAmount(Math.floor(Number(toAmount)/10))
+    if (Math.floor(Number(fromAmount)/exchangeRate) !== Number(toAmount)) {
+      setFromAmount(Math.floor(Number(toAmount)*exchangeRate))
     }
   }, [toAmount])
+
+  useEffect(() => {
+    console.log(exchangeRate)
+  }, [exchangeRate])
 
   // 환전 요청 바디
   const requestBody = {
@@ -242,8 +290,12 @@ const ExchangePage = () => {
       </s.TitleArea>
       <s.Caption>보유 {foreignDetailData?.data?.accountBalance} {foreignDetailData?.data?.currency}</s.Caption>
       <s.InputArea><s.ExchangeInput onChange={toOnChange} value={toAmount}/></s.InputArea>
+      {isInvalid && foreignDetailData?.data?.currency === "JPY" && (
+        <s.ErrorMessage>엔화는 100원 단위로만 환전 가능합니다.</s.ErrorMessage>
+      )}
         <s.BtnArea>
-          <s.PayBtn onClick={() => {exchangeRefetch()}}>충전하기</s.PayBtn>
+          <s.PayBtn 
+          onClick={() => {if (!isInvalid) {exchangeRefetch();}}} disabled={isInvalid}>충전하기</s.PayBtn>
         </s.BtnArea>
     </s.Container>
     </>
