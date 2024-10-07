@@ -33,33 +33,33 @@ const TravelCardDiv = styled.div`
   margin-top: -31px;
   z-index: 2;
 `;
-
 const MoneyDiv = styled.div`
   border-radius: 20px;
   background-color: white;
-  padding: 20px;
   display: flex;
   flex-direction: column;
+  padding: 20px;
 `;
 
 const MoneyCategoryDiv = styled.div`
   display: flex;
+  flex-direction: row;
   justify-content: space-between;
-  align-items: center;
 `;
 
-const MoneyCategoryP = styled.p`
-  color: #666666;
-  font-size: 14px;
-  font-weight: 600;
+const MoneyCategoryProgressDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  margin: 24px 0 8px 0;
 `;
 
-const MoneyChartBarContainer = styled.div`
-  width: 50%;
-  background-color: #e0e0e0;
-  height: 10px;
+const MoneyChartConsumpBar = styled.div<{ color: string }>`
+  width: 100%;
+  background-color: ${(props) => props.color};
   border-radius: 50px;
   overflow: hidden;
+  height: 12px;
 `;
 
 const MoneyChartBar = styled.div<{ paid: string; color: string }>`
@@ -68,6 +68,57 @@ const MoneyChartBar = styled.div<{ paid: string; color: string }>`
   width: ${(props) => props.paid || '0%'};
   border-radius: 50px;
 `;
+
+const MoneyCategoryP = styled.p`
+  color: #666666;
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0;
+  margin-left: 2px;
+`;
+
+const MoneyTitleDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+`;
+
+const MoneyComsumpP = styled.p<{ color: string }>`
+  font-size: 16px;
+  font-weight: 700;
+  color: ${(props) => props.color || '#666666'};
+  margin: 0px;
+  margin-left: 8px;
+`;
+
+const BudgetDiv = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-right: 2px;
+`;
+
+const MoneyBudgetP = styled.p<{ color: string }>`
+  margin: 0px;
+  font-size: 14px;
+  font-weight: 500;
+  color: ${(props) => props.color || '#666666'};
+`;
+
+const MoneyBudgetComsumpP = styled.p<{ color: string }>`
+  margin: 0px;
+  font-size: 14px;
+  font-weight: 600;
+  margin-right: 4px;
+  color: ${(props) => props.color || '#666666'};
+`;
+
+
+
+
+
+
+
+
+
 
 interface Budget {
   categoryId: number;
@@ -165,6 +216,26 @@ const SharedTravelDetailPage = () => {
     navigate('/feed'); // 확인 버튼을 누르면 /feed로 리다이렉트
   };
 
+  const hexToRgba = (hex:string, alpha:string) => {
+    // hex 코드에서 # 제거
+    const strippedHex = hex.replace('#', '');
+
+    // 16진수 값으로 변환
+    const r = parseInt(strippedHex.substring(0, 2), 16);
+    const g = parseInt(strippedHex.substring(2, 4), 16);
+    const b = parseInt(strippedHex.substring(4, 6), 16);
+
+    // rgba 문자열 생성
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  };
+  const rgbaToRgb = (rgb:string) => {
+    // hex 코드에서 # 제거
+    const strippedHex = rgb.split(',').slice(0,3);
+    
+        console.log(strippedHex.reduce((acc,item)=> acc + item,""))
+    // rgba 문자열 생성
+    return strippedHex.reduce((acc,item)=> acc + item,"");
+  };
   return (
     <>
       <BackHeader title={travel?.title || ''}></BackHeader>
@@ -191,28 +262,33 @@ const SharedTravelDetailPage = () => {
             />
           </TravelCardDiv>
           <MoneyDiv>
-            {travel?.budgets?.map((budget: Budget) => {
-              const expenditure = expenditureData.find(
-                (exp) => exp.categoryId === budget.categoryId
-              );
-             
-              const used = expenditure?.used || 0;
-              const percentageUsed = calculatePercentage(budget.budget, used);
+  {travel?.budgets?.map((budget: Budget, index: number) => {
+    const expenditure = expenditureData.find(
+      (exp) => exp.categoryId === budget.categoryId
+    );
+    const used = expenditure?.used || 0;
+    const percentageUsed = calculatePercentage(budget.budget, used);
 
-              return (
-                <MoneyCategoryDiv key={budget.categoryId}>
-                  <MoneyCategoryP>{budget.categoryName}</MoneyCategoryP>
-                  <MoneyCategoryP>{used} / {budget.budget} {travel.currency} / {percentageUsed}</MoneyCategoryP>
-                  <MoneyChartBarContainer>
-                    <MoneyChartBar
-                      paid={percentageUsed}
-                      color={percentageUsed === '100%' ? '#f56c6c' : '#67c23a'}
-                    />
-                  </MoneyChartBarContainer>
-                </MoneyCategoryDiv>
-              );
-            })}
-          </MoneyDiv>
+    return (
+      <div key={budget.categoryId}>
+        <MoneyCategoryProgressDiv>
+          <MoneyTitleDiv>
+            <MoneyCategoryP>{budget.categoryName}</MoneyCategoryP>
+            <MoneyComsumpP color="#00D5FF">{percentageUsed}</MoneyComsumpP>
+          </MoneyTitleDiv>
+          <BudgetDiv>
+            <MoneyBudgetComsumpP color='#00D5FF'>{used}</MoneyBudgetComsumpP>
+            <MoneyBudgetP color=''>{budget.budget} {travel.currency}</MoneyBudgetP>
+          </BudgetDiv>
+        </MoneyCategoryProgressDiv>
+        <MoneyChartConsumpBar color={rgbaToRgb(hexToRgba("#008DE7",percentageUsed))}>
+          <MoneyChartBar paid={percentageUsed} color={hexToRgba("#008DE7",percentageUsed)} />
+        </MoneyChartConsumpBar>
+      </div>
+    );
+  })}
+</MoneyDiv>
+
         </ContentDiv>
       </DetailDiv>
     </>
