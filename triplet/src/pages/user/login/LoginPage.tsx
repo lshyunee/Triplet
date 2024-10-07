@@ -10,6 +10,7 @@ import useInput from '../../../hooks/useInput';
 import ErrorModal from '../../../components/modal/ErrorModal';
 import CompleteModal from '../../../components/modal/CompleteModal';
 
+import { requestNotificationPermission } from '../../../firebaseNotification/firebase';
 const TitleP = styled.p`
     font-size : 32px;
     font-weight : 800;
@@ -154,8 +155,11 @@ const LoginPage = () => {
     // 로그인 상태 변경 시 처리
     useEffect(() => {
         if (loginStatus === 200) {
+            
             dispatch(loginSuccess());
+            requestNotificationPermission();
             navigate('/');
+
         }
     }, [loginStatus, dispatch, navigate]);
 

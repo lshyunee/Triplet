@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useNavigate } from 'react-router-dom';
 import { ReactComponent as USFlag } from '../../assets/pay/us.svg';
 import { ReactComponent as EUFlag } from '../../assets/pay/eu.svg';
 import { ReactComponent as JPFlag } from '../../assets/pay/jp.svg';
@@ -62,6 +63,7 @@ interface GlobalAccountProps {
   nation: String;
   foreignCurrency: number;
   isExchange: boolean;
+  accountId: number;
 };
 
 interface ExchangeProps {
@@ -70,7 +72,8 @@ interface ExchangeProps {
 
 
 const GlobalAccount = (props: GlobalAccountProps): JSX.Element => {
-  const { nation, foreignCurrency, isExchange } = props;
+  const { nation, foreignCurrency, isExchange, accountId } = props;
+  const navigate = useNavigate();
 
   return (
     <>
@@ -135,7 +138,9 @@ const GlobalAccount = (props: GlobalAccountProps): JSX.Element => {
             }
           }) ()}
         </s.CurrencyArea>
-        <s.ExchangeButton $isExchange={isExchange}>충전</s.ExchangeButton>
+        <s.ExchangeButton $isExchange={isExchange} onClick={() => {
+          navigate(`/pay/exchange/${accountId}`); // 해당 계좌 환전 페이지로 이동
+        }}>충전</s.ExchangeButton>
       </s.ButtonArea>
     </s.Containter>
     </>
