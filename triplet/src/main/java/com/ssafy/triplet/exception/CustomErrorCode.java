@@ -49,7 +49,8 @@ public enum CustomErrorCode {
     TRAVEL_BUDGET_NOT_FOUND("T0020", "카테고리 여행 예산을 찾을 수 없습니다.", HttpStatus.NOT_FOUND),
     ACCOUNT_PERMISSION_DENIED("A0031","계좌에 접근할 권한이 없습니다.",HttpStatus.FORBIDDEN),
     TOKEN_SAVE_FAIL("E0005","Device Token 저장에 실패했습니다.",HttpStatus.BAD_REQUEST),
-    DEVICE_TOKEN_NOT_FOUND("E0006","Device Token을 찾을 수 없습니다.",HttpStatus.NOT_FOUND);
+    DEVICE_TOKEN_NOT_FOUND("E0006","Device Token을 찾을 수 없습니다.",HttpStatus.NOT_FOUND),
+    INVALID_KIND_ERROR("T0021", "유효하지 않은 kind 값입니다.", HttpStatus.BAD_REQUEST);
     private final String code;
     private final String message;
     private final HttpStatus status;

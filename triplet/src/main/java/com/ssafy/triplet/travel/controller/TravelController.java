@@ -93,11 +93,8 @@ public class TravelController {
             }
 
             return ResponseEntity.ok(new ApiResponse<>("200", "완료된 여행이 조회되었습니다.", responseList));
-        } catch (CustomException customException) {
-            return ResponseEntity.badRequest().body(new ApiResponse<>(customException.getErrorCode(), customException.getMessage()));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>("E0000", "서버 에러가 발생했습니다: " + e.getMessage()));
+            return handleException(e);
         }
     }
 
