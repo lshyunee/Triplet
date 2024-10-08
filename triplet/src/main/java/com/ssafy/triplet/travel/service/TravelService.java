@@ -457,9 +457,7 @@ public class TravelService {
 
         for (TravelRequest.BudgetDTO budgetDTO : request.getBudgets()) {
             TravelBudget travelBudget;
-            if (!isNumeric(budgetDTO.getBudget()) || !isNumeric(budgetDTO.getBudgetWon())) {
-                throw new CustomException(CustomErrorCode.INVALID_BUDGET_INPUT);
-            }
+
             if (isUpdate) {
                 travelBudget = existingBudgets.stream()
                         .filter(budget -> budget.getCategory() != null &&
@@ -481,19 +479,6 @@ public class TravelService {
             travelBudgetRepository.save(travelBudget);
         }
     }
-
-    private boolean isNumeric(Object value) {
-        if (value instanceof Number) {
-            return true;
-        }
-        try {
-            Double.parseDouble(value.toString());
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
 
     // 응답 생성 메서드 (여행 생성, 여행 수정)
     private TravelResponse buildTravelResponse(Travel travel, String inviteCode) {
