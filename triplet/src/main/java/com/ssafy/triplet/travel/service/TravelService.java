@@ -10,6 +10,8 @@ import com.ssafy.triplet.account.repository.AccountRepository;
 import com.ssafy.triplet.account.service.AccountService;
 import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.exception.CustomException;
+import com.ssafy.triplet.exchange.entity.ExchangeRates;
+import com.ssafy.triplet.exchange.service.ExchangeRateService;
 import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
 import com.ssafy.triplet.travel.dto.request.TravelRequest;
@@ -79,6 +81,7 @@ public class TravelService {
     private final S3Service s3Service;
     private final InviteCodeGenerator inviteCodeGenerator;
     private final ElasticsearchService elasticsearchService;
+    private final ExchangeRateService exchangeRateService;
 
     @Transactional
     public TravelResponse createTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
@@ -296,6 +299,11 @@ public class TravelService {
                 handleMultiMemberTravel(balance, travelId, travel);
             }
         }
+        double usedBudgets = travelBudgetRepository.findTotalUsedBudgetByTravel(travel.getId());
+        travel.setTotalBudget(usedBudgets);
+        ExchangeRates exchangeRates = exchangeRateService.getExchangeRate(travel.getCountry().getCurrency());
+        double exchangeRate = Double.parseDouble(exchangeRates.getExchangeRate());
+        travel.setTotalBudgetWon(exchangeRate * usedBudgets);
         travelRepository.updateStatusByTravelId(travelId, true);
         travelWalletRepository.deleteByTravelId(travelId);
     }
