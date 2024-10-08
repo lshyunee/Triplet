@@ -1,6 +1,6 @@
 // service-worker.js
 
-const CACHE_NAME = 'my-app-cache';
+const CACHE_NAME = 'my-app-cache-v2';
 const urlsToCache = ['/', '/index.html', '/static/js/main.js'];
 
 // Install Event
