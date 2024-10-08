@@ -85,7 +85,7 @@ public class TravelService {
 
     @Transactional
     public TravelResponse createTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
-//        validateTravelRequest(request, userId, 0L);
+        validateTravelRequest(request, userId, 0L);
         String inviteCode = inviteCodeGenerator.generateInviteCode(request.getEndDate());
         Travel travel = buildTravel(userId, request, image, inviteCode);
         Travel savedTravel = travelRepository.save(travel);
@@ -107,7 +107,7 @@ public class TravelService {
         }
         if (!request.getEndDate().equals(travel.getEndDate())) {
             travel.setEndDate(request.getEndDate());
-//            inviteCodeGenerator.updateInviteCodeExpiry(travel.getInviteCode(), request.getEndDate());
+            inviteCodeGenerator.updateInviteCodeExpiry(travel.getInviteCode(), request.getEndDate());
         }
         travel.setStartDate(request.getStartDate());
         travel.setEndDate(request.getEndDate());
@@ -457,7 +457,9 @@ public class TravelService {
 
         for (TravelRequest.BudgetDTO budgetDTO : request.getBudgets()) {
             TravelBudget travelBudget;
-
+            if (!isNumeric(budgetDTO.getBudget()) || !isNumeric(budgetDTO.getBudgetWon())) {
+                throw new CustomException(CustomErrorCode.INVALID_BUDGET_INPUT);
+            }
             if (isUpdate) {
                 travelBudget = existingBudgets.stream()
                         .filter(budget -> budget.getCategory() != null &&
@@ -477,6 +479,18 @@ public class TravelService {
             travelBudget.setEightyBudget(budgetDTO.getBudget() * 0.8);
 
             travelBudgetRepository.save(travelBudget);
+        }
+    }
+
+    private boolean isNumeric(Object value) {
+        if (value instanceof Number) {
+            return true;
+        }
+        try {
+            Double.parseDouble(value.toString());
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
         }
     }
 

@@ -51,7 +51,8 @@ public enum CustomErrorCode {
     TOKEN_SAVE_FAIL("E0005","Device Token 저장에 실패했습니다.",HttpStatus.BAD_REQUEST),
     DEVICE_TOKEN_NOT_FOUND("E0006","Device Token을 찾을 수 없습니다.",HttpStatus.NOT_FOUND),
     INVALID_KIND_ERROR("T0021", "유효하지 않은 kind 값입니다.", HttpStatus.BAD_REQUEST),
-    ELASTICSEARCH_DOCUMENT_NOT_FOUND("T0022", "엘라스틱서치 인덱스에 해당 여행이 없습니다.", HttpStatus.NOT_FOUND);
+    ELASTICSEARCH_DOCUMENT_NOT_FOUND("T0022", "엘라스틱서치 인덱스에 해당 여행이 없습니다.", HttpStatus.NOT_FOUND),
+    INVALID_BUDGET_INPUT("T0023", "숫자만 입력할 수 있습니다.", HttpStatus.BAD_REQUEST);
     private final String code;
     private final String message;
     private final HttpStatus status;
