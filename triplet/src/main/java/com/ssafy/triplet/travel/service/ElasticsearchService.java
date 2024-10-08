@@ -70,7 +70,7 @@ public class ElasticsearchService {
     private BoolQuery.Builder buildCommonQuery(Long userId) {
         BoolQuery.Builder boolQueryBuilder = new BoolQuery.Builder();
 
-        List<String> userTravelIds = getUserTravelIds(userId); // 사용자의 travelId 목록을 가져오는 메서드
+        List<String> userTravelIds = getUserTravelIds(userId);
 
         List<FieldValue> userTravelIdFieldValues = userTravelIds.stream()
                 .map(Long::valueOf)
@@ -134,7 +134,7 @@ public class ElasticsearchService {
             // 사용자가 이미 다녀온 travelId 리스트
             List<String> userTravels = user.getTravels() != null ? user.getTravels() : new ArrayList<>();
 
-            // 사용자가 이미 다녀온 travel의 country_id 리스트 가져오기
+            // 사용자가 이미 다녀온 travel의 country_id 리스트
             List<String> visitedCountryIds = new ArrayList<>();
             if (!userTravels.isEmpty()) {
                 // travel 인덱스에서 사용자가 다녀온 여행지들 country_id 조회
@@ -190,8 +190,8 @@ public class ElasticsearchService {
                 if (!memberSearchHits.getSearchHits().isEmpty()) {
                     MemberDocument member = memberSearchHits.getSearchHits().get(0).getContent();
 
-                    // 나이가 같을 경우 +1
-                    if (age == member.getAge()) {
+                    // 나이 +1
+                    if  (member.getAge() >= ageLowerBound && member.getAge() <= ageUpperBound) {
                         travelScores.put(travelId, travelScores.getOrDefault(travelId, 0.0) + 1.0);
                     }
 
@@ -207,7 +207,6 @@ public class ElasticsearchService {
                 }
             });
 
-
             // 사용자가 이미 방문한 여행지는 낮은 점수
             if (!userTravels.isEmpty()) {
                 List<Long> userTravelIds = userTravels.stream()
@@ -219,12 +218,9 @@ public class ElasticsearchService {
 
             // 추천 점수 순으로 정렬
             List<Long> recommendedTravelIds = travelScores.entrySet().stream()
-                    .sorted(Map.Entry.<Long, Double>comparingByValue().reversed()) // 점수 높은 순으로 정렬
+                    .sorted(Map.Entry.<Long, Double>comparingByValue().reversed())
                     .map(Map.Entry::getKey)
                     .collect(Collectors.toList());
-
-            // 테스트 코드 (유사도 출력)
-            travelScores.forEach((travelId, score) -> System.out.println("Travel ID: " + travelId + ", 유사도 점수: " + score));
 
             // 추천된 여행지로 업데이트
             if (!recommendedTravelIds.isEmpty()) {
