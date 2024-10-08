@@ -35,7 +35,7 @@ public class ElasticsearchController {
                                                                               @RequestParam(required = false) Integer maxDays,
                                                                               @RequestParam(defaultValue = "0") int kind,
                                                                               @RequestParam(defaultValue = "1") int page) {
-//        try {
+        try {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             Page<TravelFeedListResponse> travelList = elasticsearchService.getTravelSNSList(userId, countryName, memberCount, minBudget, maxBudget, minDays, maxDays, page, kind, 10);
             TravelListPagedResponse pagedResponse = elasticsearchService.toPagedResponse(travelList);
@@ -43,9 +43,9 @@ public class ElasticsearchController {
                 return ResponseEntity.ok(new ApiResponse<>("200", "게시글이 없습니다."));
             }
             return ResponseEntity.ok(new ApiResponse<>("200", "게시글 리스트가 조회되었습니다.", pagedResponse));
-//        } catch (Exception e) {
-//            return handleException(e);
-//        }
+        } catch (Exception e) {
+            return handleException(e);
+        }
     }
 
 
