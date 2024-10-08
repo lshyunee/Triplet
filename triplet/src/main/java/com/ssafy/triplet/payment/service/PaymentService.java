@@ -6,7 +6,9 @@ import com.ssafy.triplet.account.repository.AccountRepository;
 import com.ssafy.triplet.account.repository.TransactionListRepository;
 import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.exception.CustomException;
+import com.ssafy.triplet.member.entity.Member;
 import com.ssafy.triplet.member.repository.MemberRepository;
+import com.ssafy.triplet.notification.service.FCMService;
 import com.ssafy.triplet.payment.dto.request.PaymentRequest;
 import com.ssafy.triplet.payment.dto.response.PaymentResponse;
 import com.ssafy.triplet.travel.entity.*;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class PaymentService {
     private final MemberRepository memberRepository;
     private final TravelMemberRepository travelMemberRepository;
 
+    private final FCMService fcmService;
 
     public Merchant getMerchantById(Long id) {
         return merchantRepository.findById(id).orElse(null);
@@ -101,19 +105,73 @@ public class PaymentService {
 
     private void updateBudgetUsageRate(TravelBudget travelBudget) {
 
+        String categoryName = travelBudget.getCategory().getCategoryName();
+        String messageFifty = getFiftyPercentMessage(categoryName);
+        String messageEighty = getEightyPercentMessage(categoryName);
+
         if (!travelBudget.isOverFifty() && travelBudget.getFiftyBudget() <= travelBudget.getUsedBudget()) {
             travelBudget.setOverFifty(true);
             // 50% 초과 푸시알림
-
+            webPush(travelBudget.getTravel().getId(), "여행 예산 알림 🔔", messageFifty);
         } else if (travelBudget.isOverFifty() && !travelBudget.isOverEight()) {
             if (travelBudget.getEightyBudget() <= travelBudget.getUsedBudget()) {
                 travelBudget.setOverEight(true);
                 // 80% 초과 푸시알림
-
+                webPush(travelBudget.getTravel().getId(), "여행 예산 알림🔔", messageEighty);
             }
         }
     }
 
+    private String getFiftyPercentMessage(String categoryName) {
+        switch (categoryName) {
+            case "식비":
+                return "식비의 50%가 사용됐네요! 식사가 좋았다면 여행을 공유하고 맛집 추천을 해주세요! 남은 여행도 즐겁게 보내요! 🍽️";
+            case "쇼핑":
+                return "쇼핑 예산의 절반을 썼어요! 멋진 아이템을 건졌나요? 이제 예산을 잘 관리해서 남은 여행도 즐겨보세요! 🛍️";
+            case "교통":
+                return "교통비의 50%를 썼습니다! 여행지를 이동할 때는 예산을 고려해 경로를 잘 계획해보세요! 🚗";
+            case "관광":
+                return "관광비의 절반을 사용했어요! 아직 가볼 곳이 많이 남았나요? 예산을 고려해 알차게 즐겨보세요! 🏰";
+            case "숙박":
+                return "숙박비의 50%가 사용됐습니다! 남은 일정 동안은 예산을 신중하게 사용해보세요! 🛏️";
+            case "기타":
+                return "기타 비용의 50%를 사용했어요! 남은 예산으로는 예상치 못한 지출을 잘 관리해봐요! 💡";
+            default:
+                return categoryName + "의 50%를 사용하셨습니다! 남은 여행도 즐겁게 보내세요!";
+        }
+    }
+
+    private String getEightyPercentMessage(String categoryName) {
+        switch (categoryName) {
+            case "식비":
+                return "헉! 식비의 80%가 사라졌어요! 이제 남은 예산은 20%뿐! 알뜰하게 마무리해봐요! 🍕";
+            case "쇼핑":
+                return "쇼핑 예산의 80%가 날아갔네요! 남은 예산은 20%! 조금 더 신중하게 쇼핑해봐요! 🛒";
+            case "교통":
+                return "교통비의 80%가 소진됐어요! 남은 예산으로 마지막 목적지도 잘 다녀오길 바라요! 🚌";
+            case "관광":
+                return "관광 예산의 80%가 소진됐어요! 이제 남은 예산은 20%! 계획을 다시 점검해보세요! 🎢";
+            case "숙박":
+                return "숙박 예산의 80%가 사라졌어요! 이제 남은 숙박 일정을 잘 관리해야겠어요! 🏨";
+            case "기타":
+                return "기타 비용의 80%가 소진됐습니다! 이제 남은 예산은 20%예요! 남은 일정도 잘 준비해봐요! 🔧";
+            default:
+                return categoryName + "의 80%를 사용하셨습니다! 남은 예산을 잘 관리하세요!";
+        }
+    }
+
+    private void webPush(Long travelId, String title, String message){
+        List<Member> travelMembers = travelMemberRepository.findMembersByTravelIdAndNotificationEnabled(travelId);
+        if(!travelMembers.isEmpty()){
+            for(Member member : travelMembers) {
+                fcmService.pushNotificationPay(member.getMemberId(),title,message);
+            }
+        }
+
+
+
+
+    }
     private void processTransaction(TravelWallet travelWallet, Merchant merchant, Double price) {
         updateAccountBalance(travelWallet, price);
         Category category = merchant.getCategory();
