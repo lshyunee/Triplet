@@ -289,7 +289,7 @@ useEffect(() => {
     <>
     <BackHeader title={travel?.title||""}></BackHeader>
     <DetailDiv>
-      <Img src={SampleImg}></Img>
+      <Img src={travel?.image||SampleImg}></Img>
       <Overlay />
       <ContentDiv>
           <TravelCardDiv>
@@ -317,7 +317,7 @@ useEffect(() => {
                     </MoneyTitleDiv>
                     <BudgetDiv>
                         <MoneyBudgetComsumpP color='#00D5FF'>{budgetDetails?.budgetList[0].usedBudget||0}</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[0].budgetWon||0}원</MoneyBudgetP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[0].budgetWon||0} {travel?.currency}</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar color={hexToRgba("#00D5FF","0.3")}>
@@ -334,7 +334,7 @@ useEffect(() => {
                     </MoneyTitleDiv>
                     <BudgetDiv>
                         <MoneyBudgetComsumpP color='#00C8FB'>{budgetDetails?.budgetList[1].usedBudget||0}</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[1].budgetWon||0}원</MoneyBudgetP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[1].budgetWon||0} {travel?.currency}</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar color={hexToRgba("#00C8FB","0.3")}>
@@ -351,7 +351,7 @@ useEffect(() => {
                     </MoneyTitleDiv>
                     <BudgetDiv>
                         <MoneyBudgetComsumpP color='#00B8F5'>{budgetDetails?.budgetList[2].usedBudget||0}</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[2].budgetWon||0}원</MoneyBudgetP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[2].budgetWon||0} {travel?.currency}</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar  color={hexToRgba("#00B8F5","0.3")}>
@@ -368,7 +368,7 @@ useEffect(() => {
                     </MoneyTitleDiv>
                     <BudgetDiv>
                         <MoneyBudgetComsumpP color='#00ACF1'>{budgetDetails?.budgetList[3].usedBudget||0}</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[3].budgetWon||0}원</MoneyBudgetP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[3].budgetWon||0} {travel?.currency}</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar  color={hexToRgba("#00ACF1","0.3")}>
@@ -385,7 +385,7 @@ useEffect(() => {
                     </MoneyTitleDiv>
                     <BudgetDiv>
                         <MoneyBudgetComsumpP color='#009BEB'>{budgetDetails?.budgetList[4].usedBudget||0}</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[4].budgetWon||0}원</MoneyBudgetP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[4].budgetWon||0} {travel?.currency}</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar color={hexToRgba("#009BEB","0.3")}>
@@ -402,7 +402,7 @@ useEffect(() => {
                     </MoneyTitleDiv>
                     <BudgetDiv>
                         <MoneyBudgetComsumpP color='#008DE7'>{budgetDetails?.budgetList[5].usedBudget||0}</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[5].budgetWon||0}원</MoneyBudgetP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[5].budgetWon||0} {travel?.currency}</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar color={hexToRgba("#008DE7","0.3")}>

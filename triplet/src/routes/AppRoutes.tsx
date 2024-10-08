@@ -19,7 +19,7 @@ import SimplePasswordSetConfirmPage from '../pages/user/simplePassword/SimplePas
 import AccountDetailPage from '../pages/pay/AccountDetailPage';
 import GlobalWalletPage from '../pages/pay/GlobalWalletPage';
 import ExchangePage from '../pages/pay/ExchangePage';
-import QRPage from '../pages/pay/QRPage';
+import QRPage from '../pages/pay/QRPageCopy';
 import QRPayPage from '../pages/pay/QRPayPage';
 import QRCompletePage from '../pages/pay/QRCompletePage';
 import CreateTravelPage from '../pages/travels/CreateTravelPage';
@@ -30,6 +30,7 @@ import MyInfoSetPage from '../pages/mypage/MyInfoSetPage';
 import FeedDetailPage from '../pages/feed/FeedDetailPage';
 import ForeignDetailPage from '../pages/pay/ForeignDetailPage';
 import RefundPage from '../pages/pay/RefundPage';
+import CreateQRPage from '../pages/pay/CreateQRPage';
 
 const AppRoutes: React.FC = () => (
         <Routes>
@@ -47,6 +48,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/pay/qr" element={<QRPage/>}/>
             <Route path="/pay/qr/payment" element={<QRPayPage/>}/>
             <Route path="/pay/qr/complete" element={<QRCompletePage/>}/>
+            <Route path="/qr/:merchantId" element={<CreateQRPage/>}/>
             <Route path="/pay/account-detail" element={<AccountDetailPage/>}/>
             <Route path="/pay/foreign-detail/:accountId" element={<ForeignDetailPage/>}/>
             <Route path="/pay/global-wallet" element={<GlobalWalletPage/>}/>

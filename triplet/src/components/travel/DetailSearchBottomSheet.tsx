@@ -11,8 +11,8 @@ import ErrorModal from "../modal/ErrorModal";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import useAxios from "../../hooks/useAxios";
-import { setFilter, setPages } from "../../features/travel/snsTravelFilterSlice";
-import { setFeedTravels } from "../../features/travel/snsTravelSlice";
+import { addFilter, setFilter, setPages } from "../../features/travel/snsTravelFilterSlice";
+import { setFeedTravels, initFeedTravels } from "../../features/travel/snsTravelSlice";
 
 // styled-components 정의
 const Overlay = styled.div`
@@ -244,37 +244,51 @@ const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }
 
   const { data : searchData, error : searchError, status : searchStatus,
     refetch : searchRefetch
-   } = useAxios("travels/shared", "GET",
+   } = useAxios("/travels/shared", "GET",
     {
       countryName : filter.countryName === '' ? null : filter.countryName,
       memberCount : person,
       minBudget : minBudget.value === '0' ? null : Number(minBudget.value),
       maxBudget : maxBudget.value === '0' ? null : Number(maxBudget.value),
-      minPeriod : minPeriod.value === '0' ? null : Number(minPeriod.value),
-      maxPeriod : maxPeriod.value === '0' ? null : Number(maxPeriod.value),
+      minDays : minPeriod.value === '0' ? null : Number(minPeriod.value),
+      maxDays : maxPeriod.value === '0' ? null : Number(maxPeriod.value),
       page : 1,
-      kind : filter.kind
+      kind : 2
     });
 
   const saveFilter = () => {
+    dispatch(initFeedTravels());
     searchRefetch();
   }
 
   useEffect(()=>{
 
     console.log(searchData);
+
+    console.log("Filter values before useAxios call:", {
+      countryName: filter.countryName === '' ? null : filter.countryName,
+      memberCount: person,
+      minBudget: minBudget.value === '0' ? null : Number(minBudget.value),
+      maxBudget: maxBudget.value === '0' ? null : Number(maxBudget.value),
+      minPeriod: minPeriod.value === '0' ? null : Number(minPeriod.value),
+      maxPeriod: maxPeriod.value === '0' ? null : Number(maxPeriod.value),
+      page: 1,
+      kind: 2
+    });
+    
     
     if(searchData && searchStatus === 200){
+      dispatch(initFeedTravels());
       dispatch(setFeedTravels(searchData.data.content));
       dispatch(setPages(searchData.data.pageNumber));
       dispatch(setFilter({
-        countryName : filter.countryName,
         memberCount : person,
         minBudget: Number(minBudget.value),
         maxBudget: Number(maxBudget.value),
         minDays: Number(minPeriod.value),
         maxDays: Number(maxPeriod.value)
       }))
+      dispatch(addFilter(2));
       onClose();
     }
 

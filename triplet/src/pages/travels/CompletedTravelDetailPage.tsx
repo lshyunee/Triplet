@@ -175,7 +175,7 @@ const CompletedTravelDetailPage = () => {
     const { data: budgetData, error: budgetError,
         status: budgetStatus, refetch: budgetRefetch
     } = useAxios(`/travels/expenditure-expenses/${id}`, "GET");
-    
+
     useEffect(()=> {
         travelRefetch();
     }, []);
@@ -238,7 +238,7 @@ const CompletedTravelDetailPage = () => {
         <>
             <BackHeader title={travel?.title || ""}></BackHeader>
             <DetailDiv>
-                <Img src={SampleImg}></Img>
+                <Img src={travel?.image||SampleImg}></Img>
                 <Overlay />
                 <ContentDiv>
                     <TravelCardDiv>
@@ -272,7 +272,7 @@ const CompletedTravelDetailPage = () => {
                                         <MoneyCategoryP>식사</MoneyCategoryP>
                                     </MoneyTitleDiv>
                                     <BudgetDiv>
-                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[0]?.used || 0}원</MoneyBudgetP>
+                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[0]?.used || 0} {travel?.currency}</MoneyBudgetP>
                                     </BudgetDiv>
                                 </MoneyCategoryProgressDiv>
                             </>
@@ -284,7 +284,7 @@ const CompletedTravelDetailPage = () => {
                                         <MoneyCategoryP>식사</MoneyCategoryP>
                                     </MoneyTitleDiv>
                                     <BudgetDiv>
-                                    <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[1]?.used || 0}원</MoneyBudgetP>
+                                    <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[1]?.used || 0} {travel?.currency}</MoneyBudgetP>
                                     </BudgetDiv>
                                 </MoneyCategoryProgressDiv>
                             </>
@@ -296,7 +296,7 @@ const CompletedTravelDetailPage = () => {
                                         <MoneyCategoryP>식사</MoneyCategoryP>
                                     </MoneyTitleDiv>
                                     <BudgetDiv>
-                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[2]?.used || 0}원</MoneyBudgetP>
+                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[2]?.used || 0} {travel?.currency}</MoneyBudgetP>
                                     </BudgetDiv>
                                 </MoneyCategoryProgressDiv>
                             </>
@@ -309,7 +309,7 @@ const CompletedTravelDetailPage = () => {
                                         <MoneyCategoryP>식사</MoneyCategoryP>
                                     </MoneyTitleDiv>
                                     <BudgetDiv>
-                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[3]?.used || 0}원</MoneyBudgetP>
+                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[3]?.used || 0} {travel?.currency}</MoneyBudgetP>
                                     </BudgetDiv>
                                 </MoneyCategoryProgressDiv>
                             </>
@@ -322,7 +322,7 @@ const CompletedTravelDetailPage = () => {
                                         <MoneyCategoryP>식사</MoneyCategoryP>
                                     </MoneyTitleDiv>
                                     <BudgetDiv>
-                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[4]?.used || 0}원</MoneyBudgetP>
+                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[4]?.used || 0} {travel?.currency}</MoneyBudgetP>
                                     </BudgetDiv>
                                 </MoneyCategoryProgressDiv>
                             </>
@@ -335,7 +335,7 @@ const CompletedTravelDetailPage = () => {
                                         <MoneyCategoryP>식사</MoneyCategoryP>
                                     </MoneyTitleDiv>
                                     <BudgetDiv>
-                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[5]?.used || 0}원</MoneyBudgetP>
+                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[5]?.used || 0} {travel?.currency}</MoneyBudgetP>
                                     </BudgetDiv>
                                 </MoneyCategoryProgressDiv>
                             </>

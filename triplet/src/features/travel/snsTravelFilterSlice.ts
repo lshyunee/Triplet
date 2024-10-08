@@ -18,12 +18,11 @@ const initialState : FilterState = {
     maxBudget : 0,
     minDays : 0,
     maxDays : 0,
-    page : 0,
+    page : 1,
     kind : 0
 }
 
 interface DetailFilter {
-    countryName : string,
     memberCount : number,
     minBudget : number,
     maxBudget : number,
@@ -36,21 +35,26 @@ const snsTravelFilterSlice = createSlice({
     initialState,
     reducers : {
         setFilter : (state, action : PayloadAction<DetailFilter>) => {
-            state.countryName = action.payload.countryName;
             state.memberCount = action.payload.memberCount;
             state.minBudget = action.payload.minBudget;
             state.maxBudget = action.payload.maxBudget;
             state.minDays = action.payload.minDays;
             state.maxDays = action.payload.maxDays;
         },
-        addFilter: (state, action : PayloadAction<FilterState>) => {
-            state.kind = action.payload.kind;
+        addFilter: (state, action : PayloadAction<number>) => {
+            state.kind = action.payload;
         },
         setPages :  (state, action: PayloadAction<number>) => {
             state.page = action.payload;
+        },
+        setCountry : (state, action: PayloadAction<string>) => {
+            state.countryName = action.payload;
+        },
+        initFilter : (state) => {
+            return initialState;
         }
     }
 })
 
-export const { setFilter, addFilter, setPages } = snsTravelFilterSlice.actions;
+export const { setFilter, addFilter, setPages, setCountry, initFilter } = snsTravelFilterSlice.actions;
 export default snsTravelFilterSlice.reducer;
