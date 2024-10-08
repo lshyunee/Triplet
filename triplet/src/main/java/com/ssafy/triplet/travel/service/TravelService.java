@@ -107,7 +107,7 @@ public class TravelService {
         }
         if (!request.getEndDate().equals(travel.getEndDate())) {
             travel.setEndDate(request.getEndDate());
-            inviteCodeGenerator.updateInviteCodeExpiry(travel.getInviteCode(), request.getEndDate());
+//            inviteCodeGenerator.updateInviteCodeExpiry(travel.getInviteCode(), request.getEndDate());
         }
         travel.setStartDate(request.getStartDate());
         travel.setEndDate(request.getEndDate());
