@@ -238,7 +238,7 @@ const CompletedTravelDetailPage = () => {
         <>
             <BackHeader title={travel?.title || ""}></BackHeader>
             <DetailDiv>
-                <Img src={SampleImg}></Img>
+                <Img src={travel?.image||SampleImg}></Img>
                 <Overlay />
                 <ContentDiv>
                     <TravelCardDiv>

@@ -138,7 +138,7 @@ const UpcomingTravelHomeCard = () => {
     return (
         <PositionDiv>
             <CardDiv>
-                <TravelImg src={SampleImg} alt="Travel" />
+                <TravelImg src={travelData?.image||SampleImg} alt="Travel" />
                 <Overlay />
                 <BottomOverlay /> {/* 하단 반투명 오버레이 추가 */}
                 <TitleP>고래상어보러가자</TitleP>

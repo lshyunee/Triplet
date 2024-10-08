@@ -136,7 +136,7 @@ const UpcomingTravelCard : React.FC<CompleteTravelCardProps> = ({travelId}) => {
   return (
   <StyledLink to={`/travels/upcoming/${travel}/detail`}>
       <CardDiv>
-        <TravelImg src={SampleImg} alt="Travel" />
+        <TravelImg src={travelData?.image||SampleImg} alt="Travel" />
         <Overlay />
         <BottomOverlay>
         <ContentDiv>
