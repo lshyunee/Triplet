@@ -46,24 +46,24 @@ public class ElasticsearchService {
 
     public Page<TravelFeedListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                          Integer minDays, Integer maxDays, int page, int kind, int pageSize) {
-//        try {
-        BoolQuery.Builder boolQueryBuilder = buildCommonQuery(userId);
+        try {
+            BoolQuery.Builder boolQueryBuilder = buildCommonQuery(userId);
 
-        if (kind == 0) {
-            recommendedTravel(boolQueryBuilder, userId);
-            return executeSearch(boolQueryBuilder, page, pageSize);
-        } else if (kind == 1) {
-            return latestTravel(userId, page, pageSize);
-        } else if (kind == 2) {
-            searchTravel(boolQueryBuilder, countryName, memberCount, minBudget, maxBudget, minDays, maxDays);
-            return executeSearch(boolQueryBuilder, page, pageSize);
-        } else {
-            throw new CustomException(CustomErrorCode.INVALID_KIND_ERROR);
+            if (kind == 0) {
+                recommendedTravel(boolQueryBuilder, userId);
+                return executeSearch(boolQueryBuilder, page, pageSize);
+            } else if (kind == 1) {
+                return latestTravel(userId, page, pageSize);
+            } else if (kind == 2) {
+                searchTravel(boolQueryBuilder, countryName, memberCount, minBudget, maxBudget, minDays, maxDays);
+                return executeSearch(boolQueryBuilder, page, pageSize);
+            } else {
+                throw new CustomException(CustomErrorCode.INVALID_KIND_ERROR);
+            }
+
+        } catch (Exception e) {
+            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
         }
-
-//        } catch (Exception e) {
-//            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
-//        }
     }
 
     // 빌드 메서드
@@ -191,7 +191,7 @@ public class ElasticsearchService {
                     MemberDocument member = memberSearchHits.getSearchHits().get(0).getContent();
 
                     // 나이 +1
-                    if  (member.getAge() >= ageLowerBound && member.getAge() <= ageUpperBound) {
+                    if (member.getAge() >= ageLowerBound && member.getAge() <= ageUpperBound) {
                         travelScores.put(travelId, travelScores.getOrDefault(travelId, 0.0) + 1.0);
                     }
 

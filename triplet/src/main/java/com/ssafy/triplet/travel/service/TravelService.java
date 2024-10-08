@@ -85,7 +85,7 @@ public class TravelService {
 
     @Transactional
     public TravelResponse createTravel(Long userId, TravelRequest request, MultipartFile image) throws IOException {
-        validateTravelRequest(request, userId, 0L);
+//        validateTravelRequest(request, userId, 0L);
         String inviteCode = inviteCodeGenerator.generateInviteCode(request.getEndDate());
         Travel travel = buildTravel(userId, request, image, inviteCode);
         Travel savedTravel = travelRepository.save(travel);
