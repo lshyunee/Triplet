@@ -74,6 +74,7 @@ const QRPage = () => {
                       }}
                     onError={handleError}
                     onScan={handleScan}
+                    facingMode={'environment'}
                 />
                 <s.QrScannerOverlayText>결제 QR코드를 스캔하세요</s.QrScannerOverlayText>
 			</s.Container>
