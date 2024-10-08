@@ -62,9 +62,9 @@ public class ElasticsearchService {
                 throw new CustomException(CustomErrorCode.INVALID_KIND_ERROR);
             }
 
-        } catch (Exception e) {
-            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
-        }
+//        } catch (Exception e) {
+//            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
+//        }
     }
 
     // 빌드 메서드
