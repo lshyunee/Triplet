@@ -19,7 +19,7 @@ const StyledDiv = styled.div`
     background-color: white;
     padding: 0 16px;
     position: fixed;
-    z-index: 2;
+    z-index: 1000;
 `;
 
 const StyledP = styled.p`

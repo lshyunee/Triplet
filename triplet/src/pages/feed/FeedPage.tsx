@@ -197,8 +197,8 @@ const FeedPage = () => {
             memberCount : filter.kind === 0 || filter.kind === 1 || filter.memberCount === 0 ? null : filter.memberCount,
             minBudget : filter.kind === 0 || filter.kind === 1 || filter.minBudget === 0 ? null : filter.minBudget,
             maxBudget : filter.kind === 0 || filter.kind === 1 || filter.maxBudget === 0 ? null : filter.maxBudget,
-            minPeriod : filter.kind === 0 || filter.kind === 1 || filter.minDays === 0 ? null : filter.minDays,
-            maxPeriod : filter.kind === 0 || filter.kind === 1 || filter.maxDays === 0 ? null : filter.maxDays,
+            minDays : filter.kind === 0 || filter.kind === 1 || filter.minDays === 0 ? null : filter.minDays,
+            maxDays : filter.kind === 0 || filter.kind === 1 || filter.maxDays === 0 ? null : filter.maxDays,
             page : page,
             kind : filter.kind
     });
@@ -209,7 +209,7 @@ const FeedPage = () => {
         minBudget : filter.kind === 0 || filter.kind === 1 || filter.minBudget === 0 ? null : filter.minBudget,
         maxBudget : filter.kind === 0 || filter.kind === 1 || filter.maxBudget === 0 ? null : filter.maxBudget,
         minPeriod : filter.kind === 0 || filter.kind === 1 || filter.minDays === 0 ? null : filter.minDays,
-        maxPeriod : filter.kind === 0 || filter.kind === 1 || filter.maxDays === 0 ? null : filter.maxDays,
+        maxDays : filter.kind === 0 || filter.kind === 1 || filter.maxDays === 0 ? null : filter.maxDays,
         page : page,
         kind : filter.kind
       });
