@@ -46,7 +46,7 @@ const QRPage: React.FC = () => {
                 const lastPart = result.getText().split('/').pop(); // 마지막 숫자 부분 추출
                 if (lastPart) {
                     setIsScanning(true); // 스캔 중으로 설정하여 중복 방지
-                    navigate(`/pay/qr/payment/${lastPart}`,{ replace: true });
+                    navigate(`/pay/qr/payment/${lastPart}`, { replace: true });
                 }
             }
         },
@@ -74,9 +74,21 @@ const QRPage: React.FC = () => {
         }
     }, [isScanning]);
 
+    // 컴포넌트가 언마운트될 때 카메라 스트림을 중지하는 코드 추가
+    useEffect(() => {
+        return () => {
+            const videoElement = ref.current as HTMLVideoElement | null;
+            if (videoElement && videoElement.srcObject) {
+                const stream = videoElement.srcObject as MediaStream;
+                stream.getTracks().forEach((track) => track.stop()); // 모든 트랙을 정지시킴
+                videoElement.srcObject = null;
+            }
+        };
+    }, [ref]);
+
     return (
         <>
-            <BackHeader title='결제' />
+            <BackHeader title="결제" />
             <s.Container>
                 <video ref={ref} style={{ width: '100%', height: '100%', objectFit: 'cover', zIndex: 5 }} />
                 <s.QrScannerOverlayText>결제 QR코드를 스캔하세요</s.QrScannerOverlayText>
