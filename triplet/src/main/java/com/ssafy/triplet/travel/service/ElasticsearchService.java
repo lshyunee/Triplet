@@ -48,6 +48,7 @@ public class ElasticsearchService {
                                                          Integer minDays, Integer maxDays, int page, int kind, int pageSize) {
 //        try {
         BoolQuery.Builder boolQueryBuilder = buildCommonQuery(userId);
+        System.out.println("들어오나요? kind : " + kind);
 
         if (kind == 0) {
             recommendedTravel(boolQueryBuilder, userId);
@@ -223,6 +224,9 @@ public class ElasticsearchService {
     // kind = 2 (검색)
     private void searchTravel(BoolQuery.Builder boolQueryBuilder, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                               Integer minDays, Integer maxDays) {
+        System.out.println("들어왔나요??????????????????" + countryName);
+        System.out.println(memberCount);
+        System.out.println(minBudget);
         if (countryName != null && !countryName.isEmpty()) {
             boolQueryBuilder.must(Query.of(q -> q.fuzzy(f -> f.field("country_name").value(countryName).fuzziness("AUTO"))));
         }
