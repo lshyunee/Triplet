@@ -5,6 +5,7 @@ import { pageMove } from '../../features/navigation/naviSlice';
 import BackHeader from '../../components/header/BackHeader';
 import { useZxing } from 'react-zxing';
 import { useNavigate } from 'react-router-dom';
+
 const s = {
     Container: styled.div`
         z-index: -1;
@@ -35,35 +36,43 @@ const s = {
 
 const QRPage: React.FC = () => {
     const dispatch = useDispatch();
-    const [qrData, setQrData] = useState<string | null>(null); // QR 데이터
-
     const navigate = useNavigate();
+
+    const [isScanning, setIsScanning] = useState(false); // 스캔 중인지 여부 상태 관리
+
     const { ref } = useZxing({
         onDecodeResult(result) {
-
-            if(result.getText()){
+            if (!isScanning) {
                 const lastPart = result.getText().split('/').pop(); // 마지막 숫자 부분 추출
                 if (lastPart) {
-                    navigate(`/pay/qr/payment/${lastPart}`)
+                    setIsScanning(true); // 스캔 중으로 설정하여 중복 방지
+                    navigate(`/pay/qr/payment/${lastPart}`,{ replace: true });
                 }
             }
         },
         onDecodeError(err) {
-            console.error(err);
+            console.error('QR 인식 오류:', err);
         },
-        timeBetweenDecodingAttempts: 5000,  // 인식 시도 간격을 500ms로 조정
+        timeBetweenDecodingAttempts: 500,  // 인식 시도 간격을 500ms로 조정
         constraints: {
             video: {
-              facingMode: 'environment',  // 후면 카메라 사용
-              width: { ideal: 1280 },
-              height: { ideal: 720 }
+                facingMode: 'environment',  // 후면 카메라 사용
+                width: { ideal: 1280 },
+                height: { ideal: 720 }
             }
-          }
+        }
     });
 
+    // QR 코드를 인식한 후 2초 후에 다시 스캔 가능하도록 설정 (예시)
     useEffect(() => {
-        dispatch(pageMove("pay"));
-    }, [dispatch]);
+        if (isScanning) {
+            const timeout = setTimeout(() => {
+                setIsScanning(false);
+            }, 2000); // 2초 후 스캔 가능하게 변경
+
+            return () => clearTimeout(timeout);
+        }
+    }, [isScanning]);
 
     return (
         <>
@@ -72,7 +81,6 @@ const QRPage: React.FC = () => {
                 <video ref={ref} style={{ width: '100%', height: '100%', objectFit: 'cover', zIndex: 5 }} />
                 <s.QrScannerOverlayText>결제 QR코드를 스캔하세요</s.QrScannerOverlayText>
             </s.Container>
-            {qrData && <div>스캔 결과: {qrData}</div>}
         </>
     );
 };
