@@ -50,8 +50,11 @@ const snsTravelFilterSlice = createSlice({
         setCountry : (state, action: PayloadAction<string>) => {
             state.countryName = action.payload;
         },
+        initFilter : (state) => {
+            return initialState;
+        }
     }
 })
 
-export const { setFilter, addFilter, setPages, setCountry } = snsTravelFilterSlice.actions;
+export const { setFilter, addFilter, setPages, setCountry, initFilter } = snsTravelFilterSlice.actions;
 export default snsTravelFilterSlice.reducer;

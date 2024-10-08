@@ -16,7 +16,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { initFeedTravels, addFeedTravels } from '../../features/travel/snsTravelSlice';
 import useIntersectionObserver from '../../hooks/useIntersectionObserver';
-import { addFilter, setCountry, setFilter } from '../../features/travel/snsTravelFilterSlice';
+import { addFilter, setCountry, setFilter, initFilter  } from '../../features/travel/snsTravelFilterSlice';
 
 const FeedDiv = styled.div`
     background-color : #F3F4F6;
@@ -142,14 +142,14 @@ const DropdownMenu = styled.ul<{ isOpen: boolean }>`
 `;
 
 
-const DropdownItem = styled.li<{ disabled? : boolean }>`
+const DropdownItem = styled.li`
     padding: 10px;
-    cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')}; 
-    background-color: ${({ disabled }) => (disabled ? '#e0e0e0' : 'white')};
-    color: ${({ disabled }) => (disabled ? 'black' : '#0082D4')}; 
+    cursor: 'pointer';
+    background-color: 'white';
+    color:'#0082D4';
 
     &:hover {
-        background-color: ${({ disabled }) => (disabled ? '#e0e0e0' : '#f0f0f0')}; 
+        background-color: '#f0f0f0';
     }
 `;
 
@@ -186,7 +186,6 @@ const FeedPage = () => {
 
     const [page, setPage] = useState<number>(1);
     const [hasMore, setHasMore] = useState<boolean>(true);
-    const [ isCountry, setIsCountry ] = useState(true);
 
     const countryName = useInput();
 
@@ -194,21 +193,32 @@ const FeedPage = () => {
         loading : searchLoading, refetch : searchRefetch
        } = useAxios("/travels/shared", "GET",
         {
-          countryName : filter.countryName === '' ? null : filter.countryName,
-          memberCount : filter.memberCount,
-          minBudget : filter.minBudget === 0 ? null : filter.minBudget,
-          maxBudget : filter.maxBudget === 0 ? null : filter.maxBudget,
-          minPeriod : filter.minDays === 0 ? null : filter.minDays,
-          maxPeriod : filter.maxDays === 0 ? null : filter.maxDays,
-          page : page,
-          kind : filter.kind
+            countryName : filter.kind === 0 || filter.kind === 1 || filter.countryName === '' ? null : filter.countryName,
+            memberCount : filter.kind === 0 || filter.kind === 1 || filter.memberCount === 0 ? null : filter.memberCount,
+            minBudget : filter.kind === 0 || filter.kind === 1 || filter.minBudget === 0 ? null : filter.minBudget,
+            maxBudget : filter.kind === 0 || filter.kind === 1 || filter.maxBudget === 0 ? null : filter.maxBudget,
+            minPeriod : filter.kind === 0 || filter.kind === 1 || filter.minDays === 0 ? null : filter.minDays,
+            maxPeriod : filter.kind === 0 || filter.kind === 1 || filter.maxDays === 0 ? null : filter.maxDays,
+            page : page,
+            kind : filter.kind
     });
+
+    console.log({
+        countryName : filter.kind === 0 || filter.kind === 1 || filter.countryName === '' ? null : filter.countryName,
+        memberCount : filter.kind === 0 || filter.kind === 1 || filter.memberCount === 0 ? null : filter.memberCount,
+        minBudget : filter.kind === 0 || filter.kind === 1 || filter.minBudget === 0 ? null : filter.minBudget,
+        maxBudget : filter.kind === 0 || filter.kind === 1 || filter.maxBudget === 0 ? null : filter.maxBudget,
+        minPeriod : filter.kind === 0 || filter.kind === 1 || filter.minDays === 0 ? null : filter.minDays,
+        maxPeriod : filter.kind === 0 || filter.kind === 1 || filter.maxDays === 0 ? null : filter.maxDays,
+        page : page,
+        kind : filter.kind
+      });
 
     useEffect(() => {
         dispatch(pageMove("feed"));
         dispatch(initFeedTravels());
-        dispatch(addFilter(0));
-        dispatch(setCountry(''));
+        dispatch(initFilter());
+        searchRefetch();
     }, [])
 
 
@@ -227,10 +237,9 @@ const FeedPage = () => {
         dispatch(initFeedTravels());
         
         if(filter.countryName !== ''){
+            console.log("refetch?");
             searchRefetch();
-            setIsCountry(false);
         }else {
-            setIsCountry(true);
             dispatch(addFilter(0));
         }
 
@@ -241,7 +250,8 @@ const FeedPage = () => {
     };
 
     useEffect(()=>{
-        if(!searchLoading && filter.kind !== undefined){
+        if(!searchLoading){
+            console.log("kind 바뀜", filter.kind);
             dispatch(initFeedTravels());
             searchRefetch();
         }
@@ -271,11 +281,8 @@ const FeedPage = () => {
     }, [dropdownRef]);
 
     useEffect(() => {
-    }, [isDropdownOpen]);
-
-
-    useEffect(() => {
         if (hasMore && !searchLoading) {
+            console.log("refetch?");
             searchRefetch();
         }
     }, [page, hasMore]);
@@ -331,9 +338,9 @@ const FeedPage = () => {
                         <ArrowDown onClick={toggleDropdown}/>
                         
                         <DropdownMenu isOpen={isDropdownOpen}>
-                            <DropdownItem onClick={() => handleSortOptionSelect('추천순')} disabled={false}>추천순</DropdownItem>
-                            <DropdownItem onClick={() => handleSortOptionSelect('최신순')} disabled={false}>최신순</DropdownItem>
-                            <DropdownItem onClick={() => !isCountry && handleSortOptionSelect('정확도순')} disabled={isCountry}>정확도순</DropdownItem>
+                            <DropdownItem onClick={() => handleSortOptionSelect('추천순')}>추천순</DropdownItem>
+                            <DropdownItem onClick={() => handleSortOptionSelect('최신순')}>최신순</DropdownItem>
+                            <DropdownItem onClick={() => handleSortOptionSelect('정확도순')}>정확도순</DropdownItem>
                         </DropdownMenu>
                     </FilterDownDiv>
                     <FilterDownDiv>

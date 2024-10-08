@@ -11,7 +11,7 @@ import ErrorModal from "../modal/ErrorModal";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import useAxios from "../../hooks/useAxios";
-import { setFilter, setPages } from "../../features/travel/snsTravelFilterSlice";
+import { addFilter, setFilter, setPages } from "../../features/travel/snsTravelFilterSlice";
 import { setFeedTravels, initFeedTravels } from "../../features/travel/snsTravelSlice";
 
 // styled-components 정의
@@ -253,7 +253,7 @@ const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }
       minPeriod : minPeriod.value === '0' ? null : Number(minPeriod.value),
       maxPeriod : maxPeriod.value === '0' ? null : Number(maxPeriod.value),
       page : 1,
-      kind : filter.kind
+      kind : 2
     });
 
   const saveFilter = () => {
@@ -275,6 +275,7 @@ const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }
         minDays: Number(minPeriod.value),
         maxDays: Number(maxPeriod.value)
       }))
+      dispatch(addFilter(2));
       onClose();
     }
 
