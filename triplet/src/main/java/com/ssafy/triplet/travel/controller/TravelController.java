@@ -126,14 +126,14 @@ public class TravelController {
 
     @PostMapping("/share")
     public ResponseEntity<ApiResponse<TravelResponse>> shareTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
-                                                                   @RequestBody TravelShareRequest requestDTO) {
-        try {
+                                                                   @RequestBody TravelShareRequest requestDTO) throws IOException {
+//        try {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             travelService.postTravel(userId, requestDTO);
             return ResponseEntity.ok(new ApiResponse<>("200", "여행 공유 상태가 변경되었습니다."));
-        } catch (Exception e) {
-            return handleException(e);
-        }
+//        } catch (Exception e) {
+//            return handleException(e);
+//        }
     }
 
     @PostMapping("/invite/{inviteCode}")

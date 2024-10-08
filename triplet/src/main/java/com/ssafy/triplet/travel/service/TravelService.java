@@ -212,7 +212,6 @@ public class TravelService {
     public void postTravel(Long userId, TravelShareRequest request) throws IOException {
         Travel travel = travelRepository.findById(request.getTravelId())
                 .orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
-        TravelWallet travelWallet = travelWalletRepository.findByTravelId(travel);
 
         if (!travel.isStatus()) {
             throw new CustomException(CustomErrorCode.TRAVEL_NOT_COMPLETED);
@@ -229,15 +228,12 @@ public class TravelService {
             travel.setShared(true);
             if (request.getShareStatus() == 1) {
                 travel.setShareStatus(true);
-                travelWallet.setShare(true);
             } else {
                 travel.setShareStatus(false);
-                travelWallet.setShare(false);
             }
         } else {
             travel.setShared(false);
             travel.setShareStatus(false);
-            travelWallet.setShare(false);
         }
         travelRepository.save(travel);
         elasticsearchService.updateTravelInElasticsearch(travel);
