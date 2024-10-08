@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store";
 import useAxios from "../../hooks/useAxios";
 import { setFilter, setPages } from "../../features/travel/snsTravelFilterSlice";
-import { setFeedTravels } from "../../features/travel/snsTravelSlice";
+import { setFeedTravels, initFeedTravels } from "../../features/travel/snsTravelSlice";
 
 // styled-components 정의
 const Overlay = styled.div`
@@ -244,7 +244,7 @@ const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }
 
   const { data : searchData, error : searchError, status : searchStatus,
     refetch : searchRefetch
-   } = useAxios("travels/shared", "GET",
+   } = useAxios("/travels/shared", "GET",
     {
       countryName : filter.countryName === '' ? null : filter.countryName,
       memberCount : person,
@@ -265,10 +265,10 @@ const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }
     console.log(searchData);
     
     if(searchData && searchStatus === 200){
+      dispatch(initFeedTravels());
       dispatch(setFeedTravels(searchData.data.content));
       dispatch(setPages(searchData.data.pageNumber));
       dispatch(setFilter({
-        countryName : filter.countryName,
         memberCount : person,
         minBudget: Number(minBudget.value),
         maxBudget: Number(maxBudget.value),

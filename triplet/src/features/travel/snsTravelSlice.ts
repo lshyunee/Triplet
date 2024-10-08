@@ -33,15 +33,22 @@ const snsTravelSlice = createSlice({
         ) => {
             state.travelData = action.payload;
         },
-        addFeedTravels: (state, action : PayloadAction<TravelState[]>) => {
+        addFeedTravels: (state, action: PayloadAction<TravelState[]>) => {
             if (!action.payload) {
                 return;
-              }
+            }
             
-            state.travelData = [...state.travelData, ...action.payload];
+            const newData = action.payload.filter(
+                newTravel => !state.travelData.some(existingTravel => existingTravel.id === newTravel.id)
+            );
+
+            state.travelData = [...state.travelData, ...newData];
         },
+        initFeedTravels: (state) => {
+            state.travelData = []; 
+        }
     },
 });
 
-export const { setFeedTravels, addFeedTravels } = snsTravelSlice.actions;
+export const { setFeedTravels, addFeedTravels, initFeedTravels } = snsTravelSlice.actions;
 export default snsTravelSlice.reducer;

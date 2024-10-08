@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import Header from '../../components/header/Header';
 import { useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
@@ -14,8 +14,9 @@ import SnsTravelCardMini from '../../components/travel/SnsTravelCardMini';
 import DetailSearchBottomSheet from '../../components/travel/DetailSearchBottomSheet';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
-import { addFeedTravels } from '../../features/travel/snsTravelSlice';
+import { initFeedTravels, addFeedTravels } from '../../features/travel/snsTravelSlice';
 import useIntersectionObserver from '../../hooks/useIntersectionObserver';
+import { addFilter, setCountry, setFilter } from '../../features/travel/snsTravelFilterSlice';
 
 const FeedDiv = styled.div`
     background-color : #F3F4F6;
@@ -42,10 +43,10 @@ const TitleExplainP = styled.p`
 `;
 
 const SearchDiv = styled.p`
-    margin-top:40px;
     position: relative;
     display: flex;
     align-items: center;
+    margin-top : 40px;
 `
 
 const SearchWrapper = styled.div`
@@ -78,23 +79,16 @@ const SearchInput = styled.input`
 `
 
 const FilterDiv = styled.div`
-    margin-top : 12px;
     display : flex;
     justify-content : space-between;
 `;
 
-const FilterDownDiv = styled.div`
-    display : flex;
-    flex-direction : row;
-    text-align : center;
-    align-items : center;
-    gap : 4px;
-`
 
 const FilterP = styled.p`
     font-size : 14px;
     font-weight : 500;
     color : #008DE7;
+    margin-left : 10px;
 `;
 
 const FilterBtn = styled.button`
@@ -115,6 +109,50 @@ const FilterBtn = styled.button`
     }
 `;
 
+const FilterDownDiv = styled.div`
+    display: flex;
+    flex-direction: row;
+    text-align: center;
+    align-items: center;
+    gap: 4px;
+    margin-right : 10px;
+    position: relative; /* 추가: DropdownMenu의 absolute 위치를 위한 부모 기준 */
+`;
+
+const DropdownMenu = styled.ul<{ isOpen: boolean }>`
+    display: block;
+    position: absolute;
+    background-color: white;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    z-index: 100;
+    width: 70px;
+    border-radius: 5px;
+    top: 35px;
+    color : #0082D4;
+    border-radius : 0 0 10px 10px;
+    font-size : 14px;
+    font-weight : 600;
+
+    max-height: ${({ isOpen }) => (isOpen ? '200px' : '0')};
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out; 
+`;
+
+
+const DropdownItem = styled.li<{ disabled? : boolean }>`
+    padding: 10px;
+    cursor: ${({ disabled }) => (disabled ? 'not-allowed' : 'pointer')}; 
+    background-color: ${({ disabled }) => (disabled ? '#e0e0e0' : 'white')};
+    color: ${({ disabled }) => (disabled ? 'black' : '#0082D4')}; 
+
+    &:hover {
+        background-color: ${({ disabled }) => (disabled ? '#e0e0e0' : '#f0f0f0')}; 
+    }
+`;
+
 const TravelDiv = styled.div`
     margin-top: 12px;
     display: grid;
@@ -126,24 +164,35 @@ const TravelDiv = styled.div`
     height: auto; /* 부모의 높이에 맞게 자동으로 크기 설정 */
 `;
 
+const SearchP = styled.p`
+    color : #008DE7;
+    font-size : 18px;
+    font-weight : 600;
+    margin : 15px 0 0 0;
+`;
 
 const FeedPage = () => {
 
     const dispatch = useDispatch();
     const selector = useSelector;
+
     const filter = selector((state : RootState) => state.filterTravel);
     const travels = selector((state : RootState) => state.snsTravel);
 
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [selectedSortOption, setSelectedSortOption] = useState('추천순');
+
+    const dropdownRef = useRef<HTMLDivElement | null>(null);
+
     const [page, setPage] = useState<number>(1);
     const [hasMore, setHasMore] = useState<boolean>(true);
+    const [ isCountry, setIsCountry ] = useState(true);
 
-    useEffect(() => {
-        dispatch(pageMove("feed"));
-    }, [])
+    const countryName = useInput();
 
     const { data : searchData, error : searchError, status : searchStatus,
         loading : searchLoading, refetch : searchRefetch
-       } = useAxios("travels/shared", "GET",
+       } = useAxios("/travels/shared", "GET",
         {
           countryName : filter.countryName === '' ? null : filter.countryName,
           memberCount : filter.memberCount,
@@ -154,6 +203,76 @@ const FeedPage = () => {
           page : page,
           kind : filter.kind
     });
+
+    useEffect(() => {
+        dispatch(pageMove("feed"));
+        dispatch(initFeedTravels());
+        dispatch(addFilter(0));
+        dispatch(setCountry(''));
+    }, [])
+
+
+    const submitSearch = (event : React.KeyboardEvent<HTMLInputElement>) => {
+        if (event.key === 'Enter') {
+            dispatch(initFeedTravels());
+            dispatch(setCountry(countryName.value));
+            dispatch(addFilter(2));
+            setSelectedSortOption('정확도순');
+        }
+    }
+
+    useEffect(() => {
+        
+        console.log("filter", filter);
+        dispatch(initFeedTravels());
+        
+        if(filter.countryName !== ''){
+            searchRefetch();
+            setIsCountry(false);
+        }else {
+            setIsCountry(true);
+            dispatch(addFilter(0));
+        }
+
+    },[filter.countryName]);
+
+    const toggleDropdown = () => {
+        setIsDropdownOpen(!isDropdownOpen);
+    };
+
+    useEffect(()=>{
+        if(!searchLoading && filter.kind !== undefined){
+            dispatch(initFeedTravels());
+            searchRefetch();
+        }
+    }, [filter.kind])
+
+    const handleSortOptionSelect = (option: string) => {
+        setSelectedSortOption(option);
+        
+        let kind = option === '추천순' ? 0 : 1;
+
+        dispatch(addFilter(kind));
+        setIsDropdownOpen(false);
+
+    };
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false); 
+            }
+        };
+        
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [dropdownRef]);
+
+    useEffect(() => {
+    }, [isDropdownOpen]);
+
 
     useEffect(() => {
         if (hasMore && !searchLoading) {
@@ -203,12 +322,19 @@ const FeedPage = () => {
                     <SearchWrapper>
                         <Search/>                        
                     </SearchWrapper>
-                    <SearchInput placeholder='여행지를 입력하세요.'></SearchInput>
+                    <SearchInput type="text" value={countryName.value} onChange={countryName.onChange} 
+                    onKeyDown={submitSearch} placeholder='여행지를 입력하세요.'></SearchInput>
                 </SearchDiv>
                 <FilterDiv>
-                    <FilterDownDiv>
-                        <FilterP>추천순</FilterP>
-                        <ArrowDown/>
+                    <FilterDownDiv ref={dropdownRef}>
+                        <FilterP onClick={toggleDropdown}>{selectedSortOption}</FilterP>
+                        <ArrowDown onClick={toggleDropdown}/>
+                        
+                        <DropdownMenu isOpen={isDropdownOpen}>
+                            <DropdownItem onClick={() => handleSortOptionSelect('추천순')} disabled={false}>추천순</DropdownItem>
+                            <DropdownItem onClick={() => handleSortOptionSelect('최신순')} disabled={false}>최신순</DropdownItem>
+                            <DropdownItem onClick={() => !isCountry && handleSortOptionSelect('정확도순')} disabled={isCountry}>정확도순</DropdownItem>
+                        </DropdownMenu>
                     </FilterDownDiv>
                     <FilterDownDiv>
                         <FilterBtn onClick={() => setIsBottomSheetOpen(true)}>
@@ -222,7 +348,7 @@ const FeedPage = () => {
                 <TravelDiv>
                     {travels?.travelData.map((travel, index) => (
                         <SnsTravelCardMini
-                            key={travel.id}
+                            key={travel.id || index}  // id가 없거나 중복될 경우 index 사용
                             title={travel.title}
                             days={travel.days}
                             totalBudgetWon={travel.totalBudgetWon}
