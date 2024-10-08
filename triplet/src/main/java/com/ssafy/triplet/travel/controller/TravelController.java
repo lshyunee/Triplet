@@ -32,13 +32,13 @@ public class TravelController {
             @AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
             @RequestPart("data") TravelRequest requestDTO,
             @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
-        try {
+//        try {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             TravelResponse responseDTO = travelService.createTravel(userId, requestDTO, image);
             return ResponseEntity.ok(new ApiResponse<>("200", "여행이 생성되었습니다.", responseDTO));
-        } catch (Exception e) {
-            return handleException(e);
-        }
+//        } catch (Exception e) {
+//            return handleException(e);
+//        }
     }
 
     @PutMapping("/update")
@@ -127,13 +127,13 @@ public class TravelController {
     @PostMapping("/share")
     public ResponseEntity<ApiResponse<TravelResponse>> shareTravel(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
                                                                    @RequestBody TravelShareRequest requestDTO) throws IOException {
-//        try {
+        try {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             travelService.postTravel(userId, requestDTO);
             return ResponseEntity.ok(new ApiResponse<>("200", "여행 공유 상태가 변경되었습니다."));
-//        } catch (Exception e) {
-//            return handleException(e);
-//        }
+        } catch (Exception e) {
+            return handleException(e);
+        }
     }
 
     @PostMapping("/invite/{inviteCode}")
