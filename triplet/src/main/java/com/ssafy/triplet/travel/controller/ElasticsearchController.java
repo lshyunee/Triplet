@@ -39,6 +39,7 @@ public class ElasticsearchController {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             Page<TravelFeedListResponse> travelList = elasticsearchService.getTravelSNSList(userId, countryName, memberCount, minBudget, maxBudget, minDays, maxDays, page, kind, 10);
             TravelListPagedResponse pagedResponse = elasticsearchService.toPagedResponse(travelList);
+        System.out.println("들어오나요?controller");
             if (travelList.isEmpty()) {
                 return ResponseEntity.ok(new ApiResponse<>("200", "게시글이 없습니다."));
             }
