@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
 import BackHeader from '../../components/header/BackHeader';
 import { useZxing } from 'react-zxing';
-
+import { useNavigate } from 'react-router-dom';
 const s = {
     Container: styled.div`
         z-index: -1;
@@ -37,9 +37,16 @@ const QRPage: React.FC = () => {
     const dispatch = useDispatch();
     const [qrData, setQrData] = useState<string | null>(null); // QR 데이터
 
+    const navigate = useNavigate();
     const { ref } = useZxing({
         onDecodeResult(result) {
-            setQrData(result.getText());
+
+            if(result.getText()){
+                const lastPart = result.getText().split('/').pop(); // 마지막 숫자 부분 추출
+                if (lastPart) {
+                    navigate(`/pay/qr/payment/${lastPart}`)
+                }
+            }
         },
         onDecodeError(err) {
             console.error(err);
