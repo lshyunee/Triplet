@@ -233,7 +233,7 @@ const AccountDetailPage = () => {
     });
 
   useEffect(() => {
-    if (accountDetailData) {
+    if (accountDetailData && start && end) {
       const fetchData = async () => {
         try {
           await Promise.all([
@@ -245,7 +245,7 @@ const AccountDetailPage = () => {
       };
       fetchData();
     }
-  }, [accountDetailData])
+  }, [accountDetailData, start, end])
 
   useEffect(() => {
     if (transactionData) {

@@ -30,6 +30,7 @@ import MyInfoSetPage from '../pages/mypage/MyInfoSetPage';
 import FeedDetailPage from '../pages/feed/FeedDetailPage';
 import ForeignDetailPage from '../pages/pay/ForeignDetailPage';
 import RefundPage from '../pages/pay/RefundPage';
+import CreateQRPage from '../pages/pay/CreateQRPage';
 
 const AppRoutes: React.FC = () => (
         <Routes>
@@ -47,6 +48,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/pay/qr" element={<QRPage/>}/>
             <Route path="/pay/qr/payment" element={<QRPayPage/>}/>
             <Route path="/pay/qr/complete" element={<QRCompletePage/>}/>
+            <Route path="/qr/:merchantId" element={<CreateQRPage/>}/>
             <Route path="/pay/account-detail" element={<AccountDetailPage/>}/>
             <Route path="/pay/foreign-detail/:accountId" element={<ForeignDetailPage/>}/>
             <Route path="/pay/global-wallet" element={<GlobalWalletPage/>}/>
