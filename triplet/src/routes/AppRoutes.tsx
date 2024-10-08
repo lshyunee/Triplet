@@ -19,7 +19,7 @@ import SimplePasswordSetConfirmPage from '../pages/user/simplePassword/SimplePas
 import AccountDetailPage from '../pages/pay/AccountDetailPage';
 import GlobalWalletPage from '../pages/pay/GlobalWalletPage';
 import ExchangePage from '../pages/pay/ExchangePage';
-import QRPage from '../pages/pay/QRPage';
+import QRPage from '../pages/pay/QRPageCopy';
 import QRPayPage from '../pages/pay/QRPayPage';
 import QRCompletePage from '../pages/pay/QRCompletePage';
 import CreateTravelPage from '../pages/travels/CreateTravelPage';
