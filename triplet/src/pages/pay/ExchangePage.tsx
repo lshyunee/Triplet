@@ -248,6 +248,26 @@ const s = {
     loading: exchangeLoading, 
     status: exchangeStatus, 
     refetch: exchangeRefetch } = useAxios(`/exchange`, 'POST', requestBody);
+  
+  const handlePayment = async () => {
+    if (!isInvalid) {
+      try {
+          exchangeRefetch()
+      } catch (error) {
+        alert('충전이 실패했습니다.');
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (exchangeStatus) {
+      if (exchangeStatus === 200) { 
+        navigate(`/pay/global-wallet`);
+      } else {
+        alert('잔액이 부족합니다.');
+      }
+    }
+  }, [exchangeStatus])
 
   return(
     <>
@@ -309,9 +329,7 @@ const s = {
       )}
         <s.BtnArea>
           <s.PayBtn 
-          onClick={() => {if (!isInvalid) {exchangeRefetch();}
-          // 충전 성공 or 실패에 따라 모달?
-          navigate(`/pay/global-wallet`);}} disabled={isInvalid}>충전하기</s.PayBtn>
+          onClick={handlePayment} disabled={isInvalid}>충전하기</s.PayBtn>
         </s.BtnArea>
     </s.Container>
     </>

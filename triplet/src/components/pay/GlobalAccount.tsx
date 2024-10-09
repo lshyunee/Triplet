@@ -122,19 +122,19 @@ const GlobalAccount = (props: GlobalAccountProps): JSX.Element => {
           {(() => {
             switch (nation) {
               case "미국":
-                return <s.LocalCurrency>{(foreignCurrency*1).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
               case "유럽":
-                return <s.LocalCurrency>{(foreignCurrency*2).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
               case "일본":
-                return <s.LocalCurrency>{(foreignCurrency*3).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
               case "중국":
-                return <s.LocalCurrency>{(foreignCurrency*4).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
               case "영국":
-                return <s.LocalCurrency>{(foreignCurrency*5).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
               case "스위스":
-                return <s.LocalCurrency>{(foreignCurrency*6).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
               case "캐나다":
-                return <s.LocalCurrency>{(foreignCurrency*7).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
             }
           }) ()}
         </s.CurrencyArea>
