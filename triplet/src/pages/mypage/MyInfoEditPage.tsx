@@ -9,6 +9,8 @@ import CompleteModal from '../../components/modal/CompleteModal';
 
 import useAxios from '../../hooks/useAxios';
 import useInput from '../../hooks/useInput';
+import { useDispatch } from 'react-redux';
+import { setUserInfo } from '../../features/user/userInfoSlice';
 
 const HowP = styled.p`
     font-size : 12px;
@@ -132,6 +134,7 @@ const ConfirmBtn = styled.button`
 const MyInfoEditPage = () => {
 
     const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const validNum = (value:string): boolean => {
         const regex = /^[0-9]*$/;
@@ -196,63 +199,10 @@ const MyInfoEditPage = () => {
         setIdentificationNum(`${identificationNumFront.value}${identificationNumBack.value}`);
     }, [identificationNumFront, identificationNumBack])
 
-      // 전화번호 인증
-    useEffect(() => {
-        setPhoneNum(`${phoneNumFront.value}${phoneNumMiddle.value}${phoneNumBack.value}`);
-    }, [phoneNumFront, phoneNumMiddle, phoneNumBack])
-
-    const { data: phoneData, error: phoneError, loading: phoneLoading,
-        status: phoneStatus, refetch: phoneRefetch }
-        = useAxios('/sms/send','POST', undefined,{phoneNumber : phoneNum});
-
-        const certificateSend = () => {
-            phoneRefetch();
-        };
-
-    const [ isSend, setIsSend ] = useState(false);
-
-    useEffect(() => {
-        
-        if(phoneError!==null && phoneStatus!==200){
-            console.log(phoneError);
-            const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
-            setErrorMsg(message);
-            isErrorOpen();
-        }
-        
-        if(phoneData !== null && phoneStatus===200){
-            setIsSend(true);
-        }
-
-    }, [phoneData, phoneError])
-
-    const { data : smsData, error: smsError, loading: smsLoading,
-        status: smsStatus, refetch: smsRefetch}
-        = useAxios('/sms/confirm', 'POST', undefined, 
-            {phoneNumber : phoneNum, certificationNumber: certificationNum.value});
-
-    const certificateCheck = () => {
-        smsRefetch();
-    }
-
-    const [ isCheck, setIsCheck ] = useState(false);
-
-    useEffect (() => {
-        if(smsData!==null){
-            setIsCheck(true);
-        }else if (smsError!==null){
-            console.log(smsError);
-            const message = smsError.response.data.message || '전화번호를 인증할 수 없습니다.';
-            setErrorMsg(message);
-            isErrorOpen();
-        }
-    }, [smsData, smsError]);
-
     const { data: editData, error: editError, loading: editLoading,
         status: editStatus, refetch: editRefetch }
         = useAxios('/user/my', 'PUT', undefined, {
             name : name.value,
-            phoneNumber : phoneNum,
             identificationNumber : identificationNum
         });
 
@@ -268,9 +218,10 @@ const MyInfoEditPage = () => {
     useEffect(() => {
 
         if(editData !== null){
+            dispatch(setUserInfo({name:name.value}));
             setMsg("정보 수정이 완료 되었습니다.");
             isModalOpen();
-            navigate(-1);
+            navigate("/mypage");
         }
 
         if(editError !== null){

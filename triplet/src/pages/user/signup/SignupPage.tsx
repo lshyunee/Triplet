@@ -300,7 +300,7 @@ const SignupPage = () => {
         }
 
         if(signupError!==null){
-            const message = signupError.response.data.message || '회원 정보 입력이 올바르지 않습니다.';
+            const message = signupError.response.data.data.message || '회원 정보 입력이 올바르지 않습니다.';
             setErrorMsg(message);
             isErrorOpen();
         }
