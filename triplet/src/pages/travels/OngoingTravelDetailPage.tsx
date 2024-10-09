@@ -192,6 +192,8 @@ const OngoingTravelDetailPage = () => {
   
     const dispatch = useDispatch();
 
+    const id = useParams();
+
   useEffect(() => {
     dispatch(pageMove("travels"));
   }, [dispatch]);
@@ -304,9 +306,7 @@ useEffect(() => {
           creatorId={travel?.creatorId||0}
           />
           </TravelCardDiv>
-            <StyledLink to={`/travels/wallet/${travel?.travelId}`}>
-                <TravelDetailPay/>
-            </StyledLink>
+                <TravelDetailPay travelId={travel.travelId}/>
             <MoneyDiv>
                 <MoneyCategoryDiv>
                     <MoneyCategoryP>항공</MoneyCategoryP>

@@ -327,6 +327,12 @@ const FeedPage = () => {
         return regex.test(value);
     }
 
+    const detailSearchClose = () => {
+        setIsBottomSheetOpen(false);
+        setKind(2);
+        setSelectedSortOption("정확도순");
+    }
+
     const country = useInput(valid);
 
     const [ isBottomSheetOpen, setIsBottomSheetOpen ] = useState(false);
@@ -381,7 +387,7 @@ const FeedPage = () => {
                     <TargetDiv ref={targetRef} />
                 </TravelDiv>
                 <DetailSearchBottomSheet isOpen={isBottomSheetOpen} 
-            onClose={() => setIsBottomSheetOpen(false)}></DetailSearchBottomSheet>
+            onClose={detailSearchClose}></DetailSearchBottomSheet>
             </FeedDiv>
         </>
     );

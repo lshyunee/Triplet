@@ -41,24 +41,6 @@ const InfoP = styled.p`
     color: #666666;
 `;
 
-// const Badge = styled.div`
-//     position: absolute;
-//     top: 20px;
-//     right: 20px;
-//     width : 70px;
-//     height : 30px;
-//     z-index: 2;
-//     background-color: rgba(0, 0, 0, 0.5);
-//     border-radius: 50px;
-//     border : 1px solid white;
-//     font-size: 12px;
-//     font-weight: 500;
-//     color : white;
-//     display: flex; /* Flexbox 사용 */
-//     justify-content: center; /* 수평 중앙 정렬 */
-//     align-items: center; /* 수직 중앙 정렬 */
-// `;
-
 const ProgressContainer = styled.div`
     position: absolute;
     bottom: 20px; /* 진행률 바를 위로 올려 텍스트 위에 맞춤 */

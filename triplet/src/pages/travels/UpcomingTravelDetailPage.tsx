@@ -16,6 +16,7 @@ import { addUpcomingTravels, selectUpcomingTravelByTitleId } from '../../feature
 import { RootState } from '../../store';
 import useAxios from '../../hooks/useAxios';
 import { addCompletedTravels } from '../../features/travel/completedTravelSlice';
+import { Link } from 'react-router-dom';
 
 const DetailDiv = styled.div`
     padding : 56px 0 0 0;
@@ -179,6 +180,12 @@ const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
     margin-right : 4px;
     color : ${props => props.color || "#666666"}
 `;
+const StyledLink = styled(Link)`
+    display: block;
+    width: 100%;
+    text-decoration: none !important;  /* 밑줄 강제로 제거 */
+    color: inherit !important;         /* 링크 색상 기본값 제거 */
+`;
 
 
 const CompletedTravelDetailPage = () => {
@@ -309,7 +316,7 @@ useEffect(() => {
           creatorId={travel?.creatorId||0}
           />
           </TravelCardDiv>
-          <TravelDetailPay/>
+            <TravelDetailPay travelId={Number(id)}/>
           <MoneyDiv>
                 <MoneyCategoryDiv>
                     <MoneyCategoryP>항공</MoneyCategoryP>

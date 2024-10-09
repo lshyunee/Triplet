@@ -11,8 +11,9 @@ import { ReactComponent as RightArrow } from '../../assets/common/rightArrow.svg
 import { ReactComponent as PayIcon } from '../../assets/common/payIcon.svg';
 import WarningModal from '../../components/modal/WarningModal';
 import { pageMove } from '../../features/navigation/naviSlice';
+
 const DetailDiv = styled.div`
-  padding: 56px 0 0 0;
+  padding: 56px 0 56px 0;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -30,6 +31,7 @@ const ContentDiv = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-bottom : 24px;
 `;
 
 const TravelCardDiv = styled.div`

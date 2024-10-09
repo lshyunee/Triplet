@@ -14,6 +14,7 @@ import { ReactComponent as ShareIcon } from '../../assets/common/shareIcon.svg';
 import useAxios from '../../hooks/useAxios';
 import ShareTravelModal from '../../components/modal/ShareTravelModal';
 import CompletedTravelDetailCard from '../../components/travel/CompletedTravelDetailCard';
+import { Link } from 'react-router-dom';
 
 const DetailDiv = styled.div`
     padding : 56px 0 0 0;
@@ -172,6 +173,13 @@ const MoneyComsumpP = styled.p<MoneyCategoryProps>`
     margin-left : 8px;
 `
 
+const StyledLink = styled(Link)`
+    display: block;
+    width: 100%;
+    text-decoration: none !important;  /* 밑줄 강제로 제거 */
+    color: inherit !important;         /* 링크 색상 기본값 제거 */
+`;
+
 interface MoneyCategoryProps {
     color : string;
 }
@@ -305,7 +313,17 @@ const CompletedTravelDetailPage = () => {
                             usedBudget={usedBudget || 0}
                             creatorId={travel?.creatorId || 0}/>
                     </TravelCardDiv>
-                    <TravelDetailPay />
+                    <CategoryBudgetDiv>
+                    <StyledLink to={`/travels/wallet/complete/${travel?.travelId}`}>
+                        <CategoryTitleDiv>
+                            <CategoryTitleFontDiv>
+                                <PayIcon/>
+                                <TitleP>여행 지출 내역</TitleP>
+                            </CategoryTitleFontDiv>
+                            <RightArrow/>
+                        </CategoryTitleDiv>
+                    </StyledLink>
+                    </CategoryBudgetDiv>
                     <MoneyDiv>
                         <MoneyCategoryDiv>
                             <MoneyCategoryP>항공</MoneyCategoryP>
