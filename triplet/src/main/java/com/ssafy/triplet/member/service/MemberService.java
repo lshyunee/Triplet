@@ -155,7 +155,8 @@ public class MemberService {
         if (request.getNewPasswordConfirm() == null || !request.getNewPassword().equals(request.getNewPasswordConfirm())) {
             throw new CustomException(CustomErrorCode.PASSWORD_MISMATCH);
         }
-        member.setPassword(request.getNewPassword());
+        String encoded = passwordEncoder.encode(request.getNewPassword());
+        member.setPassword(encoded);
     }
 
     public void deleteMyInfo(String memberId) {
