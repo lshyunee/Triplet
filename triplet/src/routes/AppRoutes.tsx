@@ -31,6 +31,9 @@ import FeedDetailPage from '../pages/feed/FeedDetailPage';
 import ForeignDetailPage from '../pages/pay/ForeignDetailPage';
 import RefundPage from '../pages/pay/RefundPage';
 import CreateQRPage from '../pages/pay/CreateQRPage';
+import TravelWalletDetailPage from "../pages/travels/TravelWalletDetailPage";
+import TravelWalletRechargePage from "../pages/travels/TravelWalletRechargePage";
+import TravelWalletRefundPage from "../pages/travels/TravelWalletRefundPage";
 
 const AppRoutes: React.FC = () => (
         <Routes>
@@ -62,6 +65,9 @@ const AppRoutes: React.FC = () => (
             <Route path="/feed" element={<FeedPage/>}/>
             <Route path="/feed/:id/detail" element={<FeedDetailPage/>}/>
             <Route path="/alarm" element={<Alarm/>}/>
+            <Route path="/travels/wallet/:travelId" element={<TravelWalletDetailPage/>}/>
+            <Route path="/travels/wallet/recharge/:travelId/:currency" element={<TravelWalletRechargePage/>}/>
+            <Route path="/travels/wallet/refund/:travelId/:currency" element={<TravelWalletRefundPage/>}/>
         </Routes>
 );
 
