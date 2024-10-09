@@ -213,13 +213,15 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
             <PasswordDiv>
                 <TitleDiv>
                     <Title>간편비밀번호 설정</Title>
-                    <Description>
-                        간편비밀번호를
-                        <br />
-                        다시 한 번 입력해주세요.
+                    <Description style={{ color: isError ? 'red' : 'black' }}>
+                        {isError
+                            ? "비밀번호가 일치하지 않습니다."
+                            : <>
+                                간편비밀번호를
+                                <br />
+                                다시 한 번 입력해주세요.
+                            </>}
                     </Description>
-                    {/* 비밀번호가 일치하지 않을 때 에러 메시지 표시 */}
-                    {isError && <ErrorMessage>비밀번호가 일치하지 않습니다.</ErrorMessage>}
                 </TitleDiv>
 
                 <PasswordDots>
