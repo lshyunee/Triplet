@@ -14,7 +14,7 @@ import userEvent from '@testing-library/user-event';
 
 
 interface ForeignAccount {
-  id: number;
+  accountId: number;
   bankCode: string;
   bankName: string;
   accountNumber: string;
@@ -34,7 +34,7 @@ interface ForeignAccountListResponse {
 }
 
 interface TravelWallet {
-  id: number;
+  walletId: number;
   currency: string;
   balance: number;
   share: boolean;
@@ -262,19 +262,37 @@ const QRPayPage = () => {
 
     if (selectedValue === 'travelWallet') {
       if (travelWallet) {
-        setAccountId(travelWallet.id);  
+        setAccountId(travelWallet.walletId);  
         setIsTravel(1);  
       }             
     } else if (selectedValue === 'accountData') {
-      setAccountId(accountData.accountId);  
+      setAccountId(accountData.data.accountId);  
       setIsTravel(0);                    
     } else if (selectedValue === 'targetAccount') {
       if (targetAccount) {
-        setAccountId(targetAccount?.id);  
+        setAccountId(targetAccount?.accountId);  
         setIsTravel(0);   
       }                  
     }
   };
+
+  const handlePayment = async () => {
+    try {
+      payRefetch()
+    } catch (error) {
+      alert('결제가 실패했습니다.');
+    }
+  };
+
+  useEffect(() => {
+    if (payStatus) {
+      if (payStatus === 200) { 
+        // navigate(`/pay/global-wallet`);
+      } else {
+        alert('잔액이 부족합니다.');
+      }
+    }
+  }, [payStatus])
 
 
 	return (
@@ -292,18 +310,16 @@ const QRPayPage = () => {
 
           <s.Caption>결제 지갑</s.Caption>
           <s.InputArea>
-            <s.ExchangeInput onChange={handleAccountChange}>
-            {travelWallet && Object.keys(travelWallet).length > 0 && (<s.Option>내 여행지갑</s.Option>)}
+            <s.ExchangeInput onChange={handleAccountChange} defaultValue="">
+            <s.Option value="" disabled>계좌를 선택하세요</s.Option>
+            {travelWallet && Object.keys(travelWallet).length > 0 && (<s.Option value="travelWallet">내 여행지갑</s.Option>)}
             {merchantData?.data?.currency === 'KRW' ? (
             <s.Option value="accountData">{accountData?.accountName}</s.Option>) : (
             <s.Option value="targetAccount">{targetAccount?.accountName}</s.Option>)}
             </s.ExchangeInput>
             </s.InputArea>
 
-          <s.BtnArea><s.PayBtn onClick={() => {
-            payRefetch();
-            // navigate(`/`) 어디로 보내지?
-          }}>결제하기</s.PayBtn></s.BtnArea>
+          <s.BtnArea><s.PayBtn onClick={handlePayment}>결제하기</s.PayBtn></s.BtnArea>
 			</s.Container>
 		</>
 	);
