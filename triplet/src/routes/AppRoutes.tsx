@@ -28,13 +28,14 @@ import OngoingTravelDetailPage from '../pages/travels/OngoingTravelDetailPage';
 import CompletedTravelDetailPage from '../pages/travels/CompletedTravelDetailPage';
 import MyInfoSetPage from '../pages/mypage/MyInfoSetPage';
 import FeedDetailPage from '../pages/feed/FeedDetailPage';
+import FeedTransactionHistoryPage from '../pages/feed/FeedTransactionHistoryPage';
 import ForeignDetailPage from '../pages/pay/ForeignDetailPage';
 import RefundPage from '../pages/pay/RefundPage';
 import CreateQRPage from '../pages/pay/CreateQRPage';
 import TravelWalletDetailPage from "../pages/travels/TravelWalletDetailPage";
 import TravelWalletRechargePage from "../pages/travels/TravelWalletRechargePage";
 import TravelWalletRefundPage from "../pages/travels/TravelWalletRefundPage";
-import TravelTransactionListPage from "../pages/travels/TravelTransactionListPage";
+import TransferPage from '../pages/pay/TransferPage';
 
 const AppRoutes: React.FC = () => (
         <Routes>
@@ -52,6 +53,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/pay/qr" element={<QRPage/>}/>
             <Route path="/pay/qr/payment/:merchantId" element={<QRPayPage/>}/>
             <Route path="/pay/qr/complete" element={<QRCompletePage/>}/>
+            <Route path="/pay/transfer" element={<TransferPage/>}/>
             <Route path="/qr/:merchantId" element={<CreateQRPage/>}/>
             <Route path="/pay/account-detail" element={<AccountDetailPage/>}/>
             <Route path="/pay/foreign-detail/:accountId" element={<ForeignDetailPage/>}/>
@@ -65,6 +67,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/travels/completed/:id/detail" element={<CompletedTravelDetailPage/>}/>
             <Route path="/feed" element={<FeedPage/>}/>
             <Route path="/feed/:id/detail" element={<FeedDetailPage/>}/>
+            <Route path="/feed/:travelId/detail/transaction" element={<FeedTransactionHistoryPage/>}/>
             <Route path="/alarm" element={<Alarm/>}/>
             <Route path="/travels/wallet/:travelId" element={<TravelWalletDetailPage/>}/>
             <Route path="/travels/wallet/recharge/:travelId/:currency" element={<TravelWalletRechargePage/>}/>

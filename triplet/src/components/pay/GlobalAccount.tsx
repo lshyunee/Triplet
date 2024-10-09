@@ -64,6 +64,7 @@ interface GlobalAccountProps {
   foreignCurrency: number;
   isExchange: boolean;
   accountId: number;
+  rate: number;
 };
 
 interface ExchangeProps {
@@ -72,7 +73,7 @@ interface ExchangeProps {
 
 
 const GlobalAccount = (props: GlobalAccountProps): JSX.Element => {
-  const { nation, foreignCurrency, isExchange, accountId } = props;
+  const { nation, foreignCurrency, isExchange, accountId, rate } = props;
   const navigate = useNavigate();
 
   return (
@@ -99,7 +100,7 @@ const GlobalAccount = (props: GlobalAccountProps): JSX.Element => {
       <s.ButtonArea>
         <s.CurrencyArea>
           <div>
-            <s.ForeignCurrency>{foreignCurrency}</s.ForeignCurrency>
+            <s.ForeignCurrency>{Number(foreignCurrency).toLocaleString()}</s.ForeignCurrency>
             {(() => {
               switch (nation) {
                 case "미국":
@@ -122,19 +123,19 @@ const GlobalAccount = (props: GlobalAccountProps): JSX.Element => {
           {(() => {
             switch (nation) {
               case "미국":
-                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*rate).toLocaleString()}원</s.LocalCurrency>
               case "유럽":
-                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*rate).toLocaleString()}원</s.LocalCurrency>
               case "일본":
-                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*rate/100).toLocaleString()}원</s.LocalCurrency>
               case "중국":
-                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*rate).toLocaleString()}원</s.LocalCurrency>
               case "영국":
-                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*rate).toLocaleString()}원</s.LocalCurrency>
               case "스위스":
-                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*rate).toLocaleString()}원</s.LocalCurrency>
               case "캐나다":
-                return <s.LocalCurrency>{Number(foreignCurrency).toLocaleString()}원</s.LocalCurrency>
+                return <s.LocalCurrency>{(foreignCurrency*rate).toLocaleString()}원</s.LocalCurrency>
             }
           }) ()}
         </s.CurrencyArea>

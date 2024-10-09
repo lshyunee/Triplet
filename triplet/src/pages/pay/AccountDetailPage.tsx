@@ -10,6 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { isDate } from 'util/types';
 import { addDays } from 'react-datepicker/dist/date_utils';
 import useAxios from '../../hooks/useAxios';
+import { useNavigate } from 'react-router-dom';
 
 interface Transaction {
   transactionId: number;
@@ -36,6 +37,7 @@ const s = {
     padding-left: 16px;
     padding-right: 16px;
     height: calc(100vh - 112px);
+    overflow-y: auto;
   `,
   Card: styled.div`
     background-color: #E5F3FF;
@@ -70,6 +72,7 @@ const s = {
     width: 66px;
     border-radius: 50px;
     border: 0;
+    cursor: pointer;
   `,
   ButtonArea: styled.div`
     display: flex;
@@ -192,11 +195,6 @@ const s = {
     border-radius: 5px;         
     padding: 5px;             
     margin: 0 5px;    
-    cursor: pointer;           
-
-    &:hover {
-      background-color: #e0e0e0; /* 호버 시 배경 색상 변경 */
-    }
 `,
 }
 
@@ -272,6 +270,11 @@ const AccountDetailPage = () => {
     };
   }, [isDateOpen]);
 
+  const navigate = useNavigate();
+
+  const transferOnclick = (e: React.MouseEvent<HTMLButtonElement>) => {
+		navigate('/pay/transfer');
+	};
   
   return (
     <>
@@ -284,8 +287,8 @@ const AccountDetailPage = () => {
         </s.CardTitleArea>
         <s.CardCaption>{accountDetailData?.data?.bankName} {accountDetailData?.data?.accountNumber}</s.CardCaption>
         <s.ButtonArea>
-          <s.CardKrw>{accountDetailData?.data?.accountBalance} 원</s.CardKrw>
-          <s.CardButton>송금</s.CardButton>
+          <s.CardKrw>{accountDetailData?.data?.accountBalance.toLocaleString()} 원</s.CardKrw>
+          <s.CardButton onClick={transferOnclick}>송금</s.CardButton>
         </s.ButtonArea>
       </s.Card>
       <s.CalendarButton>

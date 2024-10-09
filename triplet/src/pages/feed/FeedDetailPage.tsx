@@ -7,7 +7,10 @@ import BackHeader from '../../components/header/BackHeader';
 import SnsTravelDetailCard from '../../components/travel/SnsTravelDetailCard';
 import useAxios from '../../hooks/useAxios';
 import { sharedTravelDataInsert } from '../../features/travel/shareTravelSlice';
+import { ReactComponent as RightArrow } from '../../assets/common/rightArrow.svg';
+import { ReactComponent as PayIcon } from '../../assets/common/payIcon.svg';
 import WarningModal from '../../components/modal/WarningModal';
+import { pageMove } from '../../features/navigation/naviSlice';
 const DetailDiv = styled.div`
   padding: 56px 0 0 0;
   display: flex;
@@ -39,6 +42,42 @@ const MoneyDiv = styled.div`
   display: flex;
   flex-direction: column;
   padding: 20px;
+`;
+
+const CategoryBudgetDiv = styled.div`
+    width : 100%;
+    height : 64px;
+    background-color : white;
+    border-radius : 20px;
+`;
+
+
+const CategoryShareDiv = styled.div`
+    width : 100%;
+    height : 64px;
+    background-color : white;
+    border-radius : 20px;
+    margin-bottom : 28px;
+`;
+
+const CategoryTitleDiv = styled.div`
+    display : flex;
+    flex-direciton : row;
+    justify-content : space-between;
+    align-items : center;
+    margin : 16px;
+`;
+
+const CategoryTitleFontDiv = styled.div`
+    display : flex;
+`;
+
+const TitleP = styled.p`
+    font-size : 16px;
+    font-weight : 600;
+    margin : 0 0 0 12px;
+    display : flex;
+    align-items : center;
 `;
 
 const MoneyCategoryDiv = styled.div`
@@ -136,6 +175,8 @@ const SharedTravelDetailPage = () => {
   const { id } = useParams<{ id: string }>();
   const travel = useSelector((state: RootState) => state.sharedTravel);
   const [expenditureData, setExpenditureData] = useState<Expenditure[]>([]);
+  const [modalMessage, setModalMessage] = useState('');
+
 
   const { data: travelData, refetch: travelRefetch, error } = useAxios(
     `/travels/${id}`,
@@ -150,19 +191,26 @@ const SharedTravelDetailPage = () => {
   useEffect(() => {
     if (!travel?.travelId || travel.travelId === 0) {
       travelRefetch();
-      usedBudgetfetch();
+      usedBudgetfetch()
+    dispatch(pageMove("feed"));
     }
+    
   }, []);
 
   useEffect(() => {
-    if (error) { // 에러가 발생했을 때 처리
+    if (error) { 
+      // 에러가 발생했을 때 처리
         if (error.response?.status === 400 && error.response?.data?.code === 'T0004') {
+          setModalMessage("여행을 찾을 수 없습니다.")
           setShowModal(true); // 모달을 띄움
         }
       }
     else if (travelData) {
-        console.log(travelData)
-    
+      console.log(travelData.data)
+      if (travelData.data.shared === false) {
+        setModalMessage("잘못된 접근입니다.")
+        setShowModal(true);
+      } 
       dispatch(
         sharedTravelDataInsert({
           travelId: travelData.data.travelId,
@@ -212,6 +260,10 @@ const SharedTravelDetailPage = () => {
     navigate('/feed'); // 확인 버튼을 누르면 /feed로 리다이렉트
   };
 
+  const handleCategoryClick = () => {
+    navigate(`/feed/${id}/detail/transaction`);
+  };
+
   const hexToRgba = (hex:string, alpha:string) => {
     // hex 코드에서 # 제거
     const strippedHex = hex.replace('#', '');
@@ -236,10 +288,11 @@ const SharedTravelDetailPage = () => {
       <BackHeader title={travel?.title || ''}></BackHeader>
       {showModal && (
         <WarningModal
-          message="여행이 존재하지 않습니다."
+          message={modalMessage}
           onConfirm={handleModalConfirm}
         />
       )}
+      {(travel?.travelId !== 0 && travel?.shared )&& 
       <DetailDiv>
         <Img src={travel?.image || ''}></Img>
         <ContentDiv>
@@ -256,7 +309,19 @@ const SharedTravelDetailPage = () => {
               currency={travel?.currency || ''}
             />
           </TravelCardDiv>
-          <MoneyDiv>
+        {travel?.shareStatus && 
+          <CategoryBudgetDiv onClick={handleCategoryClick}>
+              <CategoryTitleDiv>
+                  <CategoryTitleFontDiv>
+                    <PayIcon />
+                      <TitleP>여행 지출 내역</TitleP>
+                        </CategoryTitleFontDiv>
+                      <RightArrow />
+            </CategoryTitleDiv>
+          </CategoryBudgetDiv>
+          }
+      <MoneyDiv>
+
   {travel?.budgets?.map((budget: Budget, index: number) => {
     const expenditure = expenditureData.find(
       (exp) => exp.categoryId === budget.categoryId
@@ -280,12 +345,14 @@ const SharedTravelDetailPage = () => {
           <MoneyChartBar paid={percentageUsed} color={hexToRgba("#008DE7",percentageUsed)} />
         </MoneyChartConsumpBar>
       </div>
-    );
-  })}
+      );
+    })}
+  
 </MoneyDiv>
 
         </ContentDiv>
       </DetailDiv>
+}
     </>
   );
 };

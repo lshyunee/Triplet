@@ -137,9 +137,9 @@ const PayPage = () => {
 		navigate('/pay/account-detail');
 	};
 	
-	const onclick = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const transferOnclick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		window.alert('야호');
+		navigate('/pay/transfer');
 	};
 
 	const walletOnClick = () => {
@@ -157,8 +157,8 @@ const PayPage = () => {
 					</s.CardTitleArea>
 					<s.CardCaption>{accountData?.data?.bankName} {accountData?.data?.accountNumber}</s.CardCaption>
 					<s.ButtonArea>
-						<s.CardContent>{accountData?.data?.accountBalance} 원</s.CardContent>
-						<s.CardButton onClick={onclick}>송금</s.CardButton>
+						<s.CardContent>{accountData?.data?.accountBalance.toLocaleString()} 원</s.CardContent>
+						<s.CardButton onClick={transferOnclick}>송금</s.CardButton>
 					</s.ButtonArea>
 				</s.MyCard>
 				<s.MyCard onClick={walletOnClick}>
@@ -173,42 +173,49 @@ const PayPage = () => {
 							foreignCurrency={foreignAccountData?.data[6]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[6]?.accountId}
+							rate={exchangeRateData?.data[4]?.exchangeRate}
 						/>
 						<GlobalAccount
 							nation='유럽'
 							foreignCurrency={foreignAccountData?.data[3]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[3]?.accountId}
+							rate={exchangeRateData?.data[0]?.exchangeRate}
 						/>
 						<GlobalAccount
 							nation='일본'
 							foreignCurrency={foreignAccountData?.data[5]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[5]?.accountId}
+							rate={exchangeRateData?.data[3]?.exchangeRate}
 						/>
 						<GlobalAccount
 							nation='중국'
 							foreignCurrency={foreignAccountData?.data[2]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[2]?.accountId}
+							rate={exchangeRateData?.data[1]?.exchangeRate}
 						/>
 						<GlobalAccount
 							nation='영국'
 							foreignCurrency={foreignAccountData?.data[4]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[4]?.accountId}
+							rate={exchangeRateData?.data[2]?.exchangeRate}
 						/>
 						<GlobalAccount
 							nation='스위스'
 							foreignCurrency={foreignAccountData?.data[1]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[1]?.accountId}
+							rate={exchangeRateData?.data[5]?.exchangeRate}
 						/>
 						<GlobalAccount
 							nation='캐나다'
 							foreignCurrency={foreignAccountData?.data[0]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[0]?.accountId}
+							rate={exchangeRateData?.data[6]?.exchangeRate}
 						/>
 					</s.CurrencyArea>
 				</s.MyCard>
