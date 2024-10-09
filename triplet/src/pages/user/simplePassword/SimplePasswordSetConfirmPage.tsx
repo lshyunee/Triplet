@@ -20,6 +20,46 @@ const shuffleArray = (array: number[]) => {
         .map(({ value }) => value);
 };
 
+const s = {
+    // 모달 스타일링
+    ModalOverlay: styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `,
+    ModalContainer: styled.div`
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  `,
+    ModalText: styled.p`
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 20px;
+  `,
+    ModalButton: styled.button`
+    background-color: #008DE7;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    &:hover {
+      background-color: #006bbf;
+    }
+  `
+}
+
 const PasswordDiv = styled.div`
     min-height : calc(100vh - 56px);
     padding : 0.3vh 0 0;
@@ -140,6 +180,8 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
             // 6자리 비밀번호가 입력되면 이동
             if (password.join('') === prePassword.join('')) {
                 resRefetch();
+                // 모달 열기
+                setIsModalOpen(true);
             } else {
                 setIsError(true); // 에러 상태로 설정
                 setPassword([]);
@@ -164,6 +206,13 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
     const handleReset = () => {
         setPassword([]);
         setNumbers(shuffleArray([...numbers]));
+    };
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    // 모달 닫기 및 페이지 이동 처리
+    const closeModal = () => {
+        setIsModalOpen(false);
+        navigate(`/`);
     };
 
     return (
@@ -212,7 +261,18 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
                     </BottomButtons>
                 </ButtonDiv>
             </PasswordDiv>
+            <>
+                {isModalOpen && (
+                    <s.ModalOverlay>
+                        <s.ModalContainer>
+                            <s.ModalText>충전이 완료되었습니다.</s.ModalText>
+                            <s.ModalButton onClick={closeModal}>확인</s.ModalButton>
+                        </s.ModalContainer>
+                    </s.ModalOverlay>
+                )}
+            </>
         </div>
+
     );
 };
 
