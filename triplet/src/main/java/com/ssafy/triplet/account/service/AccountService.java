@@ -127,6 +127,29 @@ public class AccountService {
                 .accountBalance(account.getAccountBalance()).build();
     }
 
+    public AccountDetailResponse getForeignAccount(String memberId, String currency) {
+        Member member = memberRepository.findByMemberId(memberId);
+        if (member == null) {
+            throw new CustomException(CustomErrorCode.MEMBER_NOT_FOUND);
+        }
+        Account account = accountRepository.findForeignByCurrency(memberId, currency);
+        if (account == null) {
+            throw new CustomException(CustomErrorCode.ACCOUNT_NOT_FOUND);
+        }
+        return AccountDetailResponse.builder()
+                .accountId(account.getAccountId())
+                .bankCode(account.getBankCode())
+                .bankName(account.getBankName())
+                .accountNumber(account.getAccountNumber())
+                .accountName(account.getAccountName())
+                .accountType(account.getAccountType())
+                .currency(account.getCurrency())
+                .memberName(member.getName())
+                .accountCreatedDate(account.getAccountCreatedDate().toString())
+                .accountExpiryDate(account.getAccountExpiryDate().toString())
+                .accountBalance(account.getAccountBalance()).build();
+    }
+
     // 외화지갑 목록 조회
     public List<AccountDetailResponse> getForeignAccounts(String memberId) {
         Member member = memberRepository.findByMemberId(memberId);

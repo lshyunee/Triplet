@@ -17,6 +17,10 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     Account findByAccountNumber(String accountNumber);
 
+    @Query("select a from Account  a join fetch a.member m " +
+            "where m.memberId = :memberId and a.currency = :currency")
+    Account findForeignByCurrency(String memberId, String currency);
+
     @Query("select a from Account a join fetch a.member m " +
             "where m.memberId = :memberId and a.accountType = 'OVERSEAS' order by a.currency asc")
     List<Account> findMyForeignAccounts(String memberId);

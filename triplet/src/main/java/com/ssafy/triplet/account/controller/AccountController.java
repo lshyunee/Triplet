@@ -31,6 +31,13 @@ public class AccountController {
         return ResponseEntity.ok().body(new ApiResponse<>("200", "원화계좌 조회 성공", krwAccount));
     }
 
+    @GetMapping("/foreign-account/{currency}")
+    public ResponseEntity<?> findForeignAccount(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+                                                @PathVariable String currency) {
+        AccountDetailResponse foreignAccount = accountService.getForeignAccount(customUserPrincipal.getMemberId(), currency);
+        return ResponseEntity.ok().body(new ApiResponse<>("200", "외화계좌 조회 성공", foreignAccount));
+    }
+
     @GetMapping("/foreign-account")
     public ResponseEntity<?> findForeignAccounts(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
         List<AccountDetailResponse> foreignAccounts = accountService.getForeignAccounts(customUserPrincipal.getMemberId());
