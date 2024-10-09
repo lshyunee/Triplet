@@ -34,6 +34,7 @@ import CreateQRPage from '../pages/pay/CreateQRPage';
 import TravelWalletDetailPage from "../pages/travels/TravelWalletDetailPage";
 import TravelWalletRechargePage from "../pages/travels/TravelWalletRechargePage";
 import TravelWalletRefundPage from "../pages/travels/TravelWalletRefundPage";
+import TravelTransactionListPage from "../pages/travels/TravelTransactionListPage";
 
 const AppRoutes: React.FC = () => (
         <Routes>
@@ -68,6 +69,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/travels/wallet/:travelId" element={<TravelWalletDetailPage/>}/>
             <Route path="/travels/wallet/recharge/:travelId/:currency" element={<TravelWalletRechargePage/>}/>
             <Route path="/travels/wallet/refund/:travelId/:currency" element={<TravelWalletRefundPage/>}/>
+            <Route path="/travels/wallet/complete/:travelId" element={<TravelTransactionListPage/>}/>
         </Routes>
 );
 
