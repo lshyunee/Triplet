@@ -138,6 +138,7 @@ public class TravelWalletService {
     public TravelWalletResponse getTravelWallet(Long travelId) {
         Travel travel = findTravelById(travelId);
         TravelWalletResponse response = new TravelWalletResponse();
+        response.setWalletId(travelWalletRepository.findTravelWalletIdByTravel(travelId));
         response.setCurrency(travel.getCountry().getCurrency());
         response.setShare(travel.isShareStatus());
         response.setBalance(travelWalletRepository.findBalanceByTravel(travelId));
