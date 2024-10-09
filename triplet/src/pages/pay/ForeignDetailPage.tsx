@@ -336,11 +336,11 @@ const ForeignDetailPage = () => {
                       <s.PaymentTypeRed>출금</s.PaymentTypeRed>
                     )}
                     {transaction.transactionType === 1 ? (
-                      <s.PaymentAmountBlue>{transaction.price.toLocaleString()}원</s.PaymentAmountBlue>
+                      <s.PaymentAmountBlue>{transaction.price.toLocaleString()}{foreignDetailData?.data?.currency}</s.PaymentAmountBlue>
                     ) : (
-                      <s.PaymentAmountRed>{transaction.price.toLocaleString()}원</s.PaymentAmountRed>
+                      <s.PaymentAmountRed>{transaction.price.toLocaleString()}{foreignDetailData?.data?.currency}</s.PaymentAmountRed>
                     )}
-                    <s.BalanceText>잔액 {transaction.transactionAfterBalance.toLocaleString()}원</s.BalanceText>
+                    <s.BalanceText>잔액 {transaction.transactionAfterBalance.toLocaleString()}{foreignDetailData?.data?.currency}</s.BalanceText>
                   </s.PaymentAmountArea>
                 </s.PaymentArea>
                 <s.PaymentLine />

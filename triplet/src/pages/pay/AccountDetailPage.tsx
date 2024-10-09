@@ -185,7 +185,19 @@ const s = {
     align-items: center;
     height: 50vh;  
     color: #666666;
-  `
+  `,
+    StyledSelect: styled.select`
+    background-color: #f0f0f0; 
+    color: #333;              
+    border-radius: 5px;         
+    padding: 5px;             
+    margin: 0 5px;    
+    cursor: pointer;           
+
+    &:hover {
+      background-color: #e0e0e0; /* 호버 시 배경 색상 변경 */
+    }
+`,
 }
 
 const AccountDetailPage = () => {
@@ -287,6 +299,9 @@ const AccountDetailPage = () => {
             onChange={((range: any) => setDateRange(range))}
             dateFormat={"yyyy.MM.dd"}
             ref={dateInputRef}
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="scroll"
           />
         </s.CalendarTextArea>
       </s.CalendarButton>
