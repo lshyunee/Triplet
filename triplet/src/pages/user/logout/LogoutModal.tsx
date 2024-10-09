@@ -103,7 +103,7 @@ const LogoutModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         <Title>로그아웃</Title>
         <Description>로그아웃 하시겠습니까?</Description>
         <ConfirmDiv>
-          <Button isCancel onClick={onClose}>취소</Button>
+          <Button isCancel={true} onClick={onClose}>취소</Button>
           <Button onClick={handleLogout}>확인</Button>
         </ConfirmDiv>
       </ModalContentDiv>

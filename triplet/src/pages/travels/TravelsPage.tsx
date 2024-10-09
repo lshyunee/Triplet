@@ -14,6 +14,7 @@ import { RootState } from '../../store';
 import { addCompletedTravels, setCompletedTravels, selectAllCompletedTravelIds } from '../../features/travel/completedTravelSlice';
 import { addUpcomingTravels, selectAllUpcomingTravelIds, setUpcomingTravels } from '../../features/travel/upcomingTravelSlice';
 import useAxios from '../../hooks/useAxios';
+import { selectOngoingTravelId } from '../../features/travel/ongoingTravelSlice';
 
 const TravelDiv = styled.div`
     min-height : calc(100vh - 56px);
@@ -99,7 +100,8 @@ const TravelsPage = () => {
     useEffect(() => {
 
         if (upcomingData && upcomingStatus === 200) {
-            dispatch(addUpcomingTravels(upcomingData.data)); // 액션을 dispatch로 호출
+            console.log(upcomingData);
+            dispatch(addUpcomingTravels(upcomingData.data));
           }
 
     }, [upcomingData, upcomingError])
@@ -116,7 +118,6 @@ const TravelsPage = () => {
     const completedTravelIds: number[] = useSelector(selectAllCompletedTravelIds);
     const upcomingTravelIds : number[] = useSelector(selectAllUpcomingTravelIds);
 
-
     return (
         <>
             <Header/>
@@ -125,9 +126,7 @@ const TravelsPage = () => {
                     <CategoryP>
                         진행중인 여행
                     </CategoryP>
-                    <StyledLink to="/travels/ongoing/detail">                    
-                       <OngoingTravelCard></OngoingTravelCard>
-                    </StyledLink>
+                    <OngoingTravelCard />
                 </OngoingTravelDiv>
                 <UpcomingTravelDiv>
                     <CategoryP>

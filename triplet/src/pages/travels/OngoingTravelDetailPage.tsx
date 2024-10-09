@@ -15,7 +15,7 @@ import { ReactComponent as ShareIcon } from '../../assets/common/shareIcon.svg';
 import { selectUpcomingTravelByTitleId } from '../../features/travel/upcomingTravelSlice';
 import { RootState } from '../../store';
 import useAxios from '../../hooks/useAxios';
-import { ongoingTravelDataInsert } from '../../features/travel/ongoingTravelSlice';
+import { ongoingTravelDataInsert, selectOngoingTravelId } from '../../features/travel/ongoingTravelSlice';
 
 const DetailDiv = styled.div`
     padding : 56px 0 0 0;
@@ -98,6 +98,7 @@ const MoneyDiv = styled.div`
     display : flex;
     flex-direction : column;
     padding : 20px;
+    margin-bottom : 24px;
 `
 
 const MoneyCategoryDiv = styled.div`
@@ -114,7 +115,7 @@ const MoneyCategoryProgressDiv = styled.div`
 `
 
 interface MonyeProgressProps {
-    paid : string;
+    paid : number;
     color : string;
 }
 
@@ -129,7 +130,7 @@ const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
 const MoneyChartBar = styled.div<MonyeProgressProps>`
     height : 100%;
     background-color : ${props => props.color};
-    width : ${props => props.paid || '50%'};
+    width : ${props => `${props.paid}%` || '0%'};
     border-radius : 50px;
 `
 
@@ -180,59 +181,40 @@ const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
 `;
 
 
-const CompletedTravelDetailPage = () => {
-  const dispatch = useDispatch();
+const OngoingTravelDetailPage = () => {
+  
+    const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(pageMove("travels"));
   }, [dispatch]);
 
+  const travelId = useSelector(selectOngoingTravelId);
   const travel = useSelector((state:any) => state.ongoingTravel);
 
   const { data : travelData, error : travelError, status : travelStatus,
     refetch : travelRefetch
-  } = useAxios("/travels/ongoing", "GET");
+  } = useAxios(`/travels/${travelId}`, "GET");
 
   const { data: budgetData, error: budgetError,
     status: budgetStatus, refetch: budgetRefetch
 } = useAxios(`/travels/expenditure-expenses/${travel.travelId}`, "GET");
 
 useEffect(()=> {
-    if(!travel?.travelId ||travel.travelId === 0){
-        travelRefetch();
-    }else{
-        budgetRefetch();
-    }
-  }, [])
+    travelRefetch();
+}, [])
 
-  useEffect(() => {
+useEffect(() => {
     if (travelData && travelData.data) {
       dispatch(ongoingTravelDataInsert({
-        travelId: travelData.data.travelId,
-        title: travelData.data.title,
-        startDate: travelData.data.startDate,
-        endDate: travelData.data.endDate,
-        image: travelData.data.image,
-        countryName: travelData.data.countryName,
-        countryId: travelData.data.countryId,
-        currency: travelData.data.currency,
-        memberCount: travelData.data.memberCount,
-        totalBudget: travelData.data.totalBudget,
-        usedBudget: travelData.data.usedBudget,
-        status: travelData.data.status,
-        shareStatus: travelData.data.shareStatus,
-        shared: travelData.data.shared,
+        airportCost : travelData.data.airportCost,
+        travelId : travelData.data.travelId,
+        creatorId : travelData.data.creatorId,
       }));
       console.log(travelData);
     }
-  }, [travelData, travelError]);
-  
-  useEffect(()=>{
-    if(travel && travel.travelId !== 0){
-        budgetRefetch();
-    }
-        
-  },[travel])
+    budgetRefetch();
+}, [travelData, travelError]);
 
   interface BudgetDetails {
     isComplete: boolean;
@@ -304,12 +286,16 @@ useEffect(() => {
       <ContentDiv>
           <TravelCardDiv>
           <TravelDetailCard 
+          travelId={travel?.travelId||0}
           title={travel?.title||""}
           startDate={travel?.startDate||""} endDate={travel?.endDate||""}
           country={travel?.countryName||""}
           memberCount={travel?.memberCount||0}
           usedBudget={usedBudget|0}
-          totalBudgetWon={travel?.totalBudget||0}/>
+          totalBudget={travel?.totalBudget||0}
+          currency={travel?.currency||""}
+          creatorId={travel?.creatorId||0}
+          />
           </TravelCardDiv>
           <TravelDetailPay/>
           <CategoryBudgetDiv>
@@ -324,124 +310,127 @@ useEffect(() => {
             <MoneyDiv>
                 <MoneyCategoryDiv>
                     <MoneyCategoryP>항공</MoneyCategoryP>
-                    <MoneyCategoryP>600,000원</MoneyCategoryP>
+                    <MoneyCategoryP>{travel?.airportCost} 원</MoneyCategoryP>
                 </MoneyCategoryDiv>
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
-                        <MoneyCategoryP>식사</MoneyCategoryP>
+                        <MoneyCategoryP>{budgetDetails?.budgetList[0]?.categoryName}</MoneyCategoryP>
                         <MoneyComsumpP color="#00D5FF">
-                            {budgetDetails?.budgetList[0]?.usedBudget && budgetDetails?.budgetList[0]?.budgetWon 
-                                ? ((budgetDetails.budgetList[0].usedBudget / budgetDetails.budgetList[0].budgetWon) * 100).toFixed(0) 
+                            {budgetDetails?.budgetList[0]?.usedBudget && budgetDetails?.budgetList[0]?.categoryBudget 
+                                ? ((budgetDetails.budgetList[0].usedBudget / budgetDetails.budgetList[0].categoryBudget) * 100).toFixed(0) 
                                 : 0}%  
                         </MoneyComsumpP>
                     </MoneyTitleDiv>
                     <BudgetDiv>
                         <MoneyBudgetComsumpP color='#00D5FF'>{budgetDetails?.budgetList[0].usedBudget||0}</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[0].budgetWon||0} {travel?.currency}</MoneyBudgetP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[0].categoryBudget||0} {travel?.currency}</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar color={hexToRgba("#00D5FF","0.3")}>
-                    <MoneyChartBar paid="80%" color="#00D5FF"/>
+                    <MoneyChartBar paid={budgetDetails?.budgetList[0]?.usedBudget && budgetDetails?.budgetList[0]?.categoryBudget 
+                                ? ((budgetDetails.budgetList[0].usedBudget / budgetDetails.budgetList[0].categoryBudget) * 100)
+                                : 0}  color="#00D5FF"/>
                 </MoneyChartConsumpBar>
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
-                        <MoneyCategoryP>교통</MoneyCategoryP>
+                        <MoneyCategoryP>{budgetDetails?.budgetList[1]?.categoryName}</MoneyCategoryP>
                         <MoneyComsumpP color="#00C8FB">
-                            {budgetDetails?.budgetList[1]?.usedBudget && budgetDetails?.budgetList[1]?.budgetWon 
+                            {budgetDetails?.budgetList[1]?.usedBudget && budgetDetails?.budgetList[1]?.categoryBudget 
                                 ? ((budgetDetails.budgetList[1].usedBudget / budgetDetails.budgetList[1].categoryBudget) * 100).toFixed(0) 
                                 : 0}%
                         </MoneyComsumpP>
                     </MoneyTitleDiv>
                     <BudgetDiv>
                         <MoneyBudgetComsumpP color='#00C8FB'>{budgetDetails?.budgetList[1].usedBudget||0}</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[1].budgetWon||0} {travel?.currency}</MoneyBudgetP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[1].categoryBudget||0} {travel?.currency}</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar color={hexToRgba("#00C8FB","0.3")}>
-                    <MoneyChartBar paid="30%" color="#00C8FB"/>
+                    <MoneyChartBar paid={budgetDetails?.budgetList[1]?.usedBudget && budgetDetails?.budgetList[1]?.categoryBudget 
+                                ? ((budgetDetails.budgetList[1].usedBudget / budgetDetails.budgetList[1].categoryBudget) * 100)
+                                : 0}  color="#00C8FB"/>
                 </MoneyChartConsumpBar>
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
-                        <MoneyCategoryP>관광</MoneyCategoryP>
+                        <MoneyCategoryP>{budgetDetails?.budgetList[2]?.categoryName}</MoneyCategoryP>
                         <MoneyComsumpP color="#00B8F5">
-                                {budgetDetails?.budgetList[2]?.usedBudget && budgetDetails?.budgetList[2]?.budgetWon 
-                                ? ((budgetDetails.budgetList[2].usedBudget / budgetDetails.budgetList[2].budgetWon) * 100).toFixed(0) 
+                                {budgetDetails?.budgetList[2]?.usedBudget && budgetDetails?.budgetList[2]?.categoryBudget 
+                                ? ((budgetDetails.budgetList[2].usedBudget / budgetDetails.budgetList[2].categoryBudget) * 100).toFixed(0) 
                                 : 0}%
                         </MoneyComsumpP>
                     </MoneyTitleDiv>
                     <BudgetDiv>
                         <MoneyBudgetComsumpP color='#00B8F5'>{budgetDetails?.budgetList[2].usedBudget||0}</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[2].budgetWon||0} {travel?.currency}</MoneyBudgetP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[2].categoryBudget||0} {travel?.currency}</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar  color={hexToRgba("#00B8F5","0.3")}>
-                    <MoneyChartBar paid="30%" color="#00B8F5"/>
+                    <MoneyChartBar paid={budgetDetails?.budgetList[2]?.usedBudget && budgetDetails?.budgetList[2]?.categoryBudget 
+                                ? ((budgetDetails.budgetList[2].usedBudget / budgetDetails.budgetList[2].categoryBudget) * 100)
+                                : 0}  color="#00B8F5"/>
                 </MoneyChartConsumpBar>
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
-                        <MoneyCategoryP>쇼핑</MoneyCategoryP>
+                        <MoneyCategoryP>{budgetDetails?.budgetList[3]?.categoryName}</MoneyCategoryP>
                         <MoneyComsumpP color="#00ACF1">
-                            {budgetDetails?.budgetList[3]?.usedBudget && budgetDetails?.budgetList[3]?.budgetWon 
-                                ? ((budgetDetails.budgetList[3].usedBudget / budgetDetails.budgetList[3].budgetWon) * 100).toFixed(0) 
+                            {budgetDetails?.budgetList[3]?.usedBudget && budgetDetails?.budgetList[3]?.categoryBudget 
+                                ? ((budgetDetails.budgetList[3].usedBudget / budgetDetails.budgetList[3].categoryBudget) * 100).toFixed(0) 
                                 : 0}%
                         </MoneyComsumpP>
                     </MoneyTitleDiv>
                     <BudgetDiv>
                         <MoneyBudgetComsumpP color='#00ACF1'>{budgetDetails?.budgetList[3].usedBudget||0}</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[3].budgetWon||0} {travel?.currency}</MoneyBudgetP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[3].categoryBudget||0} {travel?.currency}</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar  color={hexToRgba("#00ACF1","0.3")}>
-                    <MoneyChartBar paid="30%" color='#00ACF1'/>
+                    <MoneyChartBar paid={budgetDetails?.budgetList[3]?.usedBudget && budgetDetails?.budgetList[3]?.categoryBudget 
+                                ? ((budgetDetails.budgetList[3].usedBudget / budgetDetails.budgetList[3].categoryBudget) * 100)
+                                : 0}  color='#00ACF1'/>
                 </MoneyChartConsumpBar>
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
-                        <MoneyCategoryP>숙박</MoneyCategoryP>
+                        <MoneyCategoryP>{budgetDetails?.budgetList[4]?.categoryName}</MoneyCategoryP>
                         <MoneyComsumpP color="#009BEB">
-                        {budgetDetails?.budgetList[4]?.usedBudget && budgetDetails?.budgetList[4]?.budgetWon 
-                                ? ((budgetDetails.budgetList[4].usedBudget / budgetDetails.budgetList[4].budgetWon) * 100).toFixed(0) 
+                        {budgetDetails?.budgetList[4]?.usedBudget && budgetDetails?.budgetList[4]?.categoryBudget 
+                                ? ((budgetDetails.budgetList[4].usedBudget / budgetDetails.budgetList[4].categoryBudget) * 100).toFixed(0) 
                                 : 0}%
                         </MoneyComsumpP>
                     </MoneyTitleDiv>
                     <BudgetDiv>
                         <MoneyBudgetComsumpP color='#009BEB'>{budgetDetails?.budgetList[4].usedBudget||0}</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[4].budgetWon||0} {travel?.currency}</MoneyBudgetP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[4].categoryBudget||0} {travel?.currency}</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar color={hexToRgba("#009BEB","0.3")}>
-                    <MoneyChartBar paid="30%"  color='#009BEB'/>
+                    <MoneyChartBar paid={budgetDetails?.budgetList[4]?.usedBudget && budgetDetails?.budgetList[4]?.categoryBudget 
+                                ? ((budgetDetails.budgetList[4].usedBudget / budgetDetails.budgetList[4].categoryBudget) * 100)
+                                : 0}  color='#009BEB'/>
                 </MoneyChartConsumpBar>
                 <MoneyCategoryProgressDiv>
                     <MoneyTitleDiv>
-                        <MoneyCategoryP>기타</MoneyCategoryP>
+                        <MoneyCategoryP>{budgetDetails?.budgetList[5]?.categoryName}</MoneyCategoryP>
                         <MoneyComsumpP color="#008DE7">
-                            {budgetDetails?.budgetList[5]?.usedBudget && budgetDetails?.budgetList[5]?.budgetWon 
-                                ? ((budgetDetails.budgetList[5].usedBudget / budgetDetails.budgetList[5].budgetWon) * 100).toFixed(0) 
+                            {budgetDetails?.budgetList[5]?.usedBudget && budgetDetails?.budgetList[5]?.categoryBudget 
+                                ? ((budgetDetails.budgetList[5].usedBudget / budgetDetails.budgetList[5].categoryBudget) * 100).toFixed(0) 
                                 : 0}%
                         </MoneyComsumpP>
                     </MoneyTitleDiv>
                     <BudgetDiv>
                         <MoneyBudgetComsumpP color='#008DE7'>{budgetDetails?.budgetList[5].usedBudget||0}</MoneyBudgetComsumpP>
-                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[5].budgetWon||0} {travel?.currency}</MoneyBudgetP>
+                        <MoneyBudgetP color=''>/ {budgetDetails?.budgetList[5].categoryBudget||0} {travel?.currency}</MoneyBudgetP>
                     </BudgetDiv>
                 </MoneyCategoryProgressDiv>
                 <MoneyChartConsumpBar color={hexToRgba("#008DE7","0.3")}>
-                    <MoneyChartBar paid="30%" color='#008DE7'/>
+                    <MoneyChartBar paid={budgetDetails?.budgetList[5]?.usedBudget && budgetDetails?.budgetList[5]?.categoryBudget 
+                                ? ((budgetDetails.budgetList[5].usedBudget / budgetDetails.budgetList[5].categoryBudget) * 100)
+                                : 0}  color='#008DE7'/>
                 </MoneyChartConsumpBar>
             </MoneyDiv>
-          <CategoryShareDiv>
-              <CategoryTitleDiv>
-                  <CategoryTitleFontDiv>
-                      <ShareIcon/>
-                      <TitleP>여행 공유 옵션</TitleP>
-                  </CategoryTitleFontDiv>
-                  <RightArrow/>
-              </CategoryTitleDiv>
-          </CategoryShareDiv>
       </ContentDiv>
     </DetailDiv>
   </>
   );
 }
 
-export default CompletedTravelDetailPage;
+export default OngoingTravelDetailPage;

@@ -118,7 +118,8 @@ const LoginPage = () => {
     formData.append('memberId', id.value);
     formData.append('password', pw.value);
 
-    const { data: loginData, error: loginError, loading: loginLoading, status: loginStatus, refetch: loginRefetch } = useAxios('/login', 'POST', formData);
+    const { data: loginData, error: loginError, loading: loginLoading, 
+        status: loginStatus, refetch: loginRefetch } = useAxios('/login', 'POST', undefined, formData);
 
     // 로그인 핸들러
     const handleLogin = (e: any) => {

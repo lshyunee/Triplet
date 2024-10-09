@@ -108,7 +108,7 @@ const MoneyCategoryProgressDiv = styled.div`
     display : flex;
     flex-direction : row;
     justify-content : space-between;
-    margin : 24px 0 0 0;
+    margin : 24px 0 8px 0;
 `;
 
 const MoneyCategoryP = styled.p`
@@ -130,12 +130,51 @@ const BudgetDiv = styled.div`
     margin-right : 2px;
 `;
 
-const MoneyBudgetP = styled.p`
+const MoneyBudgetP = styled.p<MoneyCategoryProps>`
     margin : 0px;
-    font-size : 16px;
-    font-weight : 400;
-    color : black;
+    font-size : 14px;
+    font-weight : 500;
+    color : ${props => props.color || "#666666"}
 `;
+
+const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
+    margin : 0px;
+    font-size : 14px;
+    font-weight : 600;
+    margin-right : 4px;
+    color : ${props => props.color || "#666666"}
+`;
+
+interface MonyeProgressProps {
+    paid : string;
+    color : string;
+}
+
+const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
+    width: 100%;
+    background-color: ${props => props.color};
+    border-radius: 50px;
+    overflow: hidden;
+    height: 12px;
+`;
+
+const MoneyChartBar = styled.div<MonyeProgressProps>`
+    height : 100%;
+    background-color : ${props => props.color};
+    width : ${props => props.paid || '50%'};
+    border-radius : 50px;
+`
+const MoneyComsumpP = styled.p<MoneyCategoryProps>`
+    font-size : 16px;
+    font-weight : 700;
+    color : ${props => props.color || "#666666"};
+    margin : 0px;
+    margin-left : 8px;
+`
+
+interface MoneyCategoryProps {
+    color : string;
+}
 
 interface Travel {
     travelId: number;
@@ -147,6 +186,7 @@ interface Travel {
     countryId: number;
     currency: string;
     memberCount: number;
+    totalBudget : number
     totalBudgetWon: number;
     usedBudget: number;
     status: boolean;
@@ -234,6 +274,19 @@ const CompletedTravelDetailPage = () => {
     
     const [ isShareModal, setShareModal ] = useState(false);
 
+    const hexToRgba = (hex:string, alpha:string) => {
+        // hex 코드에서 # 제거
+        const strippedHex = hex.replace('#', '');
+    
+        // 16진수 값으로 변환
+        const r = parseInt(strippedHex.substring(0, 2), 16);
+        const g = parseInt(strippedHex.substring(2, 4), 16);
+        const b = parseInt(strippedHex.substring(4, 6), 16);
+    
+        // rgba 문자열 생성
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+
     return (
         <>
             <BackHeader title={travel?.title || ""}></BackHeader>
@@ -242,105 +295,150 @@ const CompletedTravelDetailPage = () => {
                 <Overlay />
                 <ContentDiv>
                     <TravelCardDiv>
-                        <CompletedTravelDetailCard title={travel?.title || ""}
+                        <CompletedTravelDetailCard 
+                            travelId={travel?.travelId||0}
+                            title={travel?.title || ""}
                             startDate={travel?.startDate || ""} 
                             endDate={travel?.endDate || ""}
                             country={travel?.country || ""}
                             memberCount={travel?.memberCount || 0}
-                            usedBudget={usedBudget || 0}/>
+                            usedBudget={usedBudget || 0}
+                            creatorId={travel?.creatorId || 0}/>
                     </TravelCardDiv>
                     <TravelDetailPay />
-                    <CategoryBudgetDiv>
-                        <CategoryTitleDiv>
-                            <CategoryTitleFontDiv>
-                                <PayIcon />
-                                <TitleP>여행 지출 내역</TitleP>
-                            </CategoryTitleFontDiv>
-                            <RightArrow />
-                        </CategoryTitleDiv>
-                    </CategoryBudgetDiv>
                     <MoneyDiv>
                         <MoneyCategoryDiv>
                             <MoneyCategoryP>항공</MoneyCategoryP>
-                            <MoneyCategoryP>600,000원</MoneyCategoryP>
+                            <MoneyCategoryP>{travel?.airportCost} 원</MoneyCategoryP>
                         </MoneyCategoryDiv>
-                        {/* 항목이 있는지 확인 후 조건부 렌더링 */}
                         {budgetDetails?.budgetList?.[0] && (
                             <>
                                 <MoneyCategoryProgressDiv>
                                     <MoneyTitleDiv>
-                                        <MoneyCategoryP>식사</MoneyCategoryP>
+                                        <MoneyCategoryP>{budgetDetails?.budgetList?.[0]?.categoryName}</MoneyCategoryP>
+                                        <MoneyComsumpP color="#00D5FF">
+                                        {budgetDetails?.budgetList[0]?.used && usedBudget
+                                            ? ((budgetDetails.budgetList[0].used / usedBudget) * 100).toFixed(0) 
+                                            : 0}% 
+                                        </MoneyComsumpP> 
                                     </MoneyTitleDiv>
                                     <BudgetDiv>
-                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[0]?.used || 0} {travel?.currency}</MoneyBudgetP>
+                                    <MoneyBudgetComsumpP color='#00D5FF'>{budgetDetails?.budgetList[0].used || 0}</MoneyBudgetComsumpP>
+                                        <MoneyBudgetP color=''>/ {usedBudget} {travel?.currency}</MoneyBudgetP>
                                     </BudgetDiv>
                                 </MoneyCategoryProgressDiv>
                             </>
                         )}
+                        <MoneyChartConsumpBar color={hexToRgba("#00D5FF","0.3")}>
+                            <MoneyChartBar paid="80%" color="#00D5FF"/>
+                        </MoneyChartConsumpBar>
                         {budgetDetails?.budgetList?.[1] && (
                             <>
                                 <MoneyCategoryProgressDiv>
                                     <MoneyTitleDiv>
-                                        <MoneyCategoryP>식사</MoneyCategoryP>
+                                        <MoneyCategoryP>{budgetDetails?.budgetList?.[1]?.categoryName}</MoneyCategoryP>
+                                        <MoneyComsumpP color="#00C8FB">
+                                        {budgetDetails?.budgetList[1]?.used && usedBudget
+                                            ? ((budgetDetails.budgetList[1].used / usedBudget) * 100).toFixed(0) 
+                                            : 0}% 
+                                        </MoneyComsumpP> 
                                     </MoneyTitleDiv>
                                     <BudgetDiv>
-                                    <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[1]?.used || 0} {travel?.currency}</MoneyBudgetP>
+                                    <MoneyBudgetComsumpP color='#00C8FB'>{budgetDetails?.budgetList[1].used || 0}</MoneyBudgetComsumpP>
+                                        <MoneyBudgetP color=''>/ {usedBudget} {travel?.currency}</MoneyBudgetP>
                                     </BudgetDiv>
                                 </MoneyCategoryProgressDiv>
                             </>
                         )}
+                        <MoneyChartConsumpBar color={hexToRgba("#00C8FB","0.3")}>
+                            <MoneyChartBar paid="80%" color="#00C8FB"/>
+                        </MoneyChartConsumpBar>
                         {budgetDetails?.budgetList?.[2] && (
                             <>
                                 <MoneyCategoryProgressDiv>
                                     <MoneyTitleDiv>
-                                        <MoneyCategoryP>식사</MoneyCategoryP>
+                                        <MoneyCategoryP>{budgetDetails?.budgetList?.[0]?.categoryName}</MoneyCategoryP>
+                                        <MoneyComsumpP color="#00B8F5">
+                                        {budgetDetails?.budgetList[2]?.used && usedBudget
+                                            ? ((budgetDetails.budgetList[2].used / usedBudget) * 100).toFixed(0) 
+                                            : 0}% 
+                                        </MoneyComsumpP> 
                                     </MoneyTitleDiv>
                                     <BudgetDiv>
-                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[2]?.used || 0} {travel?.currency}</MoneyBudgetP>
+                                    <MoneyBudgetComsumpP color='#00B8F5'>{budgetDetails?.budgetList[2].used || 0}</MoneyBudgetComsumpP>
+                                        <MoneyBudgetP color=''>/ {usedBudget} {travel?.currency}</MoneyBudgetP>
                                     </BudgetDiv>
                                 </MoneyCategoryProgressDiv>
                             </>
                         )}
-
+                        <MoneyChartConsumpBar color={hexToRgba("#00B8F5","0.3")}>
+                            <MoneyChartBar paid="80%" color="#00B8F5"/>
+                        </MoneyChartConsumpBar>
                         {budgetDetails?.budgetList?.[3] && (
                             <>
                                 <MoneyCategoryProgressDiv>
                                     <MoneyTitleDiv>
-                                        <MoneyCategoryP>식사</MoneyCategoryP>
+                                        <MoneyCategoryP>{budgetDetails?.budgetList?.[3]?.categoryName}</MoneyCategoryP>
+                                        <MoneyComsumpP color="#00ACF1">
+                                        {budgetDetails?.budgetList[3]?.used && usedBudget
+                                            ? ((budgetDetails.budgetList[3].used / usedBudget) * 100).toFixed(0) 
+                                            : 0}% 
+                                        </MoneyComsumpP> 
                                     </MoneyTitleDiv>
                                     <BudgetDiv>
-                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[3]?.used || 0} {travel?.currency}</MoneyBudgetP>
+                                    <MoneyBudgetComsumpP color='#00ACF1'>{budgetDetails?.budgetList[3].used || 0}</MoneyBudgetComsumpP>
+                                        <MoneyBudgetP color=''>/ {usedBudget} {travel?.currency}</MoneyBudgetP>
                                     </BudgetDiv>
                                 </MoneyCategoryProgressDiv>
                             </>
                         )}
+                        <MoneyChartConsumpBar color={hexToRgba("#00ACF1","0.3")}>
+                            <MoneyChartBar paid="80%" color="#00ACF1"/>
+                        </MoneyChartConsumpBar>
 
                         {budgetDetails?.budgetList?.[4] && (
                             <>
                                 <MoneyCategoryProgressDiv>
                                     <MoneyTitleDiv>
-                                        <MoneyCategoryP>식사</MoneyCategoryP>
+                                        <MoneyCategoryP>{budgetDetails?.budgetList?.[4]?.categoryName}</MoneyCategoryP>
+                                        <MoneyComsumpP color="#009BEB">
+                                        {budgetDetails?.budgetList[4]?.used && usedBudget
+                                            ? ((budgetDetails.budgetList[4].used / usedBudget) * 100).toFixed(0) 
+                                            : 0}% 
+                                        </MoneyComsumpP> 
                                     </MoneyTitleDiv>
                                     <BudgetDiv>
-                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[4]?.used || 0} {travel?.currency}</MoneyBudgetP>
+                                    <MoneyBudgetComsumpP color='#009BEB'>{budgetDetails?.budgetList[4].used || 0}</MoneyBudgetComsumpP>
+                                        <MoneyBudgetP color=''>/ {usedBudget} {travel?.currency}</MoneyBudgetP>
                                     </BudgetDiv>
                                 </MoneyCategoryProgressDiv>
                             </>
                         )}
-
+                        <MoneyChartConsumpBar color={hexToRgba("#009BEB","0.3")}>
+                            <MoneyChartBar paid="80%" color="#009BEB"/>
+                        </MoneyChartConsumpBar>
                         {budgetDetails?.budgetList?.[5] && (
                             <>
                                 <MoneyCategoryProgressDiv>
                                     <MoneyTitleDiv>
-                                        <MoneyCategoryP>식사</MoneyCategoryP>
+                                        <MoneyCategoryP>{budgetDetails?.budgetList?.[5]?.categoryName}</MoneyCategoryP>
+                                        <MoneyComsumpP color="#008DE7">
+                                        {budgetDetails?.budgetList[5]?.used && usedBudget
+                                            ? ((budgetDetails.budgetList[5].used / usedBudget) * 100).toFixed(0) 
+                                            : 0}% 
+                                        </MoneyComsumpP> 
                                     </MoneyTitleDiv>
                                     <BudgetDiv>
-                                        <MoneyBudgetP color=''>{budgetDetails?.budgetList?.[5]?.used || 0} {travel?.currency}</MoneyBudgetP>
+                                    <MoneyBudgetComsumpP color='#008DE7'>{budgetDetails?.budgetList[5].used || 0}</MoneyBudgetComsumpP>
+                                        <MoneyBudgetP color=''>/ {usedBudget} {travel?.currency}</MoneyBudgetP>
                                     </BudgetDiv>
                                 </MoneyCategoryProgressDiv>
                             </>
                         )}
-                    </MoneyDiv>
+                        <MoneyChartConsumpBar color={hexToRgba("#008DE7","0.3")}>
+                            <MoneyChartBar paid="80%" color="#008DE7"/>
+                        </MoneyChartConsumpBar>
+                        </MoneyDiv>
                     <CategoryShareDiv>
                         <CategoryTitleDiv  onClick={()=>{setShareModal(true)}}>
                             <CategoryTitleFontDiv>

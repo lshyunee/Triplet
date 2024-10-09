@@ -16,7 +16,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../../store';
 import { initFeedTravels, addFeedTravels } from '../../features/travel/snsTravelSlice';
 import useIntersectionObserver from '../../hooks/useIntersectionObserver';
-import { addFilter, setCountry, setFilter, initFilter  } from '../../features/travel/snsTravelFilterSlice';
+import { addFilter, setCountry, setFilter, initFilter, setPages  } from '../../features/travel/snsTravelFilterSlice';
 
 const FeedDiv = styled.div`
     background-color : #F3F4F6;
@@ -194,29 +194,39 @@ const FeedPage = () => {
 
     const countryName = useInput();
 
-    const { data : searchData, error : searchError, status : searchStatus,
-        loading : searchLoading, refetch : searchRefetch
-       } = useAxios("/travels/shared", "GET",
-        {
-            countryName : filter.kind === 0 || filter.kind === 1 || filter.countryName === '' ? null : filter.countryName,
-            memberCount : filter.kind === 0 || filter.kind === 1 || filter.memberCount === 0 ? null : filter.memberCount,
-            minBudget : filter.kind === 0 || filter.kind === 1 || filter.minBudget === 0 ? null : filter.minBudget,
-            maxBudget : filter.kind === 0 || filter.kind === 1 || filter.maxBudget === 0 ? null : filter.maxBudget,
-            minDays : filter.kind === 0 || filter.kind === 1 || filter.minDays === 0 ? null : filter.minDays,
-            maxDays : filter.kind === 0 || filter.kind === 1 || filter.maxDays === 0 ? null : filter.maxDays,
-            page : page,
-            kind : filter.kind
-    });
+    const [ kind, setKind ] = useState(0);
+
+
+    const { 
+        data: searchData, 
+        error: searchError, 
+        status: searchStatus,
+        loading: searchLoading, 
+        refetch: searchRefetch 
+      } = useAxios(
+        "/travels/shared", 
+        "GET", 
+        { // params 부분
+          countryName: kind === 0 || kind === 1 || countryName.value === '' ? undefined : countryName.value,
+          memberCount: kind === 0 || kind === 1 || Number(filter.memberCount) === 0 ? undefined : filter.memberCount,
+          minBudget: kind === 0 || kind === 1 || Number(filter.minBudget) === 0 ? undefined : filter.minBudget,
+          maxBudget: kind === 0 || kind === 1 || Number(filter.maxBudget) === 0 ? undefined : filter.maxBudget,
+          minDays: kind === 0 || kind === 1 || Number(filter.minDays) === 0 ? undefined : filter.minDays,
+          maxDays: kind === 0 || kind === 1 || Number(filter.maxDays) === 0 ? undefined : filter.maxDays,
+          page: page,
+          kind: kind
+        }
+      );
 
     // console.log({
-    //     countryName : filter.kind === 0 || filter.kind === 1 || filter.countryName === '' ? null : filter.countryName,
-    //     memberCount : filter.kind === 0 || filter.kind === 1 || filter.memberCount === 0 ? null : filter.memberCount,
-    //     minBudget : filter.kind === 0 || filter.kind === 1 || filter.minBudget === 0 ? null : filter.minBudget,
-    //     maxBudget : filter.kind === 0 || filter.kind === 1 || filter.maxBudget === 0 ? null : filter.maxBudget,
-    //     minPeriod : filter.kind === 0 || filter.kind === 1 || filter.minDays === 0 ? null : filter.minDays,
-    //     maxDays : filter.kind === 0 || filter.kind === 1 || filter.maxDays === 0 ? null : filter.maxDays,
-    //     page : page,
-    //     kind : filter.kind
+    //     countryName: kind === 0 || kind === 1 || countryName.value === '' ? null : countryName.value,
+    //     memberCount: kind === 0 || kind === 1 || Number(filter.memberCount) === 0 ? null : filter.memberCount,
+    //     minBudget: kind === 0 || kind === 1 || Number(filter.minBudget) === 0 ? null : filter.minBudget,
+    //     maxBudget: kind === 0 || kind === 1 || Number(filter.maxBudget) === 0 ? null : filter.maxBudget,
+    //     minDays: kind === 0 || kind === 1 || Number(filter.minDays) === 0 ? null : filter.minDays,
+    //     maxDays: kind === 0 || kind === 1 || Number(filter.maxDays) === 0 ? null : filter.maxDays,
+    //     page: page,
+    //     kind: kind
     //   });
 
     useEffect(() => {
@@ -228,36 +238,25 @@ const FeedPage = () => {
 
 
     const handleInputChange = (event:any) => {
-        countryName.onChange(event);
+        console.log(countryName);
         if (event.key === 'Enter') {
             dispatch(initFeedTravels());
             dispatch(setCountry(countryName.value));
             dispatch(addFilter(2));
+            setKind(2);
             setSelectedSortOption('정확도순');
+            setPage(1);
+            dispatch(setPages(1));
         }
     };
 
-    useEffect(() => {
-        
-        console.log("filter", filter);
-        dispatch(initFeedTravels());
-        
-        if(filter.countryName !== ''){
-            console.log("refetch?");
-            searchRefetch();
-        }else {
-            dispatch(addFilter(0));
-        }
-
-    },[filter.countryName]);
-
     useEffect(()=>{
         if(!searchLoading){
-            console.log("kind 바뀜", filter.kind);
+            console.log("kind 바뀜", kind);
             dispatch(initFeedTravels());
             searchRefetch();
         }
-    }, [filter.kind])
+    }, [kind])
 
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
@@ -267,9 +266,11 @@ const FeedPage = () => {
     const handleSortOptionSelect = (option: string) => {
         setSelectedSortOption(option);
         
-        let kind = option === '추천순' ? 0 : 1;
+        setKind(option === '추천순' ? 0 : 1);
 
         dispatch(addFilter(kind));
+        dispatch(setPages(1));
+        setPage(1);
         setIsDropdownOpen(false);
 
     };
@@ -289,20 +290,22 @@ const FeedPage = () => {
 
     useEffect(() => {
         if (hasMore && !searchLoading) {
-            console.log("refetch?");
-            console.log("refetch", filter);
-            searchRefetch();
+            // searchRefetch();
         }
     }, [page, hasMore]);
 
     useEffect(() => {
-        if (searchData && searchData.data.content.length > 0) {
+        if (searchData && searchData.data && searchData.data.content) {
+          if (searchData.data.content.length > 0) {
             dispatch(addFeedTravels(searchData.data.content));
             console.log(searchData.data.content);
-        } else {
+          } else {
             setHasMore(false); // 더 이상 데이터가 없으면 로딩을 중단
+          }
+        } else if (searchError) {
+          console.error("Error fetching data:", searchError);
         }
-    }, [searchData, searchError]);
+      }, [searchData, searchError]);
 
     const loadMore = () => {
         if (!searchLoading && hasMore) {

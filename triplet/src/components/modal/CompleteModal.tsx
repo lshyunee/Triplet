@@ -24,6 +24,7 @@ const ModalContentDiv = styled.div`
   justify-content: space-between;
   border-radius: 8px;
   overflow: hidden;
+  Z-index : 1001;
 `;
 
 const Title = styled.div`
@@ -64,7 +65,7 @@ interface ModalProps {
   msg: string;
 }
 
-const ErrorModal: React.FC<ModalProps> = ({ isOpen, onClose, msg }) => {
+const CompleteModal: React.FC<ModalProps> = ({ isOpen, onClose, msg }) => {
   
   // Enter 키 입력 시 모달 닫기
   useEffect(() => {
@@ -107,4 +108,4 @@ const ErrorModal: React.FC<ModalProps> = ({ isOpen, onClose, msg }) => {
   );
 }
 
-export default ErrorModal;
+export default CompleteModal;

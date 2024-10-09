@@ -2,11 +2,9 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import useAxios from '../../hooks/useAxios';
 import { useSelector, useDispatch } from 'react-redux';
-
+import { Link } from 'react-router-dom';
 import { ongoingTravelDataInsert } from '../../features/travel/ongoingTravelSlice';
 
-import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
-import ErrorModal from '../modal/ErrorModal';
 
 const PositionDiv = styled.div`
     display: flex;
@@ -98,8 +96,12 @@ const ProgressContainer = styled.div`
     overflow: hidden;
 `;
 
-const ProgressBar = styled.div`
-    width: 30%; /* 30% 진행률 */
+interface MonyeProgressProps {
+    paid : number;
+}
+
+const ProgressBar = styled.div<MonyeProgressProps>`
+    width : ${props => `${props.paid}%` || '0%'};
     height: 100%;
     border-radius: 50px;
     background-color: white;
@@ -130,6 +132,13 @@ const PriceInfo = styled.div`
 
 const PriceInfoP = styled.p`
     font-weight : 400;
+`;
+
+const StyledLink = styled(Link)`
+    display: block;
+    width: 100%;
+    text-decoration: none !important;  /* 밑줄 강제로 제거 */
+    color: inherit !important;         /* 링크 색상 기본값 제거 */
 `;
 
 const OngoingTravelCard = () => {
@@ -177,22 +186,24 @@ const OngoingTravelCard = () => {
     }
 
     return (
+        <StyledLink to={`/travels/ongoing/detail`}>
         <PositionDiv>
             <CardDiv>
                 <TravelImg src={travelData?.image} alt="Travel" />
                 <Overlay />
-                <BottomOverlay /> {/* 하단 반투명 오버레이 추가 */}
+                <BottomOverlay />
                 <TitleP>{travelData?.title}</TitleP>
                 <InfoP>{travelData?.startDate ? new Date(travelData.startDate).toLocaleDateString() : ''} ~ {travelData?.endDate ? 
                 new Date(travelData.endDate).toLocaleDateString() : ''}<br />
                 {travelData.countryName} · {travelData.memberCount}명</InfoP>
-                <ProgressText>30%</ProgressText> {/* 진행률 텍스트 추가 */}
+                <ProgressText>{(travelData.usedBudget/travelData.totalBudget*100).toFixed(0)}%</ProgressText> 
                 <ProgressContainer>
-                    <ProgressBar />
+                    <ProgressBar paid={(travelData.usedBudget/travelData.totalBudget*100)} />
                 </ProgressContainer>
                 <PriceInfo>{travelData.usedBudget} <PriceInfoP>/ {travelData.totalBudget}원</PriceInfoP></PriceInfo>
             </CardDiv>
         </PositionDiv>
+        </StyledLink>
     );
 };
 

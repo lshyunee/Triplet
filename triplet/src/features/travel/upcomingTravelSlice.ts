@@ -47,8 +47,8 @@ const upcomingTravelSlice = createSlice({
     },
 });
 
-export const selectUpcomingTravelByTitleId = (state : RootState, titleId : number) : TravelState | undefined => {
-    return state.upcomingTravel.travels.find(travel => travel.travelId === titleId);
+export const selectUpcomingTravelByTitleId = (state : RootState, travelId : number) : TravelState | undefined => {
+    return state.upcomingTravel.travels.find(travel => travel.travelId === travelId);
 };
 
 export const selectAllUpcomingTravelIds = (state:RootState) : number[] => {

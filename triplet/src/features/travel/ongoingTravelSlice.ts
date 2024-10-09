@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../../store';
 
 interface TravelState {
   travelId: number;
@@ -15,6 +16,8 @@ interface TravelState {
   status: boolean;
   shareStatus: boolean;
   shared: boolean;
+  airportCost : number;
+  creatorId : number;
 }
 
 const initialState: TravelState = {
@@ -32,6 +35,8 @@ const initialState: TravelState = {
   status: false,
   shareStatus: false,
   shared: false,
+  airportCost: 0,
+  creatorId : 0,
 };
 
 const ongoingTravelSlice = createSlice({
@@ -54,6 +59,8 @@ const ongoingTravelSlice = createSlice({
         status,
         shareStatus,
         shared,
+        airportCost,
+        creatorId,
       } = action.payload;
 
       if (travelId !== undefined) state.travelId = travelId;
@@ -70,10 +77,16 @@ const ongoingTravelSlice = createSlice({
       if (status !== undefined) state.status = status;
       if (shareStatus !== undefined) state.shareStatus = shareStatus;
       if (shared !== undefined) state.shared = shared;
+      if (airportCost !== undefined) state.airportCost = airportCost;
+      if (creatorId !== undefined) state.creatorId = creatorId;
     },
 
   },
 });
+
+export const selectOngoingTravelId = (state:RootState) : number => {
+  return state.ongoingTravel.travelId;
+};
 
 export const { ongoingTravelDataInsert } = ongoingTravelSlice.actions;
 export default ongoingTravelSlice.reducer;

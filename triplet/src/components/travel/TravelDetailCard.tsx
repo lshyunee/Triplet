@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { ReactComponent as RemoveIcon} from '../../assets/travel/removeIcon.svg';
 import useAxios from '../../hooks/useAxios';
+import RemoveModal from '../modal/RemoveModal';
 
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
 
@@ -69,8 +71,12 @@ const ProgressContainer = styled.div`
     overflow: hidden;
 `;
 
-const ProgressBar = styled.div`
-    width: 30%; /* 30% 진행률 */
+interface MonyeProgressProps {
+    paid : number;
+}
+
+const ProgressBar = styled.div<MonyeProgressProps>`
+    width : ${props => `${props.paid}%` || '0%'};
     height: 100%;
     border-radius: 50px;
     background-color: #008DE7;
@@ -109,37 +115,54 @@ const PriceInfoP = styled.p`
     color : #666666;
 `;
 
+const Remove = styled(RemoveIcon)`
+    position: absolute;
+    bottom: 125px; 
+    right: 20px;
+`;
+
+
 interface TravelDetailCardProps {
+    travelId : number,
     title : String,
     startDate : String,
     endDate : String,
     country : String,
     memberCount : number,
     usedBudget : number,
-    totalBudgetWon : number,
+    totalBudget : number,
+    currency : string,
+    creatorId : number,
 }
 
 const TravelDetailCard: React.FC<TravelDetailCardProps> = 
-        ({title, startDate, endDate, country, memberCount,usedBudget, totalBudgetWon}) => {
+        ({travelId, title, startDate, endDate, country, memberCount, usedBudget, totalBudget, currency, creatorId}) => {
 
+    const [ removeOpen, setRemoveOpen ] = useState(false);
+
+    const remove = () => {
+        setRemoveOpen(true);
+    }
 
     return (
         <PositionDiv>
             <CardDiv>
                 <TitleP>{title}</TitleP>
+                <Remove onClick={remove} />
                 <InfoP> { startDate} ~
                 {endDate}<br />{country} · {memberCount}명</InfoP>
-                <ProgressText>{(usedBudget / totalBudgetWon * 100).toFixed(0)}%</ProgressText>
+                <ProgressText>{(usedBudget / totalBudget * 100).toFixed(0)}%</ProgressText>
                 <ProgressContainer>
-                    <ProgressBar />
+                    <ProgressBar paid={(usedBudget / totalBudget * 100)} />
                 </ProgressContainer>
                 <PriceInfo>
                     <PriceUsedP>
                         {usedBudget} 
                     </PriceUsedP>
-                        <PriceInfoP>/ {totalBudgetWon}원</PriceInfoP>
+                        <PriceInfoP>/ {totalBudget } {currency}</PriceInfoP>
                 </PriceInfo>
             </CardDiv>
+            <RemoveModal isOpen={removeOpen} onClose={() => {setRemoveOpen(false)}} travelId={travelId} creatorId={creatorId}/>
         </PositionDiv>
     );
 };

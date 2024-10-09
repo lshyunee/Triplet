@@ -188,14 +188,16 @@ const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }
   }, [isOpen]);
 
   const filter = selector((state : RootState) => state.filterTravel);
+  const [ country, setCountry ] = useState('');
 
   useEffect(()=> {
+    setCountry(filter.countryName);
     setPerson(filter.memberCount);
     minBudget.changeData(filter.minBudget);
     maxBudget.changeData(filter.maxBudget);
     minPeriod.changeData(filter.minDays);
     maxPeriod.changeData(filter.maxDays);
-  }, [isOpen, filter]);
+  }, [filter]);
 
   const handleClose = () => {
     setVisible(false);
@@ -246,18 +248,17 @@ const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }
     refetch : searchRefetch
    } = useAxios("/travels/shared", "GET",
     {
-      countryName : filter.countryName === '' ? null : filter.countryName,
-      memberCount : person,
-      minBudget : minBudget.value === '0' ? null : Number(minBudget.value),
-      maxBudget : maxBudget.value === '0' ? null : Number(maxBudget.value),
-      minDays : minPeriod.value === '0' ? null : Number(minPeriod.value),
-      maxDays : maxPeriod.value === '0' ? null : Number(maxPeriod.value),
-      page : 1,
-      kind : 2
+        countryName: country === '' || country === null ? undefined : country,
+        memberCount: person === 0 ? undefined : person,
+        minBudget: Number(minBudget.value) === 0 ? undefined : Number(minBudget.value),
+        maxBudget: Number(maxBudget.value) === 0 ? undefined : Number(maxBudget.value),
+        minDays: Number(minPeriod.value) === 0 ? undefined : Number(minPeriod.value),
+        maxDays: Number(maxPeriod.value) === 0 ? undefined : Number(maxPeriod.value),
+        page: 1,
+        kind: 2
     });
 
   const saveFilter = () => {
-    dispatch(initFeedTravels());
     searchRefetch();
   }
 
@@ -265,17 +266,7 @@ const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }
 
     console.log(searchData);
 
-    console.log("Filter values before useAxios call:", {
-      countryName: filter.countryName === '' ? null : filter.countryName,
-      memberCount: person,
-      minBudget: minBudget.value === '0' ? null : Number(minBudget.value),
-      maxBudget: maxBudget.value === '0' ? null : Number(maxBudget.value),
-      minPeriod: minPeriod.value === '0' ? null : Number(minPeriod.value),
-      maxPeriod: maxPeriod.value === '0' ? null : Number(maxPeriod.value),
-      page: 1,
-      kind: 2
-    });
-    
+    console.log(minBudget.value);
     
     if(searchData && searchStatus === 200){
       dispatch(initFeedTravels());

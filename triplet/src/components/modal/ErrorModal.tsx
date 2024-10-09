@@ -24,6 +24,7 @@ const ModalContentDiv = styled.div`
   justify-content: space-between;
   border-radius: 8px;
   overflow: hidden;
+  Z-index : 1001;
 `;
 
 const Title = styled.div`

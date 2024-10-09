@@ -4,7 +4,8 @@ import axiosInstance from '../services/axios';
 const useAxios = (
   url: string, 
   method: 'GET' | 'POST' | 'PUT' | 'DELETE', 
-  body?: any, 
+  params?: any, // GET 요청을 위한 params
+  body?: any,   // POST, PUT, DELETE 요청을 위한 body
   headers = {}
 ) => {
   const [data, setData] = useState<any>(null);
@@ -18,15 +19,15 @@ const useAxios = (
       const response = await axiosInstance({
         url,
         method,
-        data: body,
-        headers,
+        ...(method === 'GET' ? { params } : { data: body }),
+        headers: body instanceof FormData ? { ...headers } : { 'Content-Type': 'application/json', ...headers }, 
       });
       setData(response.data);
       setStatus(response.status);
       setError(null); // 오류 없을 때는 null로 설정
     } catch (err: any) {
-        setData(null);
-        setError(err);
+      setData(null);
+      setError(err);
       if (err.response) {
         setStatus(err.response.status);
       }
@@ -34,14 +35,6 @@ const useAxios = (
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    setData(null);
-    setError(null);
-    setStatus(null);
-    setLoading(false);
-  },[url])
-
 
   // refetch 함수 정의
   const refetch = () => {
