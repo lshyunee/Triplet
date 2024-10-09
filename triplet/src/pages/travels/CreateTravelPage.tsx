@@ -189,8 +189,17 @@ type countryData = {
 
 interface FirstStepProps {
   $isFirst: boolean;
-}
+};
 
+type currencyData = {
+  changePercentage: string;
+  changeStatus: number;
+  created: string;
+  currency: string;
+  exchangeMin: number;
+  exchangeRate: string;
+  id: number;
+};
 
 const CreateTravelPage = () => {
   const dispatch = useDispatch();
@@ -343,12 +352,13 @@ const CreateTravelPage = () => {
   const [foreignEtc, setForeignEtc] = useState<number>(0);
   const [foreignTotal, setForeignTotal] = useState<number>(0);
 
-  const [won, setWon] = useState<number>(0);
+  const [currency, setCurrency] = useState<currencyData>();
   const { data: currencyData,
     error: currencyError,
     loading: currencyLoading,
     status: currencyStatus,
-    refetch: currencyRefetch } = useAxios('/exchange-cal', 'POST', {"sourceCurrency": "KRW", "targetCurrency": countryCurrency, "sourceAmount": won});
+    refetch: currencyRefetch } = useAxios(`/exchange-rate/${countryCurrency}`, 'GET');
+  
   
   const handleBudget = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target;
@@ -460,6 +470,29 @@ const CreateTravelPage = () => {
     }
   }, [tdata])
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await Promise.all([
+          currencyRefetch(),
+        ])
+      } catch (error) {
+        console.error('error fetching', error)
+      }
+    }
+    fetchData()
+  }, [countryCurrency])
+
+  useEffect(() => {
+    console.log(currencyData)
+    if (currencyData) {
+      setCurrency(currencyData.data)
+    }
+  }, [currencyData])
+
+  useEffect(() => {
+    console.log(currency)
+  }, [currency])
 
   return (
     <>

@@ -63,7 +63,20 @@ const QRPage: React.FC = () => {
         }
     });
 
-    // QR 코드를 인식한 후 2초 후에 다시 스캔 가능하도록 설정 (예시)
+    // 카메라를 활성화하고, 페이지를 떠날 때 카메라를 끄는 처리
+    useEffect(() => {
+        const videoElement = ref.current;
+
+        return () => {
+            if (videoElement && videoElement.srcObject) {
+                const stream = videoElement.srcObject as MediaStream;
+                stream.getTracks().forEach(track => track.stop());
+                videoElement.srcObject = null;
+            }
+        };
+    }, [ref]);
+
+    // QR 코드를 인식한 후 2초 후에 다시 스캔 가능하도록 설정
     useEffect(() => {
         if (isScanning) {
             const timeout = setTimeout(() => {
@@ -73,18 +86,6 @@ const QRPage: React.FC = () => {
             return () => clearTimeout(timeout);
         }
     }, [isScanning]);
-
-    // 컴포넌트가 언마운트될 때 카메라 스트림을 중지하는 코드 추가
-    useEffect(() => {
-        return () => {
-            const videoElement = ref.current as HTMLVideoElement | null;
-            if (videoElement && videoElement.srcObject) {
-                const stream = videoElement.srcObject as MediaStream;
-                stream.getTracks().forEach((track) => track.stop()); // 모든 트랙을 정지시킴
-                videoElement.srcObject = null;
-            }
-        };
-    }, [ref]);
 
     return (
         <>
