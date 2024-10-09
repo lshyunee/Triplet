@@ -189,14 +189,6 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
         }
     },[password]);
 
-    useEffect (() => {
-        
-        if(resData && resStatus===200){
-            navigate("/");
-        }
-
-    }, [resData, resError])
-
     // 지우기 버튼 클릭 핸들러
     const handleBackspace = () => {
         setPassword(password.slice(0, -1));
@@ -265,7 +257,7 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
                 {isModalOpen && (
                     <s.ModalOverlay>
                         <s.ModalContainer>
-                            <s.ModalText>충전이 완료되었습니다.</s.ModalText>
+                            <s.ModalText>변경이 완료되었습니다.</s.ModalText>
                             <s.ModalButton onClick={closeModal}>확인</s.ModalButton>
                         </s.ModalContainer>
                     </s.ModalOverlay>
