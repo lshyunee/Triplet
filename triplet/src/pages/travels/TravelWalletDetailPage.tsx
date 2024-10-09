@@ -4,11 +4,8 @@ import BackHeader from '../../components/header/BackHeader';
 import { useDispatch } from 'react-redux';
 import { pageMove } from '../../features/navigation/naviSlice';
 import { ReactComponent as Wallet } from '../../assets/pay/wallet.svg';
-import DatePicker from 'react-datepicker';
-import "react-datepicker/dist/react-datepicker.css";
 import { useParams, useNavigate } from 'react-router-dom';
 import useAxios from '../../hooks/useAxios';
-import axios from "axios";
 import axiosInstance from "../../services/axios";
 
 interface Transaction {
@@ -72,20 +69,6 @@ const s = {
   CardKrw: styled.div`
     font-size: 20px;
     font-weight: 600;
-  `,
-  CardCaption: styled.span`
-    font-size: 14px;
-    font-weight: 400;
-    color: #666666;
-  `,
-  CardButton: styled.button`
-    background-color: #A2D3FF;
-    font-size: 14px;
-    font-weight: 500;
-    height: 36px;
-    width: 66px;
-    border-radius: 50px;
-    border: 0;
   `,
   ButtonArea: styled.div`
     display: flex;
@@ -153,11 +136,6 @@ const s = {
     height: 50vh;
     color: #666666;
   `,
-  EditButtonContainer: styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-  `,
   EditButton: styled.button`
     font-size: 10px;
     font-weight: 500;
@@ -173,6 +151,15 @@ const s = {
     font-size: 10px;
     padding: 4px;
   `,
+  CardButton: styled.button`
+    background-color: #A2D3FF;
+    font-size: 14px;
+    font-weight: 500;
+    height: 36px;
+    width: 66px;
+    border-radius: 50px;
+    border: 0;
+  `,
 };
 
 const ForeignDetailPage = () => {
@@ -183,11 +170,7 @@ const ForeignDetailPage = () => {
 
   const { data: travelDetailData, refetch: travelDetailRefetch } = useAxios(`/travels/${travelId}`, 'GET');
   const { data: travelWalletDetailData, refetch: travelWalletDetailRefetch } = useAxios(`/travel-wallet/${travelId}`, 'GET');
-  const { data: exchangeData, refetch: exchangeRefetch } = useAxios('/exchange-cal', 'POST', undefined, {
-    sourceCurrency: travelWalletDetailData?.data?.currency,
-    targetCurrency: "KRW",
-    sourceAmount: travelWalletDetailData?.data?.balance
-  });
+
   const [transaction, setTransaction] = useState<TransactionsResponse | null>(null);
   const { data: transactionData, refetch: transactionRefetch } = useAxios(`/travel-wallet/transaction/${travelId}`, 'GET');
   const { data: categories, refetch: categoriesRefetch } = useAxios('/travels/categories', 'GET');
@@ -204,7 +187,7 @@ const ForeignDetailPage = () => {
   useEffect(() => {
     if (travelWalletDetailData && !transaction) {
       const fetchData = async () => {
-        await Promise.all([exchangeRefetch(), transactionRefetch()]);
+        await Promise.all([transactionRefetch()]);
       };
       fetchData();
     }
@@ -215,11 +198,6 @@ const ForeignDetailPage = () => {
       setTransaction(transactionData);
     }
   }, [transactionData]);
-
-  const today = new Date();
-  const week = new Date(new Date().setDate(new Date().getDate() - 7));
-  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([week, today]);
-  const [isDateOpen, setIsDateOpen] = useState<boolean>(false);
 
   const transactionGroupedByDate = transaction ? groupTransactionsByDate(transaction.data) : {};
 
@@ -250,16 +228,17 @@ const ForeignDetailPage = () => {
         <s.Container>
           <s.Card>
             <s.CardTitleArea>
-              <Wallet />
+              <Wallet/>
               <s.CardTitle>{travelDetailData?.data?.title}</s.CardTitle>
             </s.CardTitleArea>
             <s.CardKrw>{travelWalletDetailData?.data?.balance} {travelWalletDetailData?.data?.currency}</s.CardKrw>
-            <s.CardCaption>
-              {travelWalletDetailData?.data?.accountBalance === 0 ? `0 원` : `${exchangeData?.data?.targetAmount} 원`}
-            </s.CardCaption>
             <s.ButtonArea>
-              <s.CardButton onClick={() => { navigate(`/travels/wallet/recharge/${travelId}/${travelWalletDetailData?.data?.currency}`); }}>충전</s.CardButton>
-              <s.CardButton onClick={() => { navigate(`/travels/wallet/refund/${travelId}/${travelWalletDetailData?.data?.currency}`); }}>환급</s.CardButton>
+              <s.CardButton
+                  onClick={() => navigate(`/travels/wallet/recharge/${travelId}/${travelWalletDetailData?.data?.currency}`)}>충전
+              </s.CardButton>
+              <s.CardButton
+                  onClick={() => navigate(`/travels/wallet/refund/${travelId}/${travelWalletDetailData?.data?.currency}`)}>환급
+              </s.CardButton>
             </s.ButtonArea>
           </s.Card>
 
