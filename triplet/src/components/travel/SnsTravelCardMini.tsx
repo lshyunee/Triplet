@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import SampleImg from '../../assets/travelSampleImg/sampleImg.png';
+import { Link } from 'react-router-dom';
 
 const CardDiv = styled.div`
   width: 100%;
@@ -45,23 +46,12 @@ const BottomOverlay = styled.div`
   justify-content: space-between;
 `;
 
-// const Badge = styled.div`
-//   width: 70px;
-//   height: 30px;
-//   background-color: rgba(0, 0, 0, 0.5);
-//   border-radius: 50px;
-//   border: 1px solid white;
-//   font-size: 12px;
-//   font-weight: 500;
-//   color: white;
-//   display: flex; /* Flexbox 사용 */
-//   justify-content: center; /* 수평 중앙 정렬 */
-//   align-items: center; /* 수직 중앙 정렬 */
-//   z-index: 4;
-//   position: absolute;
-//   top: 10px;
-//   right: 10px;
-// `;
+const StyledLink = styled(Link)`
+    display: block;
+    width: 100%;
+    text-decoration: none !important;  /* 밑줄 강제로 제거 */
+    color: inherit !important;         /* 링크 색상 기본값 제거 */
+`;
 
 const ContentTitleDiv = styled.div`
     display : flex;
@@ -108,29 +98,33 @@ const CountryP = styled.p`
 `
 
 interface TravelDataProps {
+  travelId : number,
   title : string,
   days : number,
   totalBudgetWon : number,
   memberCount : number,
+  image : string,
 }
 
 const SnsTravelCardMini : React.FC<TravelDataProps> = ({
-  title, days, totalBudgetWon, memberCount 
+  travelId,title, days, totalBudgetWon, memberCount, image 
  }) => {
   return (
-    <CardDiv>
-      <TravelImg src={SampleImg} alt="Travel" />
-      <Overlay />
-      <BottomOverlay>
-        <ContentDiv>
-            <ContentTitleDiv>
-                <CountryP>{title}</CountryP>
-                <PriceInfoP>{days}일</PriceInfoP>
-            </ContentTitleDiv>
-            <DayInfoP>{totalBudgetWon}원/{memberCount}인</DayInfoP>
-        </ContentDiv>
-      </BottomOverlay>
-    </CardDiv>
+  <StyledLink to={`/feed/${travelId}/detail`}>
+      <CardDiv>
+        <TravelImg src={image} alt="Travel" />
+        <Overlay />
+        <BottomOverlay>
+          <ContentDiv>
+              <ContentTitleDiv>
+                  <CountryP>{title}</CountryP>
+                  <PriceInfoP>{days}일</PriceInfoP>
+              </ContentTitleDiv>
+              <DayInfoP>{totalBudgetWon}원/{memberCount}인</DayInfoP>
+          </ContentDiv>
+        </BottomOverlay>
+      </CardDiv>
+    </StyledLink>
   );
 };
 

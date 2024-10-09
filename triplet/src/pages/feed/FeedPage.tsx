@@ -370,10 +370,12 @@ const FeedPage = () => {
                     {travels?.travelData.map((travel, index) => (
                         <SnsTravelCardMini
                             key={travel.id || index}  // id가 없거나 중복될 경우 index 사용
+                            travelId={travel.id}
                             title={travel.title}
                             days={travel.days}
                             totalBudgetWon={travel.totalBudgetWon}
                             memberCount={travel.memberCount}
+                            image={travel.image}
                         />
                     ))}
                     <TargetDiv ref={targetRef} />

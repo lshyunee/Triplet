@@ -9,11 +9,12 @@ import useAxios from '../../hooks/useAxios';
 import { sharedTravelDataInsert } from '../../features/travel/shareTravelSlice';
 import WarningModal from '../../components/modal/WarningModal';
 const DetailDiv = styled.div`
-  padding: 56px 0 0 0;
+  padding: 56px 0 56px 0;
   display: flex;
   flex-direction: column;
   width: 100%;
   background-color: #f3f4f6;
+  margin-bottom : 24px;
 `;
 
 const Img = styled.img`
@@ -231,6 +232,7 @@ const SharedTravelDetailPage = () => {
     // rgba 문자열 생성
     return strippedHex.reduce((acc,item)=> acc + item + ",","")+"30%)";
   };
+
   return (
     <>
       <BackHeader title={travel?.title || ''}></BackHeader>
@@ -256,33 +258,33 @@ const SharedTravelDetailPage = () => {
               currency={travel?.currency || ''}
             />
           </TravelCardDiv>
-          <MoneyDiv>
-  {travel?.budgets?.map((budget: Budget, index: number) => {
-    const expenditure = expenditureData.find(
-      (exp) => exp.categoryId === budget.categoryId
-    );
-    const used = expenditure?.used || 0;
-    const percentageUsed = calculatePercentage(budget.budget, used);
+                <MoneyDiv>
+        {travel?.budgets?.map((budget: Budget, index: number) => {
+          const expenditure = expenditureData.find(
+            (exp) => exp.categoryId === budget.categoryId
+          );
+          const used = expenditure?.used || 0;
+          const percentageUsed = calculatePercentage(budget.budget, used);
 
-    return (
-      <div key={budget.categoryId}>
-        <MoneyCategoryProgressDiv>
-          <MoneyTitleDiv>
-            <MoneyCategoryP>{budget.categoryName}</MoneyCategoryP>
-            <MoneyComsumpP color="#00D5FF">{percentageUsed}</MoneyComsumpP>
-          </MoneyTitleDiv>
-          <BudgetDiv>
-            <MoneyBudgetComsumpP color='#00D5FF'>{used}</MoneyBudgetComsumpP>
-            <MoneyBudgetP color=''>{budget.budget} {travel.currency}</MoneyBudgetP>
-          </BudgetDiv>
-        </MoneyCategoryProgressDiv>
-        <MoneyChartConsumpBar color={rgbaToRgb(hexToRgba("#008DE7",percentageUsed))}>
-          <MoneyChartBar paid={percentageUsed} color={hexToRgba("#008DE7",percentageUsed)} />
-        </MoneyChartConsumpBar>
-      </div>
-    );
-  })}
-</MoneyDiv>
+          return (
+            <div key={budget.categoryId}>
+              <MoneyCategoryProgressDiv>
+                <MoneyTitleDiv>
+                  <MoneyCategoryP>{budget.categoryName}</MoneyCategoryP>
+                  <MoneyComsumpP color="#00D5FF">{percentageUsed}</MoneyComsumpP>
+                </MoneyTitleDiv>
+                <BudgetDiv>
+                  <MoneyBudgetComsumpP color='#00D5FF'>{used}</MoneyBudgetComsumpP>
+                  <MoneyBudgetP color=''>{budget.budget} {travel.currency}</MoneyBudgetP>
+                </BudgetDiv>
+              </MoneyCategoryProgressDiv>
+              <MoneyChartConsumpBar color={rgbaToRgb(hexToRgba("#008DE7",percentageUsed))}>
+                <MoneyChartBar paid={percentageUsed} color={hexToRgba("#008DE7",percentageUsed)} />
+              </MoneyChartConsumpBar>
+            </div>
+          );
+        })}
+      </MoneyDiv>
 
         </ContentDiv>
       </DetailDiv>

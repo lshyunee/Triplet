@@ -121,7 +121,7 @@ const ShareTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, sha
   const [ isCompleted, setIsCompleted ] = useState(false);
 
   const { data : shareData, error : shareError, status : shareStatus, refetch : shareRefetch }
-    = useAxios("/travels/share","POST", {
+    = useAxios("/travels/share","POST", undefined, {
       travelId : travelId,
       isShared : isShared,
       shareStatus : isDetailShared,
@@ -132,7 +132,6 @@ const ShareTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, sha
     if(shareData && shareStatus === 200) {
       setCompletedMSg(shareData.message);
       setIsCompleted(true);
-      return;
     }
 
     if(shareError){
@@ -159,6 +158,10 @@ const ShareTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, sha
     return null;
   }
   
+  const closeComplete = () => {
+    setIsCompleted(false);
+    onClose();
+  }
 
 
   const handleShareComplete = () => {
@@ -184,7 +187,7 @@ const ShareTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, sha
           <Button onClick={handleShareComplete}>확인</Button>
         </ConfirmDiv>
       </ModalContentDiv>
-      <CompleteModal isOpen={isCompleted} onClose={() => setIsCompleted(false)} msg={completedMsg} />
+      <CompleteModal isOpen={isCompleted} onClose={closeComplete} msg={completedMsg} />
     </ModalLayout>
   );
 };
