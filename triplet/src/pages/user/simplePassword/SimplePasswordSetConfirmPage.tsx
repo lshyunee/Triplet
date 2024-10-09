@@ -109,14 +109,15 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
 
     const { data: resData, loading: resLoading, error: resError, 
         status: resStatus, refetch: resRefetch } 
-        = useAxios('/simple-password', 'POST', { 
-            newSimplePassword : prePassword.join(''),
-            newSimplePasswordConfirm : password.join('') 
-        }); 
+    = useAxios('/simple-password', 'POST', undefined, { 
+        newSimplePassword : prePassword.join(''),
+        newSimplePasswordConfirm : password.join('') 
+    }); 
 
     useEffect(() => {
         setNumbers(shuffleArray([...numbers]));  // numbers 배열 복사 후 섞기
     }, []);
+    
 
     // 숫자 클릭 핸들러
     const handleNumberClick = (num: number) => {

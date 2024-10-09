@@ -203,7 +203,7 @@ const MyInfoSetPage = () => {
 
     const { data: editData, error: editError, loading: editLoading,
         status: editStatus, refetch: editRefetch }
-        = useAxios('/user/my', 'PUT', {
+        = useAxios('/user/my', 'PUT', undefined, {
             name : name.value,
             identificationNumber : identificationNum
         });

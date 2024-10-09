@@ -238,7 +238,7 @@ const AccountDetailPage = () => {
     error: transactionError, 
     loading: transactionLoading, 
     status: transactionStatus, 
-    refetch: transactionRefetch } = useAxios(`/transaction`, 'POST', {
+    refetch: transactionRefetch } = useAxios(`/transaction`, 'POST', undefined,{
       accountId: accountDetailData?.data?.accountId,
       startDate: start,
       endDate: end

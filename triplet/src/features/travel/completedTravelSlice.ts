@@ -44,6 +44,9 @@ const completedTravelSlice = createSlice({
         setCompletedTravels: (state, action: PayloadAction<TravelState[]>) => {
             state.travels = action.payload; // 기존 travels를 새로운 배열로 교체
         },
+        removeCompletedTravelById: (state, action: PayloadAction<number>) => {
+            state.travels = state.travels.filter(travel => travel.travelId !== action.payload);
+        },
         
     },
 });
@@ -57,5 +60,5 @@ export const selectCompletedTravelByTitleId = (state : RootState, titleId : numb
 export const selectAllCompletedTravelIds = (state:RootState) : number[] => {
     return state.completedTravel.travels.map(travel => travel.travelId);
 };
-export const { addCompletedTravels, setCompletedTravels } = completedTravelSlice.actions;
+export const { addCompletedTravels, setCompletedTravels, removeCompletedTravelById } = completedTravelSlice.actions;
 export default completedTravelSlice.reducer;

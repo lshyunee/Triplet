@@ -32,18 +32,21 @@ const upcomingTravelSlice = createSlice({
     reducers: {
         addUpcomingTravels: (state, action: PayloadAction<TravelState[]>) => {
             if (!action.payload) {
-                return;
-              }
+                return state;  // 명시적으로 state를 반환하여 문제 해결
+            }
               
             const newTravels = action.payload.filter(newTravel => 
               !state.travels.some(existingTravel => existingTravel.travelId === newTravel.travelId)
             );
             
             state.travels = [...state.travels, ...newTravels];
-          },
-        setUpcomingTravels: (state, action: PayloadAction<TravelState[]>) => {
-            state.travels = action.payload; // 기존 travels를 새로운 배열로 교체
         },
+        setUpcomingTravels: (state, action: PayloadAction<TravelState[]>) => {
+            state.travels = action.payload;
+        },
+        removeUpcomingTravelsById: (state, action: PayloadAction<number>) => {
+            state.travels = state.travels.filter(travel => travel.travelId !== action.payload);
+        }
     },
 });
 
@@ -54,5 +57,5 @@ export const selectUpcomingTravelByTitleId = (state : RootState, travelId : numb
 export const selectAllUpcomingTravelIds = (state:RootState) : number[] => {
     return state.upcomingTravel.travels.map(travel => travel.travelId);
 };
-export const { addUpcomingTravels, setUpcomingTravels } = upcomingTravelSlice.actions;
+export const { addUpcomingTravels, setUpcomingTravels, removeUpcomingTravelsById } = upcomingTravelSlice.actions;
 export default upcomingTravelSlice.reducer;

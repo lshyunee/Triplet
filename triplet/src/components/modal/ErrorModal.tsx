@@ -11,6 +11,7 @@ const ModalLayout = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+    Z-index : 1002;
 `;
 
 const ModalContentDiv = styled.div`
@@ -24,7 +25,7 @@ const ModalContentDiv = styled.div`
   justify-content: space-between;
   border-radius: 8px;
   overflow: hidden;
-  Z-index : 1001;
+  Z-index : 1002;
 `;
 
 const Title = styled.div`
@@ -45,11 +46,11 @@ const ConfirmDiv = styled.div`
   align-items: stretch;
 `;
 
-const Button = styled.button<{ isCancel?: boolean }>`
+const Button = styled.button<{ cancel?: boolean }>`
   width: 100%;
   height: 50px;
-  background-color: ${(props) => (props.isCancel ? '#E0E0E0' : '#008DE7')};
-  color: ${(props) => (props.isCancel ? '#000000' : '#FFFFFF')};
+  background-color: ${(props) => (props.cancel ? '#E0E0E0' : '#008DE7')};
+  color: ${(props) => (props.cancel ? '#000000' : '#FFFFFF')};
   font-weight: 400;
   font-size: 16px;
   border: none;
