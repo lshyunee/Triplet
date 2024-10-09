@@ -252,17 +252,22 @@ const s = {
   const handlePayment = async () => {
     if (!isInvalid) {
       try {
-        exchangeRefetch(); 
-        if (exchangeStatus === 200) { 
-          navigate(`/pay/global-wallet`);
-        } else {
-          alert('잔액이 부족합니다.');
-        }
+          exchangeRefetch()
       } catch (error) {
         alert('충전이 실패했습니다.');
       }
     }
   };
+
+  useEffect(() => {
+    if (exchangeStatus) {
+      if (exchangeStatus === 200) { 
+        navigate(`/pay/global-wallet`);
+      } else {
+        alert('잔액이 부족합니다.');
+      }
+    }
+  }, [exchangeStatus])
 
   return(
     <>
