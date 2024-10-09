@@ -171,6 +171,11 @@ const SearchP = styled.p`
     margin : 15px 0 0 0;
 `;
 
+const TargetDiv = styled.div`
+    height: 20px;
+    background-color: transparent;
+`;
+
 const FeedPage = () => {
 
     const dispatch = useDispatch();
@@ -203,16 +208,16 @@ const FeedPage = () => {
             kind : filter.kind
     });
 
-    console.log({
-        countryName : filter.kind === 0 || filter.kind === 1 || filter.countryName === '' ? null : filter.countryName,
-        memberCount : filter.kind === 0 || filter.kind === 1 || filter.memberCount === 0 ? null : filter.memberCount,
-        minBudget : filter.kind === 0 || filter.kind === 1 || filter.minBudget === 0 ? null : filter.minBudget,
-        maxBudget : filter.kind === 0 || filter.kind === 1 || filter.maxBudget === 0 ? null : filter.maxBudget,
-        minPeriod : filter.kind === 0 || filter.kind === 1 || filter.minDays === 0 ? null : filter.minDays,
-        maxDays : filter.kind === 0 || filter.kind === 1 || filter.maxDays === 0 ? null : filter.maxDays,
-        page : page,
-        kind : filter.kind
-      });
+    // console.log({
+    //     countryName : filter.kind === 0 || filter.kind === 1 || filter.countryName === '' ? null : filter.countryName,
+    //     memberCount : filter.kind === 0 || filter.kind === 1 || filter.memberCount === 0 ? null : filter.memberCount,
+    //     minBudget : filter.kind === 0 || filter.kind === 1 || filter.minBudget === 0 ? null : filter.minBudget,
+    //     maxBudget : filter.kind === 0 || filter.kind === 1 || filter.maxBudget === 0 ? null : filter.maxBudget,
+    //     minPeriod : filter.kind === 0 || filter.kind === 1 || filter.minDays === 0 ? null : filter.minDays,
+    //     maxDays : filter.kind === 0 || filter.kind === 1 || filter.maxDays === 0 ? null : filter.maxDays,
+    //     page : page,
+    //     kind : filter.kind
+    //   });
 
     useEffect(() => {
         dispatch(pageMove("feed"));
@@ -222,14 +227,15 @@ const FeedPage = () => {
     }, [])
 
 
-    const submitSearch = (event : React.KeyboardEvent<HTMLInputElement>) => {
+    const handleInputChange = (event:any) => {
+        countryName.onChange(event);
         if (event.key === 'Enter') {
             dispatch(initFeedTravels());
             dispatch(setCountry(countryName.value));
             dispatch(addFilter(2));
             setSelectedSortOption('정확도순');
         }
-    }
+    };
 
     useEffect(() => {
         
@@ -245,10 +251,6 @@ const FeedPage = () => {
 
     },[filter.countryName]);
 
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
-    };
-
     useEffect(()=>{
         if(!searchLoading){
             console.log("kind 바뀜", filter.kind);
@@ -256,6 +258,11 @@ const FeedPage = () => {
             searchRefetch();
         }
     }, [filter.kind])
+
+    const toggleDropdown = () => {
+        setIsDropdownOpen(!isDropdownOpen);
+    };
+
 
     const handleSortOptionSelect = (option: string) => {
         setSelectedSortOption(option);
@@ -283,6 +290,7 @@ const FeedPage = () => {
     useEffect(() => {
         if (hasMore && !searchLoading) {
             console.log("refetch?");
+            console.log("refetch", filter);
             searchRefetch();
         }
     }, [page, hasMore]);
@@ -330,7 +338,7 @@ const FeedPage = () => {
                         <Search/>                        
                     </SearchWrapper>
                     <SearchInput type="text" value={countryName.value} onChange={countryName.onChange} 
-                    onKeyDown={submitSearch} placeholder='여행지를 입력하세요.'></SearchInput>
+                    onKeyDown={handleInputChange} placeholder='여행지를 입력하세요.'></SearchInput>
                 </SearchDiv>
                 <FilterDiv>
                     <FilterDownDiv ref={dropdownRef}>
@@ -362,7 +370,7 @@ const FeedPage = () => {
                             memberCount={travel.memberCount}
                         />
                     ))}
-                    <div ref={targetRef} style={{ height: '20px', backgroundColor: 'transparent' }} />
+                    <TargetDiv ref={targetRef} />
                 </TravelDiv>
                 <DetailSearchBottomSheet isOpen={isBottomSheetOpen} 
             onClose={() => setIsBottomSheetOpen(false)}></DetailSearchBottomSheet>

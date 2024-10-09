@@ -170,12 +170,16 @@ const HomePage = () => {
 
     // Redux 스토어에서 데이터를 가져옴
     const travelData = useSelector((state:any) => state.ongoingTravel);
-    const upcomingData = useSelector((state: any) => state.upcomingTravels?.travels || []);
+    const upcomingTravel = useSelector((state: any) => state.upcomingTravels?.travels || []);
     const userData = useSelector((state:any) => state.userInfo);
 
     // useAxios 훅으로 데이터 요청
-    const { data: infoData, error: infoError, refetch: infoRefetch } = useAxios("/travels/ongoing", "GET");
-    const { data : userInfoData, error: userInfoError, status: userInfoStatus, refetch: userInfoRefetch } = useAxios("/user/my","GET");
+    const { data: infoData, error: infoError, refetch: infoRefetch } 
+    = useAxios("/travels/ongoing", "GET");
+    const { data : userInfoData, error: userInfoError, status: userInfoStatus, refetch: userInfoRefetch } 
+    = useAxios("/user/my","GET");
+    const { data : upcomingData, error : upcomingError, refetch : upcomingRefetch} 
+    = useAxios("/travels/upcoming", "GET");
 
     // 컴포넌트가 처음 렌더링될 때, 데이터가 없으면 Axios 요청을 트리거
     useEffect(() => {
@@ -270,7 +274,7 @@ const HomePage = () => {
                         <OngoingTravelCard />
                     </Link>
                 ) : (
-                    upcomingData.length > 0 ? (
+                    upcomingData?.length > 0 ? (
                         <UpcomingTravelHomeCard />
                     ) : (
                         <CreateTravelCard/>
