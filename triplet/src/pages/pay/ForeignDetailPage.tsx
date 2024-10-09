@@ -38,6 +38,7 @@ const s = {
     padding-left: 16px;
     padding-right: 16px;
     height: calc(100vh - 112px);
+    overflow-y: auto;
   `,
   Card: styled.div`
     background-color: #E5F3FF;
@@ -285,7 +286,7 @@ const ForeignDetailPage = () => {
           <Wallet/>
           <s.CardTitle>{foreignDetailData?.data?.accountName} / </s.CardTitle>
         </s.CardTitleArea>
-        <s.CardKrw>{foreignDetailData?.data?.accountBalance} {foreignDetailData?.data?.currency}</s.CardKrw>
+        <s.CardKrw>{foreignDetailData?.data?.accountBalance.toLocaleString()} {foreignDetailData?.data?.currency}</s.CardKrw>
         <s.CardCaption>
           {foreignDetailData?.data?.accountBalance === 0 ? `0 원` : `${exchangeData?.data?.targetAmount} 원`}
         </s.CardCaption>
