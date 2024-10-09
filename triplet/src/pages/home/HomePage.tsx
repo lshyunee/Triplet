@@ -380,7 +380,7 @@ const HomePage = () => {
                     </CardTitleArea>
                     <CardCaption>{accountData?.data.bankName} {accountData?.data.accountNumber}</CardCaption>
                     <ButtonArea>
-                        <CardContent>{accountData?.data.accountBalance}원</CardContent>
+                        <CardContent>{accountData?.data.accountBalance.toLocaleString()}원</CardContent>
                         <CardButton onClick={transferOnclick}>송금</CardButton>
                     </ButtonArea>
                 </Card>
