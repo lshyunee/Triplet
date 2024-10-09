@@ -6,7 +6,6 @@ import { pageMove } from '../../features/navigation/naviSlice';
 import { ReactComponent as Wallet } from '../../assets/pay/wallet.svg';
 import { useParams, useNavigate } from 'react-router-dom';
 import useAxios from '../../hooks/useAxios';
-import axiosInstance from "../../services/axios";
 
 interface Transaction {
   balance: number;
@@ -21,11 +20,6 @@ interface TransactionsResponse {
   code: string;
   message: string;
   data: Transaction[];
-}
-
-interface Category {
-  categoryId: number;
-  categoryName: string;
 }
 
 // 날짜별로 거래 내역을 그룹화하는 함수
@@ -136,21 +130,6 @@ const s = {
     height: 50vh;
     color: #666666;
   `,
-  EditButton: styled.button`
-    font-size: 10px;
-    font-weight: 500;
-    height: 20px;
-    width: 40px;
-    border-radius: 50px;
-    border: 0;
-    color: #333;
-    background-color: #E5E5E5;
-  `,
-  CategorySelect: styled.select`
-    margin-top: 4px;
-    font-size: 10px;
-    padding: 4px;
-  `,
   CardButton: styled.button`
     background-color: #A2D3FF;
     font-size: 14px;
@@ -168,29 +147,23 @@ const ForeignDetailPage = () => {
   const { travelId } = useParams();
 
   const { data: travelDetailData, refetch: travelDetailRefetch } = useAxios(`/travels/${travelId}`, 'GET');
-  const { data: travelWalletDetailData, refetch: travelWalletDetailRefetch } = useAxios(`/travel-wallet/${travelId}`, 'GET');
 
   const [transaction, setTransaction] = useState<TransactionsResponse | null>(null);
   const { data: transactionData, refetch: transactionRefetch } = useAxios(`/travel-wallet/transaction/${travelId}`, 'GET');
-  const { data: categories, refetch: categoriesRefetch } = useAxios('/travels/categories', 'GET');
-
-  const [editingTransactionId, setEditingTransactionId] = useState<number | null>(null);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(pageMove("travels"));
     travelDetailRefetch();
-    travelWalletDetailRefetch();
   }, [dispatch]);
 
   useEffect(() => {
-    if (travelWalletDetailData && !transaction) {
+    if (!transaction) {
       const fetchData = async () => {
         await Promise.all([transactionRefetch()]);
       };
       fetchData();
     }
-  }, [travelWalletDetailData]);
+  }, []);
 
   useEffect(() => {
     if (transactionData) {
@@ -200,45 +173,15 @@ const ForeignDetailPage = () => {
 
   const transactionGroupedByDate = transaction ? groupTransactionsByDate(transaction.data) : {};
 
-  const handleEditClick = (transactionId: number) => {
-    setEditingTransactionId(transactionId);
-    categoriesRefetch();
-  };
-
-  const handleCategoryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCategoryId(Number(e.target.value));
-  };
-
-  const handleUpdateTransaction = async (transactionId: number) => {
-    if (selectedCategoryId !== null) {
-      try {
-        await axiosInstance.put(`/travel-wallet/transaction/${transactionId}/${selectedCategoryId}`);
-        setEditingTransactionId(null);
-        transactionRefetch();
-      } catch (error) {
-        console.error("거래내역 업데이트 중 오류 발생:", error);
-      }
-    }
-  };
-
   return (
       <>
-        <BackHeader title='내 여행 지갑' />
+        <BackHeader title='여행 거래 내역' />
         <s.Container>
           <s.Card>
             <s.CardTitleArea>
               <Wallet/>
               <s.CardTitle>{travelDetailData?.data?.title}</s.CardTitle>
             </s.CardTitleArea>
-            <s.CardKrw>{travelWalletDetailData?.data?.balance} {travelWalletDetailData?.data?.currency}</s.CardKrw>
-            <s.ButtonArea>
-              <s.CardButton
-                  onClick={() => navigate(`/travels/wallet/recharge/${travelId}/${travelWalletDetailData?.data?.currency}`)}>충전
-              </s.CardButton>
-              <s.CardButton
-                  onClick={() => navigate(`/travels/wallet/refund/${travelId}/${travelWalletDetailData?.data?.currency}`)}>환급
-              </s.CardButton>
-            </s.ButtonArea>
           </s.Card>
 
           {transaction && Object.keys(transactionGroupedByDate).length === 0 ? (
@@ -267,21 +210,6 @@ const ForeignDetailPage = () => {
                             </s.PaymentTitleArea>
 
                             <s.PaymentAmountArea>
-                              {editingTransactionId === transaction.transactionId ? (
-                                  <>
-                                    <s.CategorySelect onChange={handleCategoryChange}>
-                                      <option value="">카테고리를 선택하세요</option>
-                                      {categories?.data?.map((category: Category) => (
-                                          <option key={category.categoryId} value={category.categoryId}>
-                                            {category.categoryName}
-                                          </option>
-                                      ))}
-                                    </s.CategorySelect>
-                                    <s.EditButton onClick={() => handleUpdateTransaction(transaction.transactionId)}>저장</s.EditButton>
-                                  </>
-                              ) : (
-                                  <s.EditButton onClick={() => handleEditClick(transaction.transactionId)}>수정</s.EditButton>
-                              )}
                               <s.PaymentAmountBlue>{transaction.price.toLocaleString()}원</s.PaymentAmountBlue>
                               <s.BalanceText>잔액 {transaction.balance.toLocaleString()}원</s.BalanceText>
                             </s.PaymentAmountArea>

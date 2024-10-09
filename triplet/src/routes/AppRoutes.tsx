@@ -72,6 +72,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/travels/wallet/:travelId" element={<TravelWalletDetailPage/>}/>
             <Route path="/travels/wallet/recharge/:travelId/:currency" element={<TravelWalletRechargePage/>}/>
             <Route path="/travels/wallet/refund/:travelId/:currency" element={<TravelWalletRefundPage/>}/>
+            <Route path="/travels/wallet/complete/:travelId" element={<TravelTransactionListPage/>}/>
         </Routes>
 );
 
