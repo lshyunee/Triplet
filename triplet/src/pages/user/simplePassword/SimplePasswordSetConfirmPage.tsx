@@ -114,9 +114,9 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
     const location = useLocation();
     const { prePassword } = location.state;
 
-    const { data: resData, loading: resLoading, error: resError,
-        status: resStatus, refetch: resRefetch }
-        = useAxios('/simple-password', 'POST', undefined, {
+    const { data: resData, loading: resLoading, error: resError, 
+        status: resStatus, refetch: resRefetch } 
+    = useAxios('/simple-password', 'POST', undefined, {
         newSimplePassword : prePassword.join(''),
         newSimplePasswordConfirm : password.join('')
     });
@@ -148,7 +148,7 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
     },[password]);
 
     useEffect (() => {
-
+        
         if(resData && resStatus===200){
             navigate("/");
         }

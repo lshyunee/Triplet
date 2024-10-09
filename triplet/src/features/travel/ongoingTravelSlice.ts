@@ -80,13 +80,19 @@ const ongoingTravelSlice = createSlice({
       if (airportCost !== undefined) state.airportCost = airportCost;
       if (creatorId !== undefined) state.creatorId = creatorId;
     },
-
+    removeOngoingTravel(state, action: PayloadAction<number>) {
+      if (state.travelId === action.payload) {
+        // 상태를 초기 상태로 되돌림
+        Object.assign(state, initialState);
+      }
+    },
   },
 });
+
 
 export const selectOngoingTravelId = (state:RootState) : number => {
   return state.ongoingTravel.travelId;
 };
 
-export const { ongoingTravelDataInsert } = ongoingTravelSlice.actions;
+export const { ongoingTravelDataInsert, removeOngoingTravel } = ongoingTravelSlice.actions;
 export default ongoingTravelSlice.reducer;

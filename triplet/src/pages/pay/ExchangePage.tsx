@@ -247,7 +247,7 @@ const s = {
     error: exchangeError, 
     loading: exchangeLoading, 
     status: exchangeStatus, 
-    refetch: exchangeRefetch } = useAxios(`/exchange`, 'POST', requestBody);
+    refetch: exchangeRefetch } = useAxios(`/exchange`, 'POST',undefined, requestBody);
   
   const handlePayment = async () => {
     if (!isInvalid) {

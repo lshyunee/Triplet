@@ -187,7 +187,7 @@ const QRPayPage = () => {
     error: payError, 
     loading: payLoading, 
     status: payStatus, 
-    refetch: payRefetch } = useAxios('/payment', 'POST', {
+    refetch: payRefetch } = useAxios('/payment', 'POST', undefined, {
       merchantId: merchantId,
       price: price, // 사용자가 입력한 가격
       isTravel: isTravel,

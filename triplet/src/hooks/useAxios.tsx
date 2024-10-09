@@ -19,8 +19,10 @@ const useAxios = (
       const response = await axiosInstance({
         url,
         method,
-        ...(method === 'GET' ? { params } : { data: body }),
-        headers: body instanceof FormData ? { ...headers } : { 'Content-Type': 'application/json', ...headers }, 
+        ...(method === 'GET' ? { params } : { data: body instanceof FormData ? body : JSON.stringify(body) }),
+        headers: body instanceof FormData 
+          ? { ...headers } 
+          : { 'Content-Type': 'application/json', ...headers }, 
       });
       setData(response.data);
       setStatus(response.status);

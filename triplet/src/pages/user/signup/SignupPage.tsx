@@ -191,7 +191,7 @@ const SignupPage = () => {
     // 아이디 중복 체크
     const { data: duplicatedData, error: duplicatedError, loading: duplicatedLoading,
         status: duplicatedStatus, refetch: duplicatedRefetch }
-        = useAxios('/signup/is-duplicated', 'POST', {memberId : id.value});
+        = useAxios('/signup/is-duplicated', 'POST',undefined, {memberId : id.value});
 
     const [ isDuplicated, setIsDuplicated ] = useState(true);
 
@@ -231,7 +231,7 @@ const SignupPage = () => {
 
     const { data: phoneData, error: phoneError, loading: phoneLoading,
         status: phoneStatus, refetch: phoneRefetch }
-        = useAxios('/sms/send','POST',{phoneNumber : phoneNum});
+        = useAxios('/sms/send','POST',undefined,{phoneNumber : phoneNum});
     
     const certificateSend = () => {
         phoneRefetch();
@@ -257,7 +257,7 @@ const SignupPage = () => {
 
     const { data : smsData, error: smsError, loading: smsLoading,
         status: smsStatus, refetch: smsRefetch}
-        = useAxios('/sms/confirm', 'POST', 
+        = useAxios('/sms/confirm', 'POST', undefined,
             {phoneNumber : phoneNum, certificationNumber: certificationNum.value});
 
     const certificateCheck = () => {
@@ -280,7 +280,7 @@ const SignupPage = () => {
     const { data:signupData, loading:signupLoading, 
         error:signupError, status:sigunupError, 
         refetch:signupRefetch } =
-        useAxios("/signup",'POST',{
+        useAxios("/signup",'POST',undefined,{
             memberId : id.value,
             password : pw.value,
             passwordConfirm : pwCheck.value,
@@ -300,7 +300,7 @@ const SignupPage = () => {
         }
 
         if(signupError!==null){
-            const message = signupError.response.data.message || '회원 정보 입력이 올바르지 않습니다.';
+            const message = signupError.response.data.data.message || '회원 정보 입력이 올바르지 않습니다.';
             setErrorMsg(message);
             isErrorOpen();
         }
