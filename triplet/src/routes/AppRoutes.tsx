@@ -36,6 +36,7 @@ import TravelWalletDetailPage from "../pages/travels/TravelWalletDetailPage";
 import TravelWalletRechargePage from "../pages/travels/TravelWalletRechargePage";
 import TravelWalletRefundPage from "../pages/travels/TravelWalletRefundPage";
 import TransferPage from '../pages/pay/TransferPage';
+import TravelTransactionListPage from "../pages/travels/TravelTransactionListPage";
 
 const AppRoutes: React.FC = () => (
         <Routes>
