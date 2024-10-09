@@ -37,6 +37,7 @@ const s = {
     padding-left: 16px;
     padding-right: 16px;
     height: calc(100vh - 112px);
+    overflow-y: auto;
   `,
   Card: styled.div`
     background-color: #E5F3FF;
@@ -194,11 +195,6 @@ const s = {
     border-radius: 5px;         
     padding: 5px;             
     margin: 0 5px;    
-    cursor: pointer;           
-
-    &:hover {
-      background-color: #e0e0e0; /* 호버 시 배경 색상 변경 */
-    }
 `,
 }
 
@@ -240,7 +236,7 @@ const AccountDetailPage = () => {
     error: transactionError, 
     loading: transactionLoading, 
     status: transactionStatus, 
-    refetch: transactionRefetch } = useAxios(`/transaction`, 'POST', {
+    refetch: transactionRefetch } = useAxios(`/transaction`, 'POST', undefined,{
       accountId: accountDetailData?.data?.accountId,
       startDate: start,
       endDate: end
@@ -291,7 +287,7 @@ const AccountDetailPage = () => {
         </s.CardTitleArea>
         <s.CardCaption>{accountDetailData?.data?.bankName} {accountDetailData?.data?.accountNumber}</s.CardCaption>
         <s.ButtonArea>
-          <s.CardKrw>{accountDetailData?.data?.accountBalance} 원</s.CardKrw>
+          <s.CardKrw>{accountDetailData?.data?.accountBalance.toLocaleString()} 원</s.CardKrw>
           <s.CardButton onClick={transferOnclick}>송금</s.CardButton>
         </s.ButtonArea>
       </s.Card>

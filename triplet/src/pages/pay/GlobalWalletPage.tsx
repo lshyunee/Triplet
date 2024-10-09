@@ -102,6 +102,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[6]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[6]?.accountId}
+					rate={exchangeRateData?.data[4]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[3]?.accountId)}>
@@ -110,6 +111,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[3]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[3]?.accountId}
+					rate={exchangeRateData?.data[0]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[5]?.accountId)}>
@@ -118,6 +120,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[5]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[5]?.accountId}
+					rate={exchangeRateData?.data[3]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[2]?.accountId)}>
@@ -126,6 +129,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[2]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[2]?.accountId}
+					rate={exchangeRateData?.data[1]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[4]?.accountId)}>
@@ -134,6 +138,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[4]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[4]?.accountId}
+					rate={exchangeRateData?.data[2]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[1]?.accountId)}>
@@ -142,6 +147,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[1]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[1]?.accountId}
+					rate={exchangeRateData?.data[5]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[0]?.accountId)}>
@@ -150,6 +156,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[0]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[0]?.accountId}
+					rate={exchangeRateData?.data[6]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.Card>

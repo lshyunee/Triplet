@@ -104,22 +104,20 @@ const RemoveModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, creatorI
             dispatch(removeUpcomingTravelsById(travelId));
             setMsg("여행 삭제가 완료되었습니다.");
             setCompletOpen(true);
-            onClose();
         }
 
         if(removeError) {
             console.log(removeError);
             setErrorMsg(removeError.msessage);
             setErrorOpen(true);
-            onClose();
         }
 
     }, [removeData, removeError]);
 
-
     const hanldleRemoveComplete = () => {
         setCompletOpen(false);
         navigate('/travels');
+        onClose();
     }
 
     if (!isOpen) {
@@ -137,9 +135,9 @@ const RemoveModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, creatorI
                     <Button onClick={handleRemove}>확인</Button>
                 </ConfirmDiv>
             </ModalContentDiv>
-        </ModalLayout>
         <CompleteModal isOpen={completeOpen} onClose={hanldleRemoveComplete} msg={msg}/>
         <ErrorModal isOpen={errorOpen} onClose={()=>{setErrorOpen(false)}} msg={errorMsg} />
+        </ModalLayout>
         </>
     );
 };

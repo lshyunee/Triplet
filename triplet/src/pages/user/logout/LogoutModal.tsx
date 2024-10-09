@@ -76,7 +76,7 @@ const LogoutModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
   // Hook은 항상 호출되도록 한다.
   const { data: logoutData, error: logoutError, loading: logoutLoading,
     status: logoutStatus, refetch: logoutRefetch}
-    = useAxios('/logout', 'POST', { manual: true });
+    = useAxios('/logout', 'POST' , { manual: true });
 
   const handleLogout = () => {
     // 로그아웃을 클릭했을 때만 실제 로그아웃 API 호출

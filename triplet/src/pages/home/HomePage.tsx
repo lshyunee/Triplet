@@ -304,12 +304,19 @@ const HomePage = () => {
         loading: accountLoading, 
         status: accountStatus, 
         refetch: accountRefetch } = useAxios('/account', 'GET');
+
+    const { data: exchangeRateData, 
+        error: exchangeRateError, 
+        loading: exchangeRateLoading, 
+        status: exchangeRateStatus, 
+        refetch: exchangeRateRefetch } = useAxios('/exchange-rate-list', 'GET');
     
     useEffect(() => {
         const fetchData = async () => {
             try {
             await Promise.all([
                 accountRefetch(),
+                exchangeRateRefetch(),
                 foreignAccountRefetch()   // 원화계좌 API 요청
             ]);
             } catch (error) {
@@ -388,18 +395,21 @@ const HomePage = () => {
 							foreignCurrency={foreignAccountData?.data[6]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[6]?.accountId}
+                            rate={exchangeRateData?.data[4]?.exchangeRate}
 						/>
                         <GlobalAccount
 							nation='유럽'
 							foreignCurrency={foreignAccountData?.data[3]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[3]?.accountId}
+                            rate={exchangeRateData?.data[0]?.exchangeRate}
 						/>
 						<GlobalAccount
 							nation='일본'
 							foreignCurrency={foreignAccountData?.data[5]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[5]?.accountId}
+                            rate={exchangeRateData?.data[3]?.exchangeRate}
 						/>
                     </AccountDiv>
                 </Link>

@@ -86,7 +86,7 @@ const BottomButtons = styled.div`
 
 const ButtonDiv = styled.div`
     margin-left : 55px;
-    margin-right : 55px; 
+    margin-right : 55px;
 `
 
 const IconButton = styled.button`
@@ -97,6 +97,13 @@ const IconButton = styled.button`
     align-items: center;
     margin : 20px 44px;
     padding : 0px;
+`;
+
+const ErrorMessage = styled.p`
+    color: red;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 16px;
 `;
 const SimplePasswordSetConfirmPage: React.FC = () => {
     const [numbers, setNumbers] = useState<number[]>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9]);
@@ -109,15 +116,15 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
 
     const { data: resData, loading: resLoading, error: resError, 
         status: resStatus, refetch: resRefetch } 
-    = useAxios('/simple-password', 'POST', undefined, { 
+    = useAxios('/simple-password', 'POST', undefined, {
         newSimplePassword : prePassword.join(''),
-        newSimplePasswordConfirm : password.join('') 
-    }); 
+        newSimplePasswordConfirm : password.join('')
+    });
 
     useEffect(() => {
         setNumbers(shuffleArray([...numbers]));  // numbers 배열 복사 후 섞기
     }, []);
-    
+
 
     // 숫자 클릭 핸들러
     const handleNumberClick = (num: number) => {
@@ -170,6 +177,8 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
                         <br />
                         다시 한 번 입력해주세요.
                     </Description>
+                    {/* 비밀번호가 일치하지 않을 때 에러 메시지 표시 */}
+                    {isError && <ErrorMessage>비밀번호가 일치하지 않습니다.</ErrorMessage>}
                 </TitleDiv>
 
                 <PasswordDots>
