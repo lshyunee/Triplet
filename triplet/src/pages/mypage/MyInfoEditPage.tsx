@@ -250,7 +250,7 @@ const MyInfoEditPage = () => {
 
     const { data: editData, error: editError, loading: editLoading,
         status: editStatus, refetch: editRefetch }
-        = useAxios('/user/my', 'PUT', {
+        = useAxios('/user/my', 'PUT', undefined, {
             name : name.value,
             phoneNumber : phoneNum,
             identificationNumber : identificationNum
@@ -262,9 +262,7 @@ const MyInfoEditPage = () => {
             isErrorOpen();
             return;
         }
-        if(isCheck === true){
-            editRefetch();
-        }   
+        editRefetch();
     }
 
     useEffect(() => {
@@ -325,29 +323,6 @@ const MyInfoEditPage = () => {
                             <NumP>* * * * * *</NumP>
                         </RegistDiv>
                     </InputDistanceDiv>
-                    { memberId ==="kakao" ? null : (
-                        <>
-                            <InputDistanceDiv>
-                                <HowP>전화번호</HowP>
-                                <PhoneDiv>
-                                    <StyledInputFront type="text" value={phoneNumFront.value} onChange={phoneNumFront.onChange} />
-                                    <NumP>-</NumP>
-                                    <StyledInput type="text" value={phoneNumMiddle.value} onChange={phoneNumMiddle.onChange} />
-                                    <NumP>-</NumP>
-                                    <StyledInput type="text" value={phoneNumBack.value} onChange={phoneNumBack.onChange} />
-                                    <StyledBtn onClick={certificateSend}>인증번호 발송</StyledBtn>
-                                </PhoneDiv>
-                            </InputDistanceDiv>
-                            <InputDistanceDiv>
-                                <HowP>인증번호</HowP>
-                                <CheckDiv>
-                                    <StyledInput type="text" value={certificationNum.value} onChange={certificationNum.onChange} />
-                                    <StyledBtn onClick={certificateCheck}>확인</StyledBtn>
-                                </CheckDiv>
-                                <CheckP>{isCheck ? "인증되었습니다." : ""}</CheckP>
-                            </InputDistanceDiv>
-                        </>
-                    )}
                     <ConfirmBtn onClick={myInfoEdit}>수정 완료</ConfirmBtn>
                 </InputDiv>
             </EntireDiv>

@@ -5,7 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import useAxios from '../../hooks/useAxios';
 import CompleteModal from '../../components/modal/CompleteModal';
 import ErrorModal from './ErrorModal';
-import { deleteTravel } from '../../features/travel/deleteTravelSlice';
+import { removeOngoingTravel } from '../../features/travel/ongoingTravelSlice';
+import { removeCompletedTravelById } from '../../features/travel/completedTravelSlice';
+import { removeUpcomingTravelsById } from '../../features/travel/upcomingTravelSlice';
+
 
 const ModalLayout = styled.div`
   position: fixed;
@@ -17,20 +20,21 @@ const ModalLayout = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+    Z-index : 1000;
 `;
 
 const ModalContentDiv = styled.div`
-  background-color: white;
-  max-width: 360px;
-  width: 80%;
-  padding-top: 20px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  border-radius: 8px;
-  overflow: hidden;
-Z-index : 900;
+    background-color: white;
+    max-width: 360px;
+    width: 80%;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    border-radius: 8px;
+    overflow: hidden;
+    Z-index : 1001;
 `;
 
 const Title = styled.div`
@@ -51,11 +55,11 @@ const ConfirmDiv = styled.div`
   align-items: stretch;
 `;
 
-const Button = styled.button<{ isCancel?: boolean }>`
+const Button = styled.button<{ cancel?: boolean }>`
   width: 50%;
   height: 50px;
-  background-color: ${(props) => (props.isCancel ? '#E0E0E0' : '#008DE7')};
-  color: ${(props) => (props.isCancel ? '#000000' : '#FFFFFF')};
+  background-color: ${(props) => (props.cancel ? '#E0E0E0' : '#008DE7')};
+  color: ${(props) => (props.cancel ? '#000000' : '#FFFFFF')};
   font-weight: 400;
   font-size: 16px;
   border: none;
@@ -95,7 +99,9 @@ const RemoveModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, creatorI
     useEffect(() => {
 
         if(removeData && removeStatus === 200){
-            dispatch(deleteTravel(travelId));
+            dispatch(removeOngoingTravel(travelId));
+            dispatch(removeCompletedTravelById(travelId));
+            dispatch(removeUpcomingTravelsById(travelId));
             setMsg("여행 삭제가 완료되었습니다.");
             setCompletOpen(true);
             onClose();
@@ -103,7 +109,7 @@ const RemoveModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, creatorI
 
         if(removeError) {
             console.log(removeError);
-            setMsg(removeError.msessage);
+            setErrorMsg(removeError.msessage);
             setErrorOpen(true);
             onClose();
         }
@@ -124,12 +130,12 @@ const RemoveModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, creatorI
         <>
         <ModalLayout onClick={onClose}>
             <ModalContentDiv onClick={(e) => e.stopPropagation()}>
-            <Title>삭제</Title>
-            <Description>여행을 삭제하시겠습니까?</Description>
-            <ConfirmDiv>
-                <Button isCancel={true} onClick={onClose}>취소</Button>
-                <Button onClick={handleRemove}>확인</Button>
-            </ConfirmDiv>
+                <Title>삭제</Title>
+                <Description>여행을 삭제하시겠습니까?</Description>
+                <ConfirmDiv>
+                    <Button cancel={true} onClick={onClose}>취소</Button>
+                    <Button onClick={handleRemove}>확인</Button>
+                </ConfirmDiv>
             </ModalContentDiv>
         </ModalLayout>
         <CompleteModal isOpen={completeOpen} onClose={hanldleRemoveComplete} msg={msg}/>
