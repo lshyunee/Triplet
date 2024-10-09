@@ -405,6 +405,7 @@ const CreateTravelPage = () => {
   // axios
   const submitTravelData = async () => {
     if (!title) {
+      window.alert('제목을 입력해주세요.')
       return;
     }
     if (person < 1) {
@@ -459,7 +460,6 @@ const CreateTravelPage = () => {
         try {
           await Promise.all([
             testRefetch(),
-            navigate('/travels')
           ]);
         } catch (error) {
           console.error('error fetching data:', error);
@@ -482,6 +482,19 @@ const CreateTravelPage = () => {
     }
     fetchData()
   }, [countryCurrency])
+
+  useEffect(() => {
+    if (testError) {
+      window.alert(testError.response.data.message)
+    }
+  }, [testError])
+
+  useEffect(() => {
+    if (testData) {
+
+      navigate('/travels')
+    }
+  }, [testData])
 
   useEffect(() => {
     console.log(currencyData)

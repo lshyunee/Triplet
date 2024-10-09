@@ -10,6 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { isDate } from 'util/types';
 import { addDays } from 'react-datepicker/dist/date_utils';
 import useAxios from '../../hooks/useAxios';
+import { useNavigate } from 'react-router-dom';
 
 interface Transaction {
   transactionId: number;
@@ -70,6 +71,7 @@ const s = {
     width: 66px;
     border-radius: 50px;
     border: 0;
+    cursor: pointer;
   `,
   ButtonArea: styled.div`
     display: flex;
@@ -272,6 +274,11 @@ const AccountDetailPage = () => {
     };
   }, [isDateOpen]);
 
+  const navigate = useNavigate();
+
+  const transferOnclick = (e: React.MouseEvent<HTMLButtonElement>) => {
+		navigate('/pay/transfer');
+	};
   
   return (
     <>
@@ -285,7 +292,7 @@ const AccountDetailPage = () => {
         <s.CardCaption>{accountDetailData?.data?.bankName} {accountDetailData?.data?.accountNumber}</s.CardCaption>
         <s.ButtonArea>
           <s.CardKrw>{accountDetailData?.data?.accountBalance} 원</s.CardKrw>
-          <s.CardButton>송금</s.CardButton>
+          <s.CardButton onClick={transferOnclick}>송금</s.CardButton>
         </s.ButtonArea>
       </s.Card>
       <s.CalendarButton>

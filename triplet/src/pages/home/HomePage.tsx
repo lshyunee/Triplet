@@ -24,6 +24,7 @@ import UpcomingTravelHomeCard from '../../components/travel/UpcomingTravelHomeCa
 import CreateTravelCard from '../../components/travel/CreateTravelCard';
 import { setUserInfo } from '../../features/user/userInfoSlice';
 import { loginSuccess, logout } from '../../features/auth/authSlice';
+import GlobalAccount from '../../components/pay/GlobalAccount';
 
 const MainDiv = styled.div`
     background-color: #F3F4F6;
@@ -103,6 +104,31 @@ const LargeDiv = styled.div`
     }
 `;
 
+const AccountDiv = styled.div`
+    /* height : 200px; */
+    background-color: #ffffff;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 10px;
+    margin-bottom : 32px;
+
+    &:hover {
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    border-radius: 20px;
+    transition: box-shadow 0.3s ease; /* 부드러운 전환 효과 */
+    }
+`;
+
+const AccountTitle = styled.div`
+    height : 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    padding-bottom: 10px;
+`;
+
 const Card = styled.div`
     background-color: #ffffff;
     border-radius: 20px;
@@ -111,6 +137,7 @@ const Card = styled.div`
     display: flex;
     flex-direction: column;
     margin-top : 12px;
+    cursor: pointer;
 
     &:hover {
     box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
@@ -152,6 +179,7 @@ const CardButton = styled.button`
     width: 65px;
     height: 36px;
     border-radius: 50px;
+    cursor: pointer;
 `;
 
 const ButtonArea = styled.div`
@@ -263,7 +291,47 @@ const HomePage = () => {
             }
         }
     }, [userInfoData, userInfoError]);
+
+
+    const { data: foreignAccountData, 
+		error: foreignAccountError, 
+		loading: foreignAccountLoading, 
+		status: foreignAccountStatus, 
+		refetch: foreignAccountRefetch } = useAxios('/foreign-account', 'GET');
+
+    const { data: accountData, 
+        error: accountError, 
+        loading: accountLoading, 
+        status: accountStatus, 
+        refetch: accountRefetch } = useAxios('/account', 'GET');
     
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+            await Promise.all([
+                accountRefetch(),
+                foreignAccountRefetch()   // 원화계좌 API 요청
+            ]);
+            } catch (error) {
+            console.error('Error fetching data:', error);
+            }
+        };
+    
+        fetchData();
+    }, []);
+    
+    useEffect(() => {
+        console.log(accountData?.data)
+    }, [accountData])
+
+    const accountOnClick = () => {
+		navigate('/pay/account-detail');
+	};
+
+    const transferOnclick = (e: React.MouseEvent<HTMLButtonElement>) => {
+		e.stopPropagation();
+		navigate('/pay/transfer');
+	};
  
     return (
         <MainDiv>
@@ -298,26 +366,42 @@ const HomePage = () => {
                         <RightArrow/>
                     </LittleDiv>
                 </Link>
-                <Link to="/pay/account-detail">
-                    <Card>
-                        <CardTitleArea>
-                            <CardTitle>내 통장</CardTitle>
-                            <RightArrow/>
-                        </CardTitleArea>
-                        <CardCaption>은행 312-9446-0093</CardCaption>
-                        <ButtonArea>
-                            <CardContent>20,000,000원</CardContent>
-                            <CardButton>송금</CardButton>
-                        </ButtonArea>
-                    </Card>
-                </Link>
+                <Card onClick={accountOnClick}>
+                    <CardTitleArea>
+                        <CardTitle>내 통장</CardTitle>
+                        <RightArrow/>
+                    </CardTitleArea>
+                    <CardCaption>{accountData?.data.bankName} {accountData?.data.accountNumber}</CardCaption>
+                    <ButtonArea>
+                        <CardContent>{accountData?.data.accountBalance}원</CardContent>
+                        <CardButton onClick={transferOnclick}>송금</CardButton>
+                    </ButtonArea>
+                </Card>
                 <Link to="/pay/global-wallet">
-                    <LargeDiv>
-                        <TitleDiv>
+                    <AccountDiv>
+                        <AccountTitle>
                             <TitleP>내 외화 지갑</TitleP>
                             <RightArrow/>
-                        </TitleDiv>
-                    </LargeDiv>
+                        </AccountTitle>
+                        <GlobalAccount
+							nation='미국'
+							foreignCurrency={foreignAccountData?.data[6]?.accountBalance}
+							isExchange={false}
+							accountId={foreignAccountData?.data[6]?.accountId}
+						/>
+                        <GlobalAccount
+							nation='유럽'
+							foreignCurrency={foreignAccountData?.data[3]?.accountBalance}
+							isExchange={false}
+							accountId={foreignAccountData?.data[3]?.accountId}
+						/>
+						<GlobalAccount
+							nation='일본'
+							foreignCurrency={foreignAccountData?.data[5]?.accountBalance}
+							isExchange={false}
+							accountId={foreignAccountData?.data[5]?.accountId}
+						/>
+                    </AccountDiv>
                 </Link>
             </HomeDiv>
         </MainDiv>

@@ -137,9 +137,9 @@ const PayPage = () => {
 		navigate('/pay/account-detail');
 	};
 	
-	const onclick = (e: React.MouseEvent<HTMLButtonElement>) => {
+	const transferOnclick = (e: React.MouseEvent<HTMLButtonElement>) => {
 		e.stopPropagation();
-		window.alert('야호');
+		navigate('/pay/transfer');
 	};
 
 	const walletOnClick = () => {
@@ -158,7 +158,7 @@ const PayPage = () => {
 					<s.CardCaption>{accountData?.data?.bankName} {accountData?.data?.accountNumber}</s.CardCaption>
 					<s.ButtonArea>
 						<s.CardContent>{accountData?.data?.accountBalance} 원</s.CardContent>
-						<s.CardButton onClick={onclick}>송금</s.CardButton>
+						<s.CardButton onClick={transferOnclick}>송금</s.CardButton>
 					</s.ButtonArea>
 				</s.MyCard>
 				<s.MyCard onClick={walletOnClick}>
