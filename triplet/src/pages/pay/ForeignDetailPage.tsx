@@ -206,7 +206,7 @@ const ForeignDetailPage = () => {
     error: exchangeError, 
     loading: exchangeLoading, 
     status: exchangeStatus, 
-    refetch: exchangeRefetch } = useAxios(`/exchange-cal`, 'POST', {
+    refetch: exchangeRefetch } = useAxios(`/exchange-cal`, 'POST', undefined,{
       sourceCurrency: foreignDetailData?.data?.currency,
       targetCurrency: "KRW",
       sourceAmount: foreignDetailData?.data?.accountBalance
@@ -241,7 +241,7 @@ const ForeignDetailPage = () => {
     error: transactionError, 
     loading: transactionLoading, 
     status: transactionStatus, 
-    refetch: transactionRefetch } = useAxios(`/transaction`, 'POST', {
+    refetch: transactionRefetch } = useAxios(`/transaction`, 'POST', undefined,{
       accountId: accountId,
       startDate: start,
       endDate: end

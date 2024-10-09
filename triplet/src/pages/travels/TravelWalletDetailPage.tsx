@@ -183,7 +183,7 @@ const ForeignDetailPage = () => {
 
   const { data: travelDetailData, refetch: travelDetailRefetch } = useAxios(`/travels/${travelId}`, 'GET');
   const { data: travelWalletDetailData, refetch: travelWalletDetailRefetch } = useAxios(`/travel-wallet/${travelId}`, 'GET');
-  const { data: exchangeData, refetch: exchangeRefetch } = useAxios('/exchange-cal', 'POST', {
+  const { data: exchangeData, refetch: exchangeRefetch } = useAxios('/exchange-cal', 'POST', undefined, {
     sourceCurrency: travelWalletDetailData?.data?.currency,
     targetCurrency: "KRW",
     sourceAmount: travelWalletDetailData?.data?.balance

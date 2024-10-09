@@ -203,7 +203,7 @@ const MyInfoEditPage = () => {
 
     const { data: phoneData, error: phoneError, loading: phoneLoading,
         status: phoneStatus, refetch: phoneRefetch }
-        = useAxios('/sms/send','POST',{phoneNumber : phoneNum});
+        = useAxios('/sms/send','POST', undefined,{phoneNumber : phoneNum});
 
         const certificateSend = () => {
             phoneRefetch();
@@ -228,7 +228,7 @@ const MyInfoEditPage = () => {
 
     const { data : smsData, error: smsError, loading: smsLoading,
         status: smsStatus, refetch: smsRefetch}
-        = useAxios('/sms/confirm', 'POST', 
+        = useAxios('/sms/confirm', 'POST', undefined, 
             {phoneNumber : phoneNum, certificationNumber: certificationNum.value});
 
     const certificateCheck = () => {
