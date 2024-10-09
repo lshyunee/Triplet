@@ -267,6 +267,9 @@ const FeedPage = () => {
         setSelectedSortOption(option);
         
         setKind(option === '추천순' ? 0 : 1);
+        if(option==='정확도순'){
+            setKind(2);
+        }
 
         dispatch(addFilter(kind));
         dispatch(setPages(1));

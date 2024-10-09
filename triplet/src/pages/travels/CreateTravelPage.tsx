@@ -400,7 +400,7 @@ const CreateTravelPage = () => {
     error: testError,
     loading: testLoading,
     status: testStatus,
-    refetch: testRefetch } = useAxios('/travels/create', 'POST', tdata, {'Content-Type': 'multipart/form-data'})
+    refetch: testRefetch } = useAxios('/travels/create', 'POST', undefined, tdata)
 
   // axios
   const submitTravelData = async () => {
