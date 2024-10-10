@@ -282,8 +282,8 @@ const ForeignDetailPage = () => {
                               ) : (
                                   <s.EditButton onClick={() => handleEditClick(transaction.transactionId)}>수정</s.EditButton>
                               )}
-                              <s.PaymentAmountBlue>{transaction.price.toLocaleString()}원</s.PaymentAmountBlue>
-                              <s.BalanceText>잔액 {transaction.balance.toLocaleString()}원</s.BalanceText>
+                              <s.PaymentAmountBlue>{transaction.price.toLocaleString()} {travelWalletDetailData?.data?.currency}</s.PaymentAmountBlue>
+                              <s.BalanceText>잔액 {transaction.balance.toLocaleString()} {travelWalletDetailData?.data?.currency}</s.BalanceText>
                             </s.PaymentAmountArea>
                           </s.PaymentArea>
                           <s.PaymentLine />
