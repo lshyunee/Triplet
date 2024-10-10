@@ -26,18 +26,43 @@ const StyledP = styled.p`
     margin-left : 17px;
 `;
 
+const InviteButton = styled.button`
+  font-size: 14px;
+  font-weight: 500;
+  color: #008DE7;
+  border: solid 1px #008DE7;
+  height: 32px;
+  width: 76px;
+  border-radius: 50px;
+  /* background-color: #FFFFFF; */
+  margin-right: 20px;
+  cursor: pointer;
+`;
+
+const ButtonArea = styled.div`
+  display: flex;
+  align-items: center;
+`
+
 const Header: React.FC = () => {
 
   const navigate = useNavigate();
+
+  const inviteOnClick = () => {
+    navigate('/travels/invite')
+  }
 
   return (
     <StyledDiv>
         <Link to="/" style={{ textDecoration: 'none' }}>
             <StyledP>Triplet</StyledP>
         </Link>
-        <Link to="/alarm">
-          <Alarm/>
-        </Link>
+        <ButtonArea>
+          <InviteButton onClick={inviteOnClick}>초대코드</InviteButton>
+          <Link to="/alarm">
+            <Alarm/>
+          </Link>
+        </ButtonArea>
     </StyledDiv>
   );
 }

@@ -285,7 +285,11 @@ const AccountDetailPage = () => {
           <Wallet/>
           <s.CardTitle>내 통장</s.CardTitle>
         </s.CardTitleArea>
+        {accountDetailData?.data?.bankName === '바나나은행' ? (
+        <s.CardCaption>Triplet {accountDetailData?.data?.accountNumber}</s.CardCaption>
+        ) : (
         <s.CardCaption>{accountDetailData?.data?.bankName} {accountDetailData?.data?.accountNumber}</s.CardCaption>
+        )}
         <s.ButtonArea>
           <s.CardKrw>{accountDetailData?.data?.accountBalance.toLocaleString()} 원</s.CardKrw>
           <s.CardButton onClick={transferOnclick}>송금</s.CardButton>
@@ -331,14 +335,14 @@ const AccountDetailPage = () => {
 
                   <s.PaymentAmountArea>
                     {transaction.transactionType === 1 ? (
-                      <s.PaymentTypeBlue>입금</s.PaymentTypeBlue>
+                      <s.PaymentTypeRed>입금</s.PaymentTypeRed>
                     ) : (
-                      <s.PaymentTypeRed>출금</s.PaymentTypeRed>
+                      <s.PaymentTypeBlue>출금</s.PaymentTypeBlue>
                     )}
                     {transaction.transactionType === 1 ? (
-                      <s.PaymentAmountBlue>{transaction.price.toLocaleString()}원</s.PaymentAmountBlue>
-                    ) : (
                       <s.PaymentAmountRed>{transaction.price.toLocaleString()}원</s.PaymentAmountRed>
+                    ) : (
+                      <s.PaymentAmountBlue>{transaction.price.toLocaleString()}원</s.PaymentAmountBlue>
                     )}
                     <s.BalanceText>잔액 {transaction.transactionAfterBalance.toLocaleString()}원</s.BalanceText>
                   </s.PaymentAmountArea>

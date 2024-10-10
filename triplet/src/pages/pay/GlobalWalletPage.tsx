@@ -102,7 +102,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[6]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[6]?.accountId}
-					rate={exchangeRateData?.data[4]?.exchangeRate}
+					rate={exchangeRateData?.data[6]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[3]?.accountId)}>
@@ -111,7 +111,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[3]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[3]?.accountId}
-					rate={exchangeRateData?.data[0]?.exchangeRate}
+					rate={exchangeRateData?.data[3]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[5]?.accountId)}>
@@ -120,7 +120,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[5]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[5]?.accountId}
-					rate={exchangeRateData?.data[3]?.exchangeRate}
+					rate={exchangeRateData?.data[5]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[2]?.accountId)}>
@@ -129,7 +129,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[2]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[2]?.accountId}
-					rate={exchangeRateData?.data[1]?.exchangeRate}
+					rate={exchangeRateData?.data[2]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[4]?.accountId)}>
@@ -138,7 +138,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[4]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[4]?.accountId}
-					rate={exchangeRateData?.data[2]?.exchangeRate}
+					rate={exchangeRateData?.data[4]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[1]?.accountId)}>
@@ -147,7 +147,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[1]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[1]?.accountId}
-					rate={exchangeRateData?.data[5]?.exchangeRate}
+					rate={exchangeRateData?.data[1]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.GlobalAccountCard onClick={() => handleCardClick(foreignAccountData?.data[0]?.accountId)}>
@@ -156,7 +156,7 @@ const GlobalWalletPage = () => {
 					foreignCurrency={foreignAccountData?.data[0]?.accountBalance}
 					isExchange={true}
 					accountId={foreignAccountData?.data[0]?.accountId}
-					rate={exchangeRateData?.data[6]?.exchangeRate}
+					rate={exchangeRateData?.data[0]?.exchangeRate}
 				/>
 			</s.GlobalAccountCard>
 			<s.Card>
@@ -166,45 +166,45 @@ const GlobalWalletPage = () => {
 				<s.CurrencyArea>
 					<ExchangeRate
 						nation='미국'
-						foreignCurrency={exchangeRateData?.data[4]?.exchangeRate}
-						isRise={exchangeRateData?.data[4]?.changeStatus}
-						rate={exchangeRateData?.data[4]?.changePercentage}
+						foreignCurrency={exchangeRateData?.data[6]?.exchangeRate}
+						isRise={exchangeRateData?.data[6]?.changeStatus}
+						rate={exchangeRateData?.data[6]?.changePercentage}
 					/>
 					<ExchangeRate
 						nation='유럽'
-						foreignCurrency={exchangeRateData?.data[0]?.exchangeRate}
-						isRise={exchangeRateData?.data[0]?.changeStatus}
-						rate={exchangeRateData?.data[0]?.changePercentage}
-					/>
-					<ExchangeRate
-						nation='일본'
 						foreignCurrency={exchangeRateData?.data[3]?.exchangeRate}
 						isRise={exchangeRateData?.data[3]?.changeStatus}
 						rate={exchangeRateData?.data[3]?.changePercentage}
 					/>
 					<ExchangeRate
-						nation='중국'
-						foreignCurrency={exchangeRateData?.data[1]?.exchangeRate}
-						isRise={exchangeRateData?.data[1]?.changeStatus}
-						rate={exchangeRateData?.data[1]?.changePercentage}
-					/>
-					<ExchangeRate
-						nation='영국'
-						foreignCurrency={exchangeRateData?.data[2]?.exchangeRate}
-						isRise={exchangeRateData?.data[2]?.changeStatus}
-						rate={exchangeRateData?.data[2]?.changePercentage}
-					/>
-					<ExchangeRate
-						nation='스위스'
+						nation='일본'
 						foreignCurrency={exchangeRateData?.data[5]?.exchangeRate}
 						isRise={exchangeRateData?.data[5]?.changeStatus}
 						rate={exchangeRateData?.data[5]?.changePercentage}
 					/>
 					<ExchangeRate
+						nation='중국'
+						foreignCurrency={exchangeRateData?.data[2]?.exchangeRate}
+						isRise={exchangeRateData?.data[2]?.changeStatus}
+						rate={exchangeRateData?.data[2]?.changePercentage}
+					/>
+					<ExchangeRate
+						nation='영국'
+						foreignCurrency={exchangeRateData?.data[4]?.exchangeRate}
+						isRise={exchangeRateData?.data[4]?.changeStatus}
+						rate={exchangeRateData?.data[4]?.changePercentage}
+					/>
+					<ExchangeRate
+						nation='스위스'
+						foreignCurrency={exchangeRateData?.data[1]?.exchangeRate}
+						isRise={exchangeRateData?.data[1]?.changeStatus}
+						rate={exchangeRateData?.data[1]?.changePercentage}
+					/>
+					<ExchangeRate
 						nation='캐나다'
-						foreignCurrency={exchangeRateData?.data[6]?.exchangeRate}
-						isRise={exchangeRateData?.data[6]?.changeStatus}
-						rate={exchangeRateData?.data[6]?.changePercentage}
+						foreignCurrency={exchangeRateData?.data[0]?.exchangeRate}
+						isRise={exchangeRateData?.data[0]?.changeStatus}
+						rate={exchangeRateData?.data[0]?.changePercentage}
 					/>
 				</s.CurrencyArea>
 			</s.Card>

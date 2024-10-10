@@ -3,6 +3,11 @@ import styled from 'styled-components';
 import { ReactComponent as RemoveIcon} from '../../assets/travel/removeIcon.svg';
 import useAxios from '../../hooks/useAxios';
 import RemoveModal from '../modal/RemoveModal';
+import { ReactComponent as ExitIcon } from '../../assets/travel/doorExit.svg';
+
+import ExitTravelModal from '../modal/ExitTravelModal';
+import { useParams } from 'react-router-dom';
+
 
 const PositionDiv = styled.div`
     display: flex;
@@ -61,6 +66,12 @@ const PriceInfoP = styled.p`
     color : #666666;
 `;
 
+const Exit = styled(ExitIcon)`
+    position: absolute;
+    bottom: 125px; 
+    right: 20px;
+`;
+
 interface TravelDetailCardProps {
     travelId : number,
     title : String,
@@ -76,7 +87,31 @@ const CompletedTravelDetailCard: React.FC<TravelDetailCardProps> =
         ({ travelId, title, startDate, endDate, country, memberCount, usedBudget, creatorId}) => {
 
     const [ removeOpen, setRemoveOpen ] = useState(false);
+    const [ exitOpen, setExitOpen ] = useState(false);
+
+    const { data : creatorData, error : creatorError, status : creatorStatus,
+        refetch : creatorRefetch
+    } = useAxios(`travels/confirm/${travelId}`,"GET");
+
+    const [ creator, setCreator ] = useState(false);
+
+    useEffect(()=>{
+        if(travelId!==0){
+            creatorRefetch();
+        }
+    },[travelId])
+    useEffect(()=>{
+
+        if(creatorData && creatorStatus===200){
+            setCreator(creatorData.data);
+        }
+
+    },[creatorData, creatorError]);
     
+    const exit = () => {
+        setExitOpen(true);
+    }
+
     const remove = () => {
         setRemoveOpen(true);
     }
@@ -85,7 +120,11 @@ const CompletedTravelDetailCard: React.FC<TravelDetailCardProps> =
         <PositionDiv>
             <CardDiv>
                 <TitleP>{title}</TitleP>
-                <Remove onClick={remove} />
+                { creator ? (
+                    <Remove onClick={remove} />
+                ) : (
+                    <Exit onClick={exit} />
+                )}
                 <InfoP> { startDate} ~
                 {endDate}<br />{country} · {memberCount}명</InfoP>
                 <PriceInfo>
@@ -93,6 +132,7 @@ const CompletedTravelDetailCard: React.FC<TravelDetailCardProps> =
                 </PriceInfo>
             </CardDiv>
             <RemoveModal isOpen={removeOpen} onClose={() => {setRemoveOpen(false)}} travelId={travelId} creatorId={creatorId}/>
+            <ExitTravelModal isOpen={exitOpen} onClose={() => {setExitOpen(false)}} travelId={travelId} />
         </PositionDiv>
     );
 };

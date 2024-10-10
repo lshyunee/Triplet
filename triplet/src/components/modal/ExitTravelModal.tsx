@@ -73,21 +73,20 @@ interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   travelId : number;
-  creatorId : number;
 }
 
-const RemoveModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, creatorId }) => {
+const ExitTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId }) => {
   
     const dispatch = useDispatch();
     const navigate = useNavigate();
 
-    const { data : removeData, error : removeError, status : removeStatus,
-        refetch : removeRefetch
-    } = useAxios(`/travels/delete/${travelId}`, "DELETE");
+    const { data : exitData, error : exitError, status : exitStatus,
+        refetch : exitRefetch
+    } = useAxios(`/travels/leave/${travelId}`, "POST");
 
 
     const handleRemove = () => {
-        removeRefetch();
+        exitRefetch();
     };
 
     const [ completeOpen, setCompletOpen ] = useState(false);
@@ -98,20 +97,20 @@ const RemoveModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, creatorI
 
     useEffect(() => {
 
-        if(removeData && removeStatus === 200){
+        if(exitData && exitStatus === 200){
             dispatch(removeOngoingTravel(travelId));
             dispatch(removeCompletedTravelById(travelId));
             dispatch(removeUpcomingTravelsById(travelId));
-            setMsg("여행 삭제가 완료되었습니다.");
+            setMsg("여행 나가기가 완료되었습니다.");
             setCompletOpen(true);
         }
 
-        if(removeError) {
-            setErrorMsg(removeError.msessage);
+        if(exitError) {
+            setErrorMsg(exitError.msessage);
             setErrorOpen(true);
         }
 
-    }, [removeData, removeError]);
+    }, [exitData, exitError]);
 
     const hanldleRemoveComplete = () => {
         setCompletOpen(false);
@@ -128,7 +127,7 @@ const RemoveModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, creatorI
         <ModalLayout onClick={onClose}>
             <ModalContentDiv onClick={(e) => e.stopPropagation()}>
                 <Title>삭제</Title>
-                <Description>여행을 삭제하시겠습니까?</Description>
+                <Description>여행을 나가시겠습니까?</Description>
                 <ConfirmDiv>
                     <Button cancel={true} onClick={onClose}>취소</Button>
                     <Button onClick={handleRemove}>확인</Button>
@@ -141,4 +140,4 @@ const RemoveModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, creatorI
     );
 };
 
-export default RemoveModal;
+export default ExitTravelModal;

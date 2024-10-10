@@ -139,6 +139,12 @@ const s = {
     border-radius: 50px;
     border: 0;
   `,
+  PaymentAmountRed: styled.span`
+  font-size: 16px;
+  font-weight: 600;
+  color: #EB5C5C;
+  margin-top: 8px;`
+,
 };
 
 const ForeignDetailPage = () => {
@@ -216,7 +222,7 @@ const ForeignDetailPage = () => {
                               <s.BalanceText>잔액 {transaction.balance.toLocaleString()} {travelWalletDetailData?.data?.currency}</s.BalanceText>
                             </s.PaymentAmountArea>
                           </s.PaymentArea>
-                          <s.PaymentLine />
+                          <s.PaymentLine/>
                         </React.Fragment>
                     ))}
                   </React.Fragment>

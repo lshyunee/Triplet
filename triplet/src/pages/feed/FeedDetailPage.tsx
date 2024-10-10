@@ -53,6 +53,17 @@ const CategoryBudgetDiv = styled.div`
     border-radius : 20px;
 `;
 
+const Overlay = styled.div`
+  position: absolute;
+  top: 56px;
+  left: 0;
+  width: 100%;
+  height: 200px;
+  background-color: rgba(0, 0, 0, 0.2); /* 반투명한 검정 오버레이 */
+  z-index: 1;
+`;
+
+
 
 const CategoryShareDiv = styled.div`
     width : 100%;
@@ -208,7 +219,6 @@ const SharedTravelDetailPage = () => {
         }
       }
     else if (travelData) {
-      console.log(travelData.data)
       if (travelData.data.shared === false) {
         setModalMessage("잘못된 접근입니다.")
         setShowModal(true);
@@ -297,6 +307,7 @@ const SharedTravelDetailPage = () => {
       {(travel?.travelId !== 0 && travel?.shared )&& 
       <DetailDiv>
         <Img src={travel?.image || ''}></Img>
+        <Overlay />
         <ContentDiv>
           <TravelCardDiv>
             <SnsTravelDetailCard

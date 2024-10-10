@@ -126,12 +126,12 @@ const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
     border-radius: 50px;
     overflow: hidden;
     height: 12px;
-`;
+`
 
 const MoneyChartBar = styled.div<MonyeProgressProps>`
     height : 100%;
     background-color : ${props => props.color};
-    width : ${props => props.paid || '50%'};
+    width : ${props => `${props.paid}%` || '0%'};
     border-radius : 50px;
 `
 
@@ -228,7 +228,6 @@ interface Travel {
 const [ travel, setTravel ] = useState<Travel | null>(null);
 
 useEffect(()=>{
-    console.log("travel",travel);
     if(travelData){
         setTravel(travelData.data);
         budgetRefetch();

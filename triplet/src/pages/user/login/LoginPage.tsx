@@ -135,13 +135,11 @@ const LoginPage = () => {
     
     useEffect(() => {
         if (loginData !== null) {
-            console.log(loginData);
             setCompleteMsg("로그인이 완료되었습니다.");
             isCompleteOpen();
         }
 
         if (loginError !== null) {
-            console.log(loginError);
             const message = loginError.response?.data?.message || "로그인이 불가능합니다.";
             setErrorMsg(message);
             isErrorOpen();

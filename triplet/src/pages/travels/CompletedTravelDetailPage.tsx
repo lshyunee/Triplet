@@ -135,7 +135,7 @@ const MoneyBudgetP = styled.p<MoneyCategoryProps>`
     margin : 0px;
     font-size : 14px;
     font-weight : 500;
-    color : ${props => props.color || "#666666"}
+    color : ${props => props.color || "#666666"};
 `;
 
 const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
@@ -143,11 +143,11 @@ const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
     font-size : 14px;
     font-weight : 600;
     margin-right : 4px;
-    color : ${props => props.color || "#666666"}
+    color : ${props => props.color || "#666666"};
 `;
 
 interface MonyeProgressProps {
-    paid : string;
+    paid : number;
     color : string;
 }
 
@@ -162,9 +162,10 @@ const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
 const MoneyChartBar = styled.div<MonyeProgressProps>`
     height : 100%;
     background-color : ${props => props.color};
-    width : ${props => props.paid || '50%'};
+    width : ${props => `${props.paid}%` || '0%'};
     border-radius : 50px;
 `
+
 const MoneyComsumpP = styled.p<MoneyCategoryProps>`
     font-size : 16px;
     font-weight : 700;
@@ -231,7 +232,6 @@ const CompletedTravelDetailPage = () => {
     useEffect(() => {
         if (travelData) {
             setTravel(travelData.data);
-            console.log(travelData.data);
         }
     }, [travelData, travelError]);
 
@@ -260,7 +260,6 @@ const CompletedTravelDetailPage = () => {
         if (budgetData) {
             const { isComplete, budgetList } = budgetData.data;
 
-            console.log(budgetData);
         
             setBudgetDetails({
                 isComplete,
@@ -348,7 +347,9 @@ const CompletedTravelDetailPage = () => {
                             </>
                         )}
                         <MoneyChartConsumpBar color={hexToRgba("#00D5FF","0.3")}>
-                            <MoneyChartBar paid="80%" color="#00D5FF"/>
+                            <MoneyChartBar paid={budgetDetails?.budgetList[0]?.used && usedBudget 
+                                ? ((budgetDetails.budgetList[0].used / usedBudget) * 100)
+                                : 0} color="#00D5FF"/>
                         </MoneyChartConsumpBar>
                         {budgetDetails?.budgetList?.[1] && (
                             <>
@@ -369,7 +370,9 @@ const CompletedTravelDetailPage = () => {
                             </>
                         )}
                         <MoneyChartConsumpBar color={hexToRgba("#00C8FB","0.3")}>
-                            <MoneyChartBar paid="80%" color="#00C8FB"/>
+                            <MoneyChartBar paid={budgetDetails?.budgetList[1]?.used && usedBudget 
+                                ? ((budgetDetails.budgetList[1].used / usedBudget) * 100)
+                                : 0} color="#00C8FB"/>
                         </MoneyChartConsumpBar>
                         {budgetDetails?.budgetList?.[2] && (
                             <>
@@ -390,7 +393,9 @@ const CompletedTravelDetailPage = () => {
                             </>
                         )}
                         <MoneyChartConsumpBar color={hexToRgba("#00B8F5","0.3")}>
-                            <MoneyChartBar paid="80%" color="#00B8F5"/>
+                            <MoneyChartBar paid={budgetDetails?.budgetList[2]?.used && usedBudget 
+                                ? ((budgetDetails.budgetList[2].used / usedBudget) * 100)
+                                : 0} color="#00B8F5"/>
                         </MoneyChartConsumpBar>
                         {budgetDetails?.budgetList?.[3] && (
                             <>
@@ -411,7 +416,9 @@ const CompletedTravelDetailPage = () => {
                             </>
                         )}
                         <MoneyChartConsumpBar color={hexToRgba("#00ACF1","0.3")}>
-                            <MoneyChartBar paid="80%" color="#00ACF1"/>
+                            <MoneyChartBar paid={budgetDetails?.budgetList[3]?.used && usedBudget 
+                                ? ((budgetDetails.budgetList[3].used / usedBudget) * 100)
+                                : 0} color="#00ACF1"/>
                         </MoneyChartConsumpBar>
 
                         {budgetDetails?.budgetList?.[4] && (
@@ -433,7 +440,9 @@ const CompletedTravelDetailPage = () => {
                             </>
                         )}
                         <MoneyChartConsumpBar color={hexToRgba("#009BEB","0.3")}>
-                            <MoneyChartBar paid="80%" color="#009BEB"/>
+                            <MoneyChartBar paid={budgetDetails?.budgetList[4]?.used && usedBudget 
+                                ? ((budgetDetails.budgetList[4].used / usedBudget) * 100)
+                                : 0} color="#009BEB"/>
                         </MoneyChartConsumpBar>
                         {budgetDetails?.budgetList?.[5] && (
                             <>
@@ -454,7 +463,9 @@ const CompletedTravelDetailPage = () => {
                             </>
                         )}
                         <MoneyChartConsumpBar color={hexToRgba("#008DE7","0.3")}>
-                            <MoneyChartBar paid="80%" color="#008DE7"/>
+                            <MoneyChartBar paid={budgetDetails?.budgetList[5]?.used && usedBudget 
+                                ? ((budgetDetails.budgetList[5].used / usedBudget) * 100)
+                                : 0} color="#008DE7"/>
                         </MoneyChartConsumpBar>
                         </MoneyDiv>
                     <CategoryShareDiv>

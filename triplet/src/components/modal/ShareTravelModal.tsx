@@ -114,8 +114,8 @@ interface ModalProps {
 
 const ShareTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, share, shareDetail }) => {
   
-  const [isShared, setIsShared] = useState(share ? 1 : 0);
-  const [isDetailShared, setIsDetailShared] = useState(shareDetail ? 1 : 0);
+  const [isShared, setIsShared] = useState(0);
+  const [isDetailShared, setIsDetailShared] = useState(0);
   
   const [ completedMsg, setCompletedMSg ] = useState("");
   const [ isCompleted, setIsCompleted ] = useState(false);
@@ -127,6 +127,13 @@ const ShareTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, sha
       shareStatus : isDetailShared,
     });
 
+    useEffect(()=>{
+
+      setIsShared(share ? 1 : 0)
+      setIsDetailShared(shareDetail ? 1 : 0);
+
+    }, [share, shareDetail])
+
   useEffect(()=>{
     
     if(shareData && shareStatus === 200) {
@@ -135,7 +142,7 @@ const ShareTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, sha
     }
 
     if(shareError){
-
+      
     }
 
   },[shareData, shareError])
@@ -165,7 +172,6 @@ const ShareTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, sha
 
 
   const handleShareComplete = () => {
-    console.log(travelId, isShared, isDetailShared);
     shareRefetch();
   }
 

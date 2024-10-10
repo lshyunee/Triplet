@@ -211,7 +211,6 @@ const HomePage = () => {
 
     // 컴포넌트가 처음 렌더링될 때, 데이터가 없으면 Axios 요청을 트리거
     useEffect(() => {
-        console.log("정보받아오는중!");
         if (!travelData.travelId) {
             infoRefetch();
         }
@@ -274,7 +273,6 @@ const HomePage = () => {
         }
     
         if(userInfoStatus&&userInfoStatus!==200){
-            console.log(userInfoStatus);
             if (!userInfoData || !userInfoData.data) {
                 navigate('/login');
             } else if (userInfoData.data){
@@ -328,7 +326,6 @@ const HomePage = () => {
     }, []);
     
     useEffect(() => {
-        console.log(accountData?.data)
     }, [accountData])
 
     const accountOnClick = () => {
@@ -378,7 +375,11 @@ const HomePage = () => {
                         <CardTitle>내 통장</CardTitle>
                         <RightArrow/>
                     </CardTitleArea>
+                    {accountData?.data.bankName === '바나나은행' ? (
+                    <CardCaption>Triplet {accountData?.data.accountNumber}</CardCaption>
+                    ) : (
                     <CardCaption>{accountData?.data.bankName} {accountData?.data.accountNumber}</CardCaption>
+                    )}
                     <ButtonArea>
                         <CardContent>{accountData?.data.accountBalance.toLocaleString()}원</CardContent>
                         <CardButton onClick={transferOnclick}>송금</CardButton>
@@ -395,21 +396,21 @@ const HomePage = () => {
 							foreignCurrency={foreignAccountData?.data[6]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[6]?.accountId}
-                            rate={exchangeRateData?.data[4]?.exchangeRate}
+                            rate={exchangeRateData?.data[6]?.exchangeRate}
 						/>
                         <GlobalAccount
 							nation='유럽'
 							foreignCurrency={foreignAccountData?.data[3]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[3]?.accountId}
-                            rate={exchangeRateData?.data[0]?.exchangeRate}
+                            rate={exchangeRateData?.data[3]?.exchangeRate}
 						/>
 						<GlobalAccount
 							nation='일본'
 							foreignCurrency={foreignAccountData?.data[5]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[5]?.accountId}
-                            rate={exchangeRateData?.data[3]?.exchangeRate}
+                            rate={exchangeRateData?.data[5]?.exchangeRate}
 						/>
                     </AccountDiv>
                 </Link>

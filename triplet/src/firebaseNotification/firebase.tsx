@@ -3,6 +3,7 @@
 import { initializeApp } from 'firebase/app';
 import { getMessaging, getToken } from 'firebase/messaging';
 import axios from 'axios';
+import axiosInstance from '../services/axios';
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -34,8 +35,8 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
             const storedToken = localStorage.getItem('fcmToken');
             if (!storedToken || currentToken !== storedToken) {
                 localStorage.setItem('fcmToken', currentToken);
-                await axios.post("https://j11b202.p.ssafy.io/api/v1/token", { "token": currentToken }).then(()=>{
-                    axios.put("https://j11b202.p.ssafy.io/api/v1/token/agree", { "enable": true }).catch(e => console.log("동의 여부 수정 오류 " + e));
+                await axiosInstance.post("/token", { "token": currentToken }).then(()=>{
+                    axiosInstance.put("/token/agree", { "enable": true }).catch(e => console.log("동의 여부 수정 오류 " + e));
                 }).catch(e=> console.log("토큰 저장 오류" + e));
             }
 
@@ -56,5 +57,6 @@ export async function notificationPermissionDenined() {
     if(storedToken){
         localStorage.removeItem('fcmToken');
     }
-    await axios.put("https://j11b202.p.ssafy.io/api/v1/token/agree", { "enable": false });
+    await axiosInstance.put("/token/agree", { "enable": false });
+
 }
