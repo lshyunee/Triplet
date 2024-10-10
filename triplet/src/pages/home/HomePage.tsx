@@ -375,7 +375,11 @@ const HomePage = () => {
                         <CardTitle>내 통장</CardTitle>
                         <RightArrow/>
                     </CardTitleArea>
+                    {accountData?.data.bankName === '바나나은행' ? (
+                    <CardCaption>Triplet {accountData?.data.accountNumber}</CardCaption>
+                    ) : (
                     <CardCaption>{accountData?.data.bankName} {accountData?.data.accountNumber}</CardCaption>
+                    )}
                     <ButtonArea>
                         <CardContent>{accountData?.data.accountBalance.toLocaleString()}원</CardContent>
                         <CardButton onClick={transferOnclick}>송금</CardButton>
