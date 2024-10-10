@@ -10,8 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -23,7 +25,12 @@ public class ExchangeRateController {
     @GetMapping("/exchange-rate-list")
     public ResponseEntity<?> getExchangeRate() {
 
-        List<ExchangeRates> result = exchangeRateService.getExchangeRates();
+        List<ExchangeRates> result = exchangeRateService.getExchangeRates().stream()
+                .sorted(Comparator.comparing(ExchangeRates::getCurrency))
+                .collect(Collectors.toList());
+        ;
+// currency 기준으로 정렬
+        result.sort(Comparator.comparing(ExchangeRates::getCurrency));
         return ResponseEntity.ok(new ApiResponse("200", "전체 환율 조회 성공", result));
     }
 
