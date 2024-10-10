@@ -210,8 +210,8 @@ public class AccountService {
                 .price(request.getTransactionBalance())
                 .transactionAfterBalance(withdrawal)
                 .transactionName(depositAccount.getMember().getName()).build();
-        TransactionList savedWithdrawal = transactionListRepository.save(withdrawalTransaction);
         withdrawalAccount.createTransaction(savedWithdrawal);
+        TransactionList savedWithdrawal = transactionListRepository.save(withdrawalTransaction);
 
         TransactionList depositTransaction = TransactionList.builder()
                 .transactionType(1)
@@ -220,8 +220,8 @@ public class AccountService {
                 .price(request.getTransactionBalance())
                 .transactionAfterBalance(deposit)
                 .transactionName(withdrawalAccount.getMember().getName()).build();
-        TransactionList savedDeposit = transactionListRepository.save(depositTransaction);
         depositAccount.createTransaction(savedDeposit);
+        TransactionList savedDeposit = transactionListRepository.save(depositTransaction);
 
         // 거래내역 반환 Dto
         List<CreateTransactionResponse> responses = new ArrayList<>();
