@@ -178,7 +178,13 @@ const s = {
     font-size: 14px;
     font-weight: 500;
     margin-left: 8px;
-  `
+  `,
+  ForeignAmount: styled.div`
+    font-size: 14px;
+    font-weight: 500;
+    color: #008DE7;
+    margin-top: 12px;
+  `,
 }
 
 type countryData = {
@@ -330,7 +336,7 @@ const CreateTravelPage = () => {
   };
 
   useEffect(() => {
-    console.log(countryCurrency)
+    console.log('countryCurrency', countryCurrency)
   }, [countryCurrency])
 
   // 예산설정
@@ -367,31 +373,68 @@ const CreateTravelPage = () => {
       switch (name) {
         case 'flight':
           setFlight(numberValue);
+          if (countryCurrency === "JPY") {
+            setForeignFlight(Math.floor(numberValue / exchangeRate * 100))
+          } else {
+            setForeignFlight(Math.floor(numberValue / exchangeRate))
+          }
           break;
         case 'meal':
           setMeal(numberValue);
+          if (countryCurrency === "JPY") {
+            setForeignMeal(Math.floor(numberValue / exchangeRate * 100))
+          } else {
+            setForeignMeal(Math.floor(numberValue / exchangeRate))
+          }
           break;
         case 'shopping':
           setShopping(numberValue);
+          if (countryCurrency === "JPY") {
+            setForeignShopping(Math.floor(numberValue / exchangeRate * 100))
+          } else {
+            setForeignShopping(Math.floor(numberValue / exchangeRate))
+          }
           break;
         case 'transport':
           setTransport(numberValue);
+          if (countryCurrency === "JPY") {
+            setForeignTransport(Math.floor(numberValue / exchangeRate * 100))
+          } else {
+            setForeignTransport(Math.floor(numberValue / exchangeRate))
+          }
           break;
         case 'tour':
           setTour(numberValue);
+          if (countryCurrency === "JPY") {
+            setForeignTour(Math.floor(numberValue / exchangeRate * 100))
+          } else {
+            setForeignTour(Math.floor(numberValue / exchangeRate))
+          }
           break;
         case 'accommodation':
           setAccommodation(numberValue);
+          if (countryCurrency === "JPY") {
+            setForeignAccommodation(Math.floor(numberValue / exchangeRate * 100))
+          } else {
+            setForeignAccommodation(Math.floor(numberValue / exchangeRate))
+          }
           break;
         case 'etc':
           setEtc(numberValue);
+          if (countryCurrency === "JPY") {
+            setForeignEtc(Math.floor(numberValue / exchangeRate * 100))
+          } else {
+            setForeignEtc(Math.floor(numberValue / exchangeRate))
+          }
           break;
       };
     }
   };
   useEffect(() => {
     setTotal(flight + meal + transport + shopping + tour + accommodation + etc)
+    setForeignTotal(foreignFlight + foreignMeal + foreignTransport + foreignShopping + foreignTour + foreignAccommodation + foreignEtc)
   }, [flight, meal, transport, shopping, tour, accommodation, etc])
+
 
   const [tdata, settdata] = useState<any>();
   
@@ -497,15 +540,23 @@ const CreateTravelPage = () => {
   }, [testData])
 
   useEffect(() => {
-    console.log(currencyData)
+    console.log('currencyData', currencyData)
     if (currencyData) {
       setCurrency(currencyData.data)
     }
   }, [currencyData])
 
+  const [exchangeRate, setExchangeRate] = useState<number>(1)
   useEffect(() => {
-    console.log(currency)
+    console.log('currency', currency)
+    if (currency) {
+      setExchangeRate(Number(currency.exchangeRate))
+    }
   }, [currency])
+
+  useEffect(() => {
+    console.log('exchangeRate', exchangeRate)
+  }, [exchangeRate])
 
   return (
     <>
@@ -567,20 +618,28 @@ const CreateTravelPage = () => {
       <s.SecondStep $isFirst={isFirst}>
         <s.InputText>항공</s.InputText>
         <s.InputBoxArea><s.InputBox name='flight' onChange={handleBudget} value={flight}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.ForeignAmount>{foreignFlight} {countryCurrency}</s.ForeignAmount>
         <s.InputText>식사</s.InputText>
         <s.InputBoxArea><s.InputBox name='meal' onChange={handleBudget} value={meal}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.ForeignAmount>{foreignMeal} {countryCurrency}</s.ForeignAmount>
         <s.InputText>쇼핑</s.InputText>
         <s.InputBoxArea><s.InputBox name='shopping' onChange={handleBudget} value={shopping}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.ForeignAmount>{foreignShopping} {countryCurrency}</s.ForeignAmount>
         <s.InputText>교통</s.InputText>
         <s.InputBoxArea><s.InputBox name='transport' onChange={handleBudget} value={transport}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.ForeignAmount>{foreignTransport} {countryCurrency}</s.ForeignAmount>
         <s.InputText>관광</s.InputText>
         <s.InputBoxArea><s.InputBox name='tour' onChange={handleBudget} value={tour}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.ForeignAmount>{foreignTour} {countryCurrency}</s.ForeignAmount>
         <s.InputText>숙박</s.InputText>
         <s.InputBoxArea><s.InputBox name='accommodation' onChange={handleBudget} value={accommodation}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.ForeignAmount>{foreignAccommodation} {countryCurrency}</s.ForeignAmount>
         <s.InputText>기타</s.InputText>
         <s.InputBoxArea><s.InputBox name='etc' onChange={handleBudget} value={etc}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.ForeignAmount>{foreignEtc} {countryCurrency}</s.ForeignAmount>
         <s.InputText>총 예산</s.InputText>
-        <s.InputBoxArea style={{marginBottom: '120px'}}><s.InputBox name='total' onChange={handleBudget} value={total}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.InputBoxArea><s.InputBox name='total' onChange={handleBudget} value={total}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.ForeignAmount style={{marginBottom: '120px'}}>{foreignTotal} {countryCurrency}</s.ForeignAmount>
         <s.ButtonArea>
           <s.PrevButton onClick={nextButtonOnclick}>이전으로</s.PrevButton>
           <s.SubmitButton onClick={submitTravelData}>완료하기</s.SubmitButton>

@@ -132,7 +132,7 @@ const InvitePage = () => {
 		refetch: inviteRefetch } = useAxios(`/travels/invite/${inviteCode}`, 'POST');
 
 
-  const transferOnClick = () => {
+  const inviteOnClick = () => {
     const fetchData = async () => {
 			try {
 			await Promise.all([
@@ -150,8 +150,16 @@ const InvitePage = () => {
   useEffect(() => {
     if (inviteData) {
       window.alert('초대코드 입력 완료')
+      navigate(-1)
     }
   }, [inviteData])
+
+  useEffect(() => {
+    if (inviteError) {
+      window.alert(inviteError.response.data.message)
+      console.log(inviteError)
+    }
+  }, [inviteError])
 
 	return (
 		<>
@@ -163,7 +171,7 @@ const InvitePage = () => {
           <s.InputBox onChange={inviteCodeOnChange} value={inviteCode}/>
         </s.InputBoxArea>
         <s.ButtonArea>
-          <s.NextButton onClick={transferOnClick}>입력완료</s.NextButton>
+          <s.NextButton onClick={inviteOnClick}>입력완료</s.NextButton>
         </s.ButtonArea>
 			</s.Container>
 		</>
