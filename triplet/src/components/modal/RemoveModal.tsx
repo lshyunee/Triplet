@@ -107,7 +107,6 @@ const RemoveModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, creatorI
         }
 
         if(removeError) {
-            console.log(removeError);
             setErrorMsg(removeError.msessage);
             setErrorOpen(true);
         }

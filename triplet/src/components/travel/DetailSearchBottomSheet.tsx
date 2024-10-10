@@ -264,9 +264,6 @@ const DetailSearchBottomSheet: React.FC<BottomSheetProps> = ({ isOpen, onClose }
 
   useEffect(()=>{
 
-    console.log(searchData);
-
-    console.log(minBudget.value);
     
     if(searchData && searchStatus === 200){
       dispatch(initFeedTravels());

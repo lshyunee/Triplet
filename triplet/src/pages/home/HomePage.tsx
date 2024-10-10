@@ -211,7 +211,6 @@ const HomePage = () => {
 
     // 컴포넌트가 처음 렌더링될 때, 데이터가 없으면 Axios 요청을 트리거
     useEffect(() => {
-        console.log("정보받아오는중!");
         if (!travelData.travelId) {
             infoRefetch();
         }
@@ -274,7 +273,6 @@ const HomePage = () => {
         }
     
         if(userInfoStatus&&userInfoStatus!==200){
-            console.log(userInfoStatus);
             if (!userInfoData || !userInfoData.data) {
                 navigate('/login');
             } else if (userInfoData.data){
@@ -328,7 +326,6 @@ const HomePage = () => {
     }, []);
     
     useEffect(() => {
-        console.log(accountData?.data)
     }, [accountData])
 
     const accountOnClick = () => {

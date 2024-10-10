@@ -231,7 +231,6 @@ const CompletedTravelDetailPage = () => {
     useEffect(() => {
         if (travelData) {
             setTravel(travelData.data);
-            console.log(travelData.data);
         }
     }, [travelData, travelError]);
 
@@ -260,7 +259,6 @@ const CompletedTravelDetailPage = () => {
         if (budgetData) {
             const { isComplete, budgetList } = budgetData.data;
 
-            console.log(budgetData);
         
             setBudgetDetails({
                 isComplete,

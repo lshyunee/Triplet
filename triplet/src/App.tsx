@@ -58,15 +58,15 @@ const App: React.FC = () => {
       setIsActive(true);
     }
 
-    // if(!isAuthenticated){
-    //   if(location.pathname !== "/signup"){
-    //     navigate('/login');
-    //   }
-    // }else{
-    //   if(loginSuccessPages.includes(location.pathname)){
-    //     navigate('/');
-    //   }
-    // }
+    if(!isAuthenticated){
+      if(location.pathname !== "/signup"){
+        navigate('/login');
+      }
+    }else{
+      if(loginSuccessPages.includes(location.pathname)){
+        navigate('/');
+      }
+    }
 
   }, [location.pathname, isAuthenticated]);  // location.pathname이 변경될 때마다 실행
 

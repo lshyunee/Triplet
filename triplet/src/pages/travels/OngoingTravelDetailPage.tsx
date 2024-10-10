@@ -220,7 +220,6 @@ useEffect(() => {
         travelId : travelData.data.travelId,
         creatorId : travelData.data.creatorId,
       }));
-      console.log(travelData);
     }
     budgetRefetch();
 }, [travelData, travelError]);
@@ -264,7 +263,6 @@ useEffect(() => {
           setUsedBudget(budgetList.reduce(
             (total:Number, usedBudget: any) => total + usedBudget, 0));
 
-        console.log(budgetDetails?.budgetList);
 
       }
   

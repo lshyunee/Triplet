@@ -85,7 +85,6 @@ const LogoutModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (logoutData !== null) {
-      console.log(logoutData.message);
       dispatch(resetInfo());
       dispatch(logout());
       navigate("/login");

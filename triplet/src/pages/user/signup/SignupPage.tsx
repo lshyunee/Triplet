@@ -209,7 +209,6 @@ const SignupPage = () => {
     useEffect(() => {
 
         if(duplicatedData!==null){
-            console.log(duplicatedData);
             setIsDuplicated(duplicatedData.data.duplicated);
             if(duplicatedData.data.duplicated===true){
                 setErrorMsg("이미 존재하는 아이디 입니다.");
@@ -242,7 +241,6 @@ const SignupPage = () => {
     useEffect(() => {
         
         if(phoneError!==null && phoneStatus!==200){
-            console.log(phoneError);
             const message = phoneError.response.data.message || '전화번호를 인증할 수 없습니다.';
             setErrorMsg(message);
             isErrorOpen();

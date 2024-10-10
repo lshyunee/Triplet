@@ -218,17 +218,6 @@ const FeedPage = () => {
         }
       );
 
-    // console.log({
-    //     countryName: kind === 0 || kind === 1 || countryName.value === '' ? null : countryName.value,
-    //     memberCount: kind === 0 || kind === 1 || Number(filter.memberCount) === 0 ? null : filter.memberCount,
-    //     minBudget: kind === 0 || kind === 1 || Number(filter.minBudget) === 0 ? null : filter.minBudget,
-    //     maxBudget: kind === 0 || kind === 1 || Number(filter.maxBudget) === 0 ? null : filter.maxBudget,
-    //     minDays: kind === 0 || kind === 1 || Number(filter.minDays) === 0 ? null : filter.minDays,
-    //     maxDays: kind === 0 || kind === 1 || Number(filter.maxDays) === 0 ? null : filter.maxDays,
-    //     page: page,
-    //     kind: kind
-    //   });
-
     useEffect(() => {
         dispatch(pageMove("feed"));
         dispatch(initFeedTravels());
@@ -238,7 +227,6 @@ const FeedPage = () => {
 
 
     const handleInputChange = (event:any) => {
-        console.log(countryName);
         if (event.key === 'Enter') {
             dispatch(initFeedTravels());
             dispatch(setCountry(countryName.value));
@@ -252,7 +240,6 @@ const FeedPage = () => {
 
     useEffect(()=>{
         if(!searchLoading){
-            console.log("kind 바뀜", kind);
             dispatch(initFeedTravels());
             searchRefetch();
         }
@@ -301,7 +288,6 @@ const FeedPage = () => {
         if (searchData && searchData.data && searchData.data.content) {
           if (searchData.data.content.length > 0) {
             dispatch(addFeedTravels(searchData.data.content));
-            console.log(searchData.data.content);
           } else {
             setHasMore(false); // 더 이상 데이터가 없으면 로딩을 중단
           }

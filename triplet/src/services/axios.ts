@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { logout } from '../features/auth/authSlice';
+import store from '../store';
 
 const axiosInstance = axios.create({
     baseURL: 'https://j11b202.p.ssafy.io/api/v1',
@@ -8,7 +10,6 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
     (config) => {
-        console.log(config);
         return config;
     },
     (error) => Promise.reject(error)
@@ -33,9 +34,8 @@ axiosInstance.interceptors.response.use(
                 // 토큰 재발급 요청
                 const response = await axiosInstance.post('/reissue');
 
-                console.log(response);
-
                 if (response.status === 401) {
+                    store.dispatch(logout());
                     throw new Error('Token reissue failed');
                 }
 
@@ -44,6 +44,7 @@ axiosInstance.interceptors.response.use(
             } catch (reissueError) {
                 // reissue 요청이 실패하면 로그인 페이지로 리다이렉트하거나 에러 처리
                 console.error('Token reissue failed', reissueError);
+                window.location.href = '/login';
                 return Promise.reject(reissueError);  // 재시도하지 않고 에러 반환
             }
         }

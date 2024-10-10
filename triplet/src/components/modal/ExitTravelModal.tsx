@@ -106,7 +106,6 @@ const ExitTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId }) =>
         }
 
         if(exitError) {
-            console.log(exitError);
             setErrorMsg(exitError.msessage);
             setErrorOpen(true);
         }

@@ -135,7 +135,7 @@ const ShareTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, sha
     }
 
     if(shareError){
-
+      
     }
 
   },[shareData, shareError])
@@ -165,7 +165,6 @@ const ShareTravelModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, sha
 
 
   const handleShareComplete = () => {
-    console.log(travelId, isShared, isDetailShared);
     shareRefetch();
   }
 
