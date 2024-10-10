@@ -4,9 +4,6 @@ import styled from 'styled-components';
 
 import { useNavigate } from 'react-router-dom';
 
-import ErrorModal from '../../components/modal/ErrorModal';
-import CompleteModal from '../../components/modal/CompleteModal';
-
 import useAxios from '../../hooks/useAxios';
 import useInput from '../../hooks/useInput';
 import { useDispatch } from 'react-redux';
@@ -19,10 +16,11 @@ const HowP = styled.p`
 `;
 
 const EntireDiv = styled.div`
-    min-height : 600px;
-    margin : 0px 16px 0;
-    height : calc(100vh - 112px);
-    padding : 56px 0;
+    height: 100vh; /* 화면 높이를 100%로 설정 */
+    margin: 0;
+    padding: 56px 16px; /* padding 조정 */
+    box-sizing: border-box; /* padding과 border를 포함하여 계산 */
+    overflow: hidden; /* 스크롤을 없애기 위해 overflow 속성 사용 */
 `;
 
 const InputDiv = styled.div`

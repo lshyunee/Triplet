@@ -367,7 +367,7 @@
                     </s.PaymentTitleArea>
 
                     <s.PaymentAmountArea>
-                        <s.PaymentAmountRed>{transaction.price.toLocaleString()}원</s.PaymentAmountRed>
+                        <s.PaymentAmountBlue>{transaction.price.toLocaleString()}원</s.PaymentAmountBlue>
                         <s.BalanceText>잔액 {transaction.balance.toLocaleString()}원</s.BalanceText>
                     </s.PaymentAmountArea>
                     </s.PaymentArea>

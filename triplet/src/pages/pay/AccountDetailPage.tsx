@@ -335,14 +335,14 @@ const AccountDetailPage = () => {
 
                   <s.PaymentAmountArea>
                     {transaction.transactionType === 1 ? (
-                      <s.PaymentTypeBlue>입금</s.PaymentTypeBlue>
+                      <s.PaymentTypeRed>입금</s.PaymentTypeRed>
                     ) : (
-                      <s.PaymentTypeRed>출금</s.PaymentTypeRed>
+                      <s.PaymentTypeBlue>출금</s.PaymentTypeBlue>
                     )}
                     {transaction.transactionType === 1 ? (
-                      <s.PaymentAmountBlue>{transaction.price.toLocaleString()}원</s.PaymentAmountBlue>
-                    ) : (
                       <s.PaymentAmountRed>{transaction.price.toLocaleString()}원</s.PaymentAmountRed>
+                    ) : (
+                      <s.PaymentAmountBlue>{transaction.price.toLocaleString()}원</s.PaymentAmountBlue>
                     )}
                     <s.BalanceText>잔액 {transaction.transactionAfterBalance.toLocaleString()}원</s.BalanceText>
                   </s.PaymentAmountArea>

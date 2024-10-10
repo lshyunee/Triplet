@@ -204,7 +204,7 @@ const SimplePasswordSetConfirmPage: React.FC = () => {
     // 모달 닫기 및 페이지 이동 처리
     const closeModal = () => {
         setIsModalOpen(false);
-        navigate(`/`);
+        navigate(`/mypage`);
     };
 
     return (
