@@ -155,7 +155,11 @@ const PayPage = () => {
 						<s.CardTitle>{accountData?.data?.accountName}</s.CardTitle>
 						<RightArrow/>
 					</s.CardTitleArea>
+					{accountData?.data.bankName === '바나나은행' ? (
+					<s.CardCaption>Triplet {accountData?.data?.accountNumber}</s.CardCaption>
+					) : (
 					<s.CardCaption>{accountData?.data?.bankName} {accountData?.data?.accountNumber}</s.CardCaption>
+					)}
 					<s.ButtonArea>
 						<s.CardContent>{accountData?.data?.accountBalance.toLocaleString()} 원</s.CardContent>
 						<s.CardButton onClick={transferOnclick}>송금</s.CardButton>
