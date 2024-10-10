@@ -363,35 +363,35 @@ const CreateTravelPage = () => {
   const handleBudget = (e: React.ChangeEvent<HTMLInputElement>) => {
     const {name, value} = e.target;
     const numberValue = Number(value);
-
-    switch (name) {
-      case 'flight':
-        setFlight(numberValue);
-        break;
-      case 'meal':
-        setMeal(numberValue);
-        break;
-      case 'shopping':
-        setShopping(numberValue);
-        break;
-      case 'transport':
-        setTransport(numberValue);
-        break;
-      case 'tour':
-        setTour(numberValue);
-        break;
-      case 'accommodation':
-        setAccommodation(numberValue);
-        break;
-      case 'etc':
-        setEtc(numberValue);
-        break;
-      case 'total':
-        setTotal(numberValue);
-        break;
-    };
+    if (numberValue || Number(value) === 0) {
+      switch (name) {
+        case 'flight':
+          setFlight(numberValue);
+          break;
+        case 'meal':
+          setMeal(numberValue);
+          break;
+        case 'shopping':
+          setShopping(numberValue);
+          break;
+        case 'transport':
+          setTransport(numberValue);
+          break;
+        case 'tour':
+          setTour(numberValue);
+          break;
+        case 'accommodation':
+          setAccommodation(numberValue);
+          break;
+        case 'etc':
+          setEtc(numberValue);
+          break;
+      };
+    }
   };
-
+  useEffect(() => {
+    setTotal(flight + meal + transport + shopping + tour + accommodation + etc)
+  }, [flight, meal, transport, shopping, tour, accommodation, etc])
 
   const [tdata, settdata] = useState<any>();
   
@@ -566,21 +566,21 @@ const CreateTravelPage = () => {
       </s.FirstStep>
       <s.SecondStep $isFirst={isFirst}>
         <s.InputText>항공</s.InputText>
-        <s.InputBoxArea><s.InputBox name='flight' onChange={handleBudget}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.InputBoxArea><s.InputBox name='flight' onChange={handleBudget} value={flight}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
         <s.InputText>식사</s.InputText>
-        <s.InputBoxArea><s.InputBox name='meal' onChange={handleBudget}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.InputBoxArea><s.InputBox name='meal' onChange={handleBudget} value={meal}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
         <s.InputText>쇼핑</s.InputText>
-        <s.InputBoxArea><s.InputBox name='shopping' onChange={handleBudget}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.InputBoxArea><s.InputBox name='shopping' onChange={handleBudget} value={shopping}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
         <s.InputText>교통</s.InputText>
-        <s.InputBoxArea><s.InputBox name='transport' onChange={handleBudget}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.InputBoxArea><s.InputBox name='transport' onChange={handleBudget} value={transport}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
         <s.InputText>관광</s.InputText>
-        <s.InputBoxArea><s.InputBox name='tour' onChange={handleBudget}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.InputBoxArea><s.InputBox name='tour' onChange={handleBudget} value={tour}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
         <s.InputText>숙박</s.InputText>
-        <s.InputBoxArea><s.InputBox name='accommodation' onChange={handleBudget}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.InputBoxArea><s.InputBox name='accommodation' onChange={handleBudget} value={accommodation}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
         <s.InputText>기타</s.InputText>
-        <s.InputBoxArea><s.InputBox name='etc' onChange={handleBudget}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.InputBoxArea><s.InputBox name='etc' onChange={handleBudget} value={etc}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
         <s.InputText>총 예산</s.InputText>
-        <s.InputBoxArea style={{marginBottom: '120px'}}><s.InputBox name='total' onChange={handleBudget}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
+        <s.InputBoxArea style={{marginBottom: '120px'}}><s.InputBox name='total' onChange={handleBudget} value={total}></s.InputBox><s.Unit>원</s.Unit></s.InputBoxArea>
         <s.ButtonArea>
           <s.PrevButton onClick={nextButtonOnclick}>이전으로</s.PrevButton>
           <s.SubmitButton onClick={submitTravelData}>완료하기</s.SubmitButton>
