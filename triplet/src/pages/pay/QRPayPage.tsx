@@ -287,7 +287,7 @@ const QRPayPage = () => {
   useEffect(() => {
     if (payStatus) {
       if (payStatus === 200) { 
-        // navigate(`/pay/global-wallet`);
+        navigate(`/`);
       } else {
         alert('잔액이 부족합니다.');
       }
