@@ -24,7 +24,7 @@ public interface TravelRepository extends JpaRepository<Travel, Long>, JpaSpecif
     @Query("SELECT t FROM Travel t JOIN t.travelMembers tm WHERE tm.member.id = :userId AND (t.startDate <= :today AND t.endDate >= :today) ORDER BY t.startDate ASC")
     Travel findOngoingTravelByUserId(@Param("userId") Long userId, @Param("today") LocalDate today);
 
-    @Query("SELECT t FROM Travel t JOIN t.travelMembers tm WHERE tm.member.id = :userId AND (t.endDate < :today) ORDER BY t.startDate ASC")
+    @Query("SELECT t FROM Travel t JOIN t.travelMembers tm WHERE tm.member.id = :userId AND (t.endDate < :today) ORDER BY t.startDate DESC")
     List<Travel> findCompletedTravelsByUserId(@Param("userId") Long userId, @Param("today") LocalDate today);
 
     @Query("SELECT t FROM Travel t JOIN t.travelMembers tm WHERE tm.member.id = :userId AND (t.startDate > :today) ORDER BY t.startDate ASC")
