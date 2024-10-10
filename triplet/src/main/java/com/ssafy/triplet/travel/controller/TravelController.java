@@ -203,12 +203,12 @@ public class TravelController {
     }
 
     @GetMapping("/confirm/{travelId}")
-    public ResponseEntity<ApiResponse<TravelResponse>> matchUser(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
+    public ResponseEntity<ApiResponse<Boolean>> matchUser(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal,
                                                                  @PathVariable Long travelId) {
         try {
             Long userId = memberRepository.findIdByMemberId(customUserPrincipal.getMemberId());
             travelService.matchCreator(userId, travelId);
-            return ResponseEntity.ok(new ApiResponse<>("200", "여행이 종료되었습니다."));
+            return ResponseEntity.ok(new ApiResponse<>("200", "조회되었습니다.", travelService.matchCreator(userId, travelId)));
         } catch (Exception e) {
             return handleException(e);
         }
