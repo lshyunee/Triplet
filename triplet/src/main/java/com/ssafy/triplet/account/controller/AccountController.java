@@ -8,10 +8,13 @@ import com.ssafy.triplet.account.dto.response.TransactionListResponse;
 import com.ssafy.triplet.account.service.AccountService;
 import com.ssafy.triplet.auth.dto.CustomUserPrincipal;
 import com.ssafy.triplet.response.ApiResponse;
+import com.ssafy.triplet.validation.CustomValidator;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +27,7 @@ import java.util.Map;
 public class AccountController {
 
     private final AccountService accountService;
+    private final CustomValidator customValidator;
 
     @GetMapping("/account")
     public ResponseEntity<?> findAccount(@AuthenticationPrincipal CustomUserPrincipal customUserPrincipal) {
@@ -51,13 +55,21 @@ public class AccountController {
     }
 
     @PostMapping("/transaction")
-    public ResponseEntity<?> findTransactions(@RequestBody TransactionListRequest request) {
+    public ResponseEntity<?> findTransactions(@Valid @RequestBody TransactionListRequest request,
+                                              BindingResult bindingResult) {
+        ResponseEntity<?> errorResponse = customValidator.validateField(bindingResult);
+        if (errorResponse != null) return errorResponse;
+
         Map<String, List<TransactionListResponse>> transactions = accountService.getTransactionList(request);
         return ResponseEntity.ok().body(new ApiResponse<>("200", "거래내역 조회 성공", transactions));
     }
 
     @PostMapping("/transaction/create")
-    public ResponseEntity<?> createTransaction(@RequestBody CreateTransactionRequest request) {
+    public ResponseEntity<?> createTransaction(@Valid @RequestBody CreateTransactionRequest request,
+                                               BindingResult bindingResult) {
+        ResponseEntity<?> errorResponse = customValidator.validateField(bindingResult);
+        if (errorResponse != null) return errorResponse;
+
         List<CreateTransactionResponse> transaction = accountService.createTransaction(request);
         return ResponseEntity.ok().body(new ApiResponse<>("200", "원화계좌 송금 성공", transaction));
     }
