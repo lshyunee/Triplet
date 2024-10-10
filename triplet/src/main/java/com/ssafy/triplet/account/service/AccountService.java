@@ -258,9 +258,9 @@ public class AccountService {
 
         // 조회 결과 날짜별로 그룹화
         List<TransactionList> transactions = transactionListRepository.findByTransactionDateBetween(accountId, start, end);
-        Map<LocalDate, List<TransactionList>> groupedBy = transactions.stream()
+        LinkedHashMap<LocalDate, List<TransactionList>> groupedBy = transactions.stream()
                 .collect(Collectors.groupingBy(transaction -> transaction.getTransactionDate().toLocalDate(),
-                        () -> new TreeMap<>(Comparator.reverseOrder()), Collectors.toList()));
+                        LinkedHashMap::new, Collectors.toList()));
 
         return convertTransactionsToDTO(groupedBy);
     }
@@ -280,7 +280,7 @@ public class AccountService {
     }
 
     // 날짜별 그룹화된 거래내역 Dto 로 변환
-    public Map<String, List<TransactionListResponse>> convertTransactionsToDTO(Map<LocalDate, List<TransactionList>> groupedTransactions) {
+    public LinkedHashMap<String, List<TransactionListResponse>> convertTransactionsToDTO(LinkedHashMap<LocalDate, List<TransactionList>> groupedTransactions) {
         return groupedTransactions.entrySet().stream()
                 .collect(Collectors.toMap(
                         entry -> entry.getKey().toString(),
@@ -292,7 +292,9 @@ public class AccountService {
                                 .transactionAccountNumber(t.getTransactionAccountNumber())
                                 .price(t.getPrice())
                                 .transactionAfterBalance(t.getTransactionAfterBalance())
-                                .transactionName(t.getTransactionName()).build()).collect(Collectors.toList())
+                                .transactionName(t.getTransactionName()).build()).collect(Collectors.toList()),
+                        (oldValue, newValue) -> oldValue, // 키 충돌 시 기존 값 유지
+                        LinkedHashMap::new
                 ));
     }
 
