@@ -87,7 +87,7 @@ const InvitePage = () => {
 
   const [userAccountNumber, setUserAccountNumber] = useState<string>('');
   const [userAccountBalance, setUserAccountBalance] = useState<number>(0);
-  const [transferAccountNumber, setTransferAccountNumber] = useState<string>('');
+  const [inviteCode, setInviteCode] = useState<string>('');
   const [transferAmount, setTransferAmount] = useState<number>(0);
 
 	const { data: accountData, 
@@ -118,33 +118,25 @@ const InvitePage = () => {
     }
   }, [accountData])
 
-  const accountOnChange = (e: React.FormEvent<HTMLInputElement>) => {
+  const inviteCodeOnChange = (e: React.FormEvent<HTMLInputElement>) => {
     const {
       currentTarget: {value}
     } = e;
-    if (Number(value) || value === '') {
-      setTransferAccountNumber(value)
-    }
+    setInviteCode(value)
   }
 
+  const { data: inviteData, 
+		error: inviteError, 
+		loading: inviteLoading, 
+		status: inviteStatus, 
+		refetch: inviteRefetch } = useAxios(`/travels/invite/${inviteCode}`, 'POST');
 
-  const { data: transferData,
-    error: transferError,
-    loading: transferLoading,
-    status: transferStatus,
-    refetch: transferRefetcch } = useAxios('/transaction/create', 'POST',
-    {
-      "depositAccountNumber": userAccountNumber,
-      "transactionsBalance": transferAmount,
-      "withdrawalAccountNumber": transferAccountNumber,
-    }
-    )
 
   const transferOnClick = () => {
     const fetchData = async () => {
 			try {
 			await Promise.all([
-				transferRefetcch(),     // 원화계좌 API 요청
+				inviteRefetch()
 			]);
 			} catch (error) {
 			console.error('Error fetching data:', error);
@@ -155,6 +147,12 @@ const InvitePage = () => {
 
 	const navigate = useNavigate();
 
+  useEffect(() => {
+    if (inviteData) {
+      window.alert('초대코드 입력 완료')
+    }
+  }, [inviteData])
+
 	return (
 		<>
 			<BackHeader title='초대코드 입력'/>
@@ -162,7 +160,7 @@ const InvitePage = () => {
         <s.Account>공유받은 초대코드를 입력해주세요.</s.Account>
         <s.InputText>초대코드</s.InputText>
         <s.InputBoxArea>
-          <s.InputBox onChange={accountOnChange} value={transferAccountNumber}/>
+          <s.InputBox onChange={inviteCodeOnChange} value={inviteCode}/>
         </s.InputBoxArea>
         <s.ButtonArea>
           <s.NextButton onClick={transferOnClick}>입력완료</s.NextButton>
