@@ -131,7 +131,7 @@ const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
 const MoneyChartBar = styled.div<MonyeProgressProps>`
     height : 100%;
     background-color : ${props => props.color};
-    width : ${props => props.paid || '50%'};
+    width : ${props => `${props.paid}%` || '0%'};
     border-radius : 50px;
 `
 
@@ -170,8 +170,8 @@ const MoneyBudgetP = styled.p<MoneyCategoryProps>`
     margin : 0px;
     font-size : 14px;
     font-weight : 500;
-    color : ${props => props.color || "#666666"};
-`
+    color : ${props => props.color || "#666666"}
+`;
 
 const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
     margin : 0px;
@@ -228,7 +228,6 @@ interface Travel {
 const [ travel, setTravel ] = useState<Travel | null>(null);
 
 useEffect(()=>{
-    console.log("travel",travel);
     if(travelData){
         setTravel(travelData.data);
         budgetRefetch();
