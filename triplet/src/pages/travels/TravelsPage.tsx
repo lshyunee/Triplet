@@ -100,7 +100,6 @@ const TravelsPage = () => {
     useEffect(() => {
 
         if (upcomingData && upcomingStatus === 200) {
-            console.log(upcomingData);
             dispatch(addUpcomingTravels(upcomingData.data));
           }
 

@@ -153,6 +153,7 @@ const ForeignDetailPage = () => {
   const { travelId } = useParams();
 
   const { data: travelDetailData, refetch: travelDetailRefetch } = useAxios(`/travels/${travelId}`, 'GET');
+  const { data: travelWalletDetailData, refetch: travelWalletDetailRefetch } = useAxios(`/travel-wallet/${travelId}`, 'GET');
 
   const [transaction, setTransaction] = useState<TransactionsResponse | null>(null);
   const { data: transactionData, refetch: transactionRefetch } = useAxios(`/travel-wallet/transaction/${travelId}`, 'GET');
@@ -160,6 +161,7 @@ const ForeignDetailPage = () => {
   useEffect(() => {
     dispatch(pageMove("travels"));
     travelDetailRefetch();
+    travelWalletDetailRefetch();
   }, [dispatch]);
 
   useEffect(() => {
@@ -216,8 +218,8 @@ const ForeignDetailPage = () => {
                             </s.PaymentTitleArea>
 
                             <s.PaymentAmountArea>
-                              <s.PaymentAmountRed>{transaction.price.toLocaleString()}원</s.PaymentAmountRed>
-                              <s.BalanceText>잔액 {transaction.balance.toLocaleString()}원</s.BalanceText>
+                              <s.PaymentAmountBlue>{transaction.price.toLocaleString()} {travelWalletDetailData?.data?.currency}</s.PaymentAmountBlue>
+                              <s.BalanceText>잔액 {transaction.balance.toLocaleString()} {travelWalletDetailData?.data?.currency}</s.BalanceText>
                             </s.PaymentAmountArea>
                           </s.PaymentArea>
                           <s.PaymentLine/>

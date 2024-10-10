@@ -9,6 +9,10 @@ import sharedTravelSlice from './features/travel/shareTravelSlice';
 import userInfoSlice from './features/user/userInfoSlice';
 import snsTravelFilterSlice from './features/travel/snsTravelFilterSlice';
 
+const persistedState = localStorage.getItem('isAuthenticated') === 'true'
+  ? { auth: { isAuthenticated: true } }
+  : { auth: { isAuthenticated: false } };
+
 // 스토어 생성
 const store = configureStore({
   reducer: {
@@ -22,6 +26,7 @@ const store = configureStore({
     sharedTravel : sharedTravelSlice,
     filterTravel : snsTravelFilterSlice,
   },
+  preloadedState : persistedState,
 });
 
 export type RootState = ReturnType<typeof store.getState>;

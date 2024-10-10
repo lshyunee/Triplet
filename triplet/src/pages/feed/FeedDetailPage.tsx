@@ -202,10 +202,11 @@ const SharedTravelDetailPage = () => {
   );
 
   useEffect(() => {
-    if (!travel?.travelId || travel.travelId === 0) {
+    const travelIdAsNumber = Number(id);
+    if (!travel?.travelId || travel.travelId === 0 || (id &&  travel?.travelId !== (travelIdAsNumber))) {
       travelRefetch();
       usedBudgetfetch()
-    dispatch(pageMove("feed"));
+      dispatch(pageMove("feed"));
     }
     
   }, []);
@@ -290,8 +291,6 @@ const SharedTravelDetailPage = () => {
   };
   const rgbaToRgb = (rgb:string) => {
     const strippedHex = rgb.split(',').slice(0,3);
-    
-        console.log(strippedHex.reduce((acc,item)=> acc + item + ",","")+"30%)")
     // rgba 문자열 생성
     return strippedHex.reduce((acc,item)=> acc + item + ",","")+"30%)";
   };
@@ -340,7 +339,7 @@ const SharedTravelDetailPage = () => {
       (exp) => exp.categoryId === budget.categoryId
     );
     const used = expenditure?.used || 0;
-    const percentageUsed = calculatePercentage(budget.budget, used);
+    const percentageUsed = calculatePercentage(calculateUsed(), used);
 
     return (
       <div key={budget.categoryId}>

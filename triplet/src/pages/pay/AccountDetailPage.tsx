@@ -11,7 +11,6 @@ import { isDate } from 'util/types';
 import { addDays } from 'react-datepicker/dist/date_utils';
 import useAxios from '../../hooks/useAxios';
 import { useNavigate } from 'react-router-dom';
-
 interface Transaction {
   transactionId: number;
   transactionDate: string;
@@ -30,7 +29,9 @@ interface TransactionsResponse {
     [key: string]: Transaction[];
   };
 }
-
+ 
+ 
+   //형식은 원하는 형식으로.
 const s = {
   Container: styled.div`
     padding-top: 56px;
@@ -260,6 +261,7 @@ const AccountDetailPage = () => {
   useEffect(() => {
     if (transactionData) {
       setTransaction(transactionData)
+      
     }
   }, [transactionData])
 
@@ -329,7 +331,9 @@ const AccountDetailPage = () => {
               <React.Fragment key={transaction.transactionId}>
                 <s.PaymentArea>
                   <s.PaymentTitleArea>
-                    <s.PaymentTime>{new Date(transaction.transactionDate).toLocaleTimeString()}</s.PaymentTime>
+                    <s.PaymentTime>
+                    {new Date(transaction.transactionDate).toLocaleTimeString()}
+</s.PaymentTime>
                     <s.PaymentTitle>{transaction.transactionName}</s.PaymentTitle>
                   </s.PaymentTitleArea>
 

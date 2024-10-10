@@ -15,11 +15,13 @@ const authSlice = createSlice({
   reducers: {
     loginSuccess(state) {
       state.isAuthenticated = true;
+      localStorage.setItem('isAuthenticated', 'true');
     },
     logout(state) {
       state.isAuthenticated = false;
+      localStorage.removeItem('isAuthenticated'); 
     },
-  }, 
+  },
 });
 
 export const { loginSuccess, logout } = authSlice.actions;

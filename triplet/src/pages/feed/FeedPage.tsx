@@ -196,6 +196,8 @@ const FeedPage = () => {
 
     const [ kind, setKind ] = useState(0);
 
+    const [ searchLoad, setSearchLoad ] = useState(false);
+
 
     const { 
         data: searchData, 
@@ -228,22 +230,30 @@ const FeedPage = () => {
 
     const handleInputChange = (event:any) => {
         if (event.key === 'Enter') {
+            setKind(2);
             dispatch(initFeedTravels());
             dispatch(setCountry(countryName.value));
             dispatch(addFilter(2));
-            setKind(2);
+            console.log(countryName.value);
             setSelectedSortOption('정확도순');
             setPage(1);
             dispatch(setPages(1));
+            setSearchLoad(true);
         }
     };
-
+    
     useEffect(()=>{
-        if(!searchLoading){
+        if(!searchLoading && kind !== 2){
             dispatch(initFeedTravels());
             searchRefetch();
         }
-    }, [kind])
+
+        if(searchLoad && kind === 2){
+            searchRefetch();
+            setSearchLoad(false);
+        }
+
+    }, [kind, searchLoad])
 
     const toggleDropdown = () => {
         setIsDropdownOpen(!isDropdownOpen);
@@ -254,6 +264,7 @@ const FeedPage = () => {
         setSelectedSortOption(option);
         
         setKind(option === '추천순' ? 0 : 1);
+
         if(option==='정확도순'){
             setKind(2);
         }
@@ -297,8 +308,8 @@ const FeedPage = () => {
       }, [searchData, searchError]);
 
     const loadMore = () => {
-        if (!searchLoading && hasMore) {
-            setPage((prevPage) => prevPage + 1);
+        if (!searchLoading && hasMore && travels.travelData.length > 0) {
+            setPage((prevPage) => prevPage + 1); 
         }
     };
 
@@ -370,7 +381,9 @@ const FeedPage = () => {
                             image={travel.image}
                         />
                     ))}
-                    <TargetDiv ref={targetRef} />
+                    {hasMore && travels.travelData.length > 0 && (
+                        <TargetDiv ref={targetRef} />
+                    )}
                 </TravelDiv>
                 <DetailSearchBottomSheet isOpen={isBottomSheetOpen} 
             onClose={detailSearchClose}></DetailSearchBottomSheet>

@@ -93,6 +93,31 @@ const TitleP = styled.p`
     align-items : center;
 `;
 
+const InviteDiv = styled.div`
+    height : 56px;
+    background-color : white;
+    border-radius : 20px;
+    display : flex;
+    flex-direction : column;
+    align-items : center;
+    justify-content : center;
+    padding : 20px;
+`;
+
+const InviteTitleP = styled.p`
+    font-size : 20px;
+    font-weight : 700;
+    padding : 0;
+    margin : 0;
+`;
+
+const InviteContentP = styled.p`
+    font-size : 18px;
+    font-weight : 400;
+    padding : 0;
+    margin : 8px 0 0 0;
+`;
+
 const MoneyDiv = styled.div`
     border-radius : 20px;
     background-color : white;
@@ -304,7 +329,11 @@ useEffect(() => {
           creatorId={travel?.creatorId||0}
           />
           </TravelCardDiv>
-                <TravelDetailPay travelId={travel.travelId}/>
+            <TravelDetailPay travelId={travel.travelId}/>
+            <InviteDiv>
+                <InviteTitleP>여행 초대 코드</InviteTitleP>
+                <InviteContentP>{travelData?.data.inviteCode||""}</InviteContentP>
+            </InviteDiv>
             <MoneyDiv>
                 <MoneyCategoryDiv>
                     <MoneyCategoryP>항공</MoneyCategoryP>

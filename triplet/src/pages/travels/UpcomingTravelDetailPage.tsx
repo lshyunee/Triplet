@@ -93,6 +93,32 @@ const TitleP = styled.p`
     align-items : center;
 `;
 
+const InviteDiv = styled.div`
+    height : 56px;
+    background-color : white;
+    border-radius : 20px;
+    display : flex;
+    flex-direction : column;
+    align-items : center;
+    justify-content : center;
+    padding : 20px;
+`;
+
+const InviteTitleP = styled.p`
+    font-size : 20px;
+    font-weight : 700;
+    padding : 0;
+    margin : 0;
+`;
+
+const InviteContentP = styled.p`
+    font-size : 18px;
+    font-weight : 400;
+    padding : 0;
+    margin : 8px 0 0 0;
+`;
+
+
 const MoneyDiv = styled.div`
     border-radius : 20px;
     background-color : white;
@@ -131,7 +157,7 @@ const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
 const MoneyChartBar = styled.div<MonyeProgressProps>`
     height : 100%;
     background-color : ${props => props.color};
-    width : ${props => props.paid || '50%'};
+    width : ${props => `${props.paid}%` || '0%'};
     border-radius : 50px;
 `
 
@@ -170,8 +196,8 @@ const MoneyBudgetP = styled.p<MoneyCategoryProps>`
     margin : 0px;
     font-size : 14px;
     font-weight : 500;
-    color : ${props => props.color || "#666666"};
-`
+    color : ${props => props.color || "#666666"}
+`;
 
 const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
     margin : 0px;
@@ -228,7 +254,6 @@ interface Travel {
 const [ travel, setTravel ] = useState<Travel | null>(null);
 
 useEffect(()=>{
-    console.log("travel",travel);
     if(travelData){
         setTravel(travelData.data);
         budgetRefetch();
@@ -317,6 +342,10 @@ useEffect(() => {
           />
           </TravelCardDiv>
             <TravelDetailPay travelId={Number(id)}/>
+            <InviteDiv>
+                <InviteTitleP>여행 초대 코드</InviteTitleP>
+                <InviteContentP>{travelData?.data.inviteCode||""}</InviteContentP>
+            </InviteDiv>
           <MoneyDiv>
                 <MoneyCategoryDiv>
                     <MoneyCategoryP>항공</MoneyCategoryP>
