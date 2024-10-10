@@ -17,7 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -187,7 +188,7 @@ public class PaymentService {
     private void logTransaction(TravelWallet travelWallet, Double price, Category category, String merchantName, Travel travel) {
         TravelTransactionList transaction = new TravelTransactionList();
         transaction.setPrice(price);
-        transaction.setTransactionDate(LocalDateTime.now());
+        transaction.setTransactionDate(ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDateTime());
         transaction.setBalance(travelWallet.getBalance());
         transaction.setCategory(category);
         transaction.setTransactionName(merchantName);
@@ -234,6 +235,7 @@ public class PaymentService {
     }
 
     private void logTransaction(Account account, int transactionType, Double amount, String typeName, String transactionName, String targetAccountNumber) {
+        System.out.println(ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDateTime());
         TransactionList transaction = TransactionList.builder()
                 .transactionType(transactionType) // 트랜잭션 타입 상수로 치환 가능
                 .transactionTypeName(typeName)
@@ -242,6 +244,7 @@ public class PaymentService {
                 .transactionAfterBalance(account.getAccountBalance())
                 .transactionName(transactionName)
                 .account(account)
+                .transactionDate(ZonedDateTime.now(ZoneId.of("Asia/Seoul")).toLocalDateTime())
                 .build();
         transactionListRepository.save(transaction);
     }
