@@ -103,6 +103,12 @@ const RegistDiv = styled.div`
 
 `;
 
+const RequiredP = styled.p`
+    font-size: 12px;
+    margin: 4px 0 0 0;
+    color: red;
+`;
+
 const PhoneDiv = styled.div`
     display : flex;  
     flex-direction: row;
@@ -130,131 +136,109 @@ const ConfirmBtn = styled.button`
     margin-top : 66px;
 `;
 
+const s = {
+    // 모달 스타일링
+    ModalOverlay: styled.div`
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  `,
+    ModalContainer: styled.div`
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    width: 300px;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  `,
+    ModalText: styled.p`
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 20px;
+  `,
+    ModalButton: styled.button`
+    background-color: #008DE7;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    &:hover {
+      background-color: #006bbf;
+    }
+  `
+}
+
 
 const MyInfoEditPage = () => {
-
     const navigate = useNavigate();
     const dispatch = useDispatch();
 
-    const validNum = (value:string): boolean => {
+    const validIdentificationFront = (value: string): boolean => {
         const regex = /^[0-9]*$/;
-        return regex.test(value);
+        return value.length <= 6 && regex.test(value);
     }
 
-    const validPhoneNumFront = (value:string): boolean => {
+    const validIdentificationBack = (value: string): boolean => {
         const regex = /^[0-9]*$/;
-        return value.length <=3 && regex.test(value);
-    }
-
-    const validPhoneNum = (value:string): boolean => {
-        const regex = /^[0-9]*$/;
-        return value.length <=4 && regex.test(value);
-    }
-
-    const validIdentificationFront = (value:string): boolean => {
-        const regex = /^[0-9]*$/;
-        return value.length <=6 && regex.test(value);
-    }
-
-    const validIdentificationBack = (value:string): boolean => {
-        const regex = /^[0-9]*$/;
-        return value.length <=1 && regex.test(value);
+        return value.length <= 1 && regex.test(value);
     }
 
     const name = useInput();
     const identificationNumFront = useInput(validIdentificationFront);
     const identificationNumBack = useInput(validIdentificationBack);
-    const phoneNumFront = useInput(validPhoneNumFront);
-    const phoneNumMiddle = useInput(validPhoneNum);
-    const phoneNumBack = useInput(validPhoneNum);
-    const certificationNum = useInput(validNum);
 
-    const [ phoneNum, setPhoneNum ] = useState('');
-    const [ identificationNum, setIdentificationNum ] = useState('');
-    const [ memberId, setMemberId ] = useState('');
+    const [identificationNum, setIdentificationNum] = useState('');
 
-    const { data: infoData, error: infoError, loading: infoLoading,
-            status: infoStatus, refetch: infoRefetch}
-            = useAxios("/user/my",'GET');
+    const { data: infoData, refetch: infoRefetch } = useAxios("/user/my", 'GET');
 
     useEffect(() => {
         infoRefetch();
-    },[])
+    }, []);
 
     useEffect(() => {
-        
-        if(infoData !== null){
+        if (infoData !== null) {
             name.changeData(infoData.data.name);
             identificationNumFront.changeData(infoData.data.birth);
-            phoneNumFront.changeData(infoData.data.phoneNumber.slice(0,3));
-            phoneNumMiddle.changeData(infoData.data.phoneNumber.slice(3,7));
-            phoneNumBack.changeData(infoData.data.phoneNumber.slice(7,11));
-            setMemberId(infoData.data.memberId.slice(0,5));
         }
+    }, [infoData]);
 
-    },[infoData])
-
-      // 주민등록번호
-      useEffect(() => {
+    useEffect(() => {
         setIdentificationNum(`${identificationNumFront.value}${identificationNumBack.value}`);
-    }, [identificationNumFront, identificationNumBack])
+    }, [identificationNumFront, identificationNumBack]);
 
-    const { data: editData, error: editError, loading: editLoading,
-        status: editStatus, refetch: editRefetch }
-        = useAxios('/user/my', 'PUT', undefined, {
-            name : name.value,
-            identificationNumber : identificationNum
-        });
+    const { data: editData, error: editError, refetch: editRefetch } = useAxios('/user/my', 'PUT', undefined, {
+        name: name.value,
+        identificationNumber: identificationNum
+    });
 
     const myInfoEdit = () => {
-        if(name.value.length===0){
-            setErrorMsg("이름을 입력해주세요.");
-            isErrorOpen();
-            return;
-        }
         editRefetch();
+        setIsModalOpen(true);
     }
 
     useEffect(() => {
-
-        if(editData !== null){
-            dispatch(setUserInfo({name:name.value}));
-            setMsg("정보 수정이 완료 되었습니다.");
-            isModalOpen();
-            navigate("/mypage");
+        if (editData !== null) {
+            dispatch(setUserInfo({ name: name.value }));
         }
+    }, [editData]);
 
-        if(editError !== null){
-            const message = editError.response.data.message || "정보 수정이 불가능합니다.";
-            setErrorMsg(message);
-            isErrorOpen();
-        }
+    // 버튼 비활성화 조건: 이름과 주민등록번호 필드가 비어있으면 버튼 비활성화
+    const isFormValid = name.value && identificationNumFront.value && identificationNumBack.value;
 
-    },[editData, editError]);
-
-    // 에러 모달
-    const [ isError, setIsError ] = useState(false);
-    const [ errorMsg, setErrorMsg ] = useState('');
-    
-    const isErrorOpen = () => {
-        setIsError(true);
-    }
-
-    const closeError = () => {
-        setIsError(false);
-    }
-
-    // 완료 모달
-    const [ isModel, setIsModel ] = useState(false);
-    const [ msg, setMsg ] = useState('');
-
-    const isModalOpen = () => {
-        setIsModel(true);
-    }
-
-    const isModelClose = () => {
-        setIsModel(false);
-    }
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    // 모달 닫기 및 페이지 이동 처리
+    const closeModal = () => {
+        setIsModalOpen(false);
+        navigate(`/mypage`);
+    };
 
     return (
         <>
@@ -264,6 +248,7 @@ const MyInfoEditPage = () => {
                     <InputDistanceDiv>
                         <HowP>이름</HowP>
                         <StyledInput type="text" value={name.value} onChange={name.onChange} />
+                        {!name.value && <RequiredP>필수 입력값입니다.</RequiredP>}
                     </InputDistanceDiv>
                     <InputDistanceDiv>
                         <HowP>주민등록번호</HowP>
@@ -273,10 +258,23 @@ const MyInfoEditPage = () => {
                             <StyledInput type="text" value={identificationNumBack.value} onChange={identificationNumBack.onChange} />
                             <NumP>* * * * * *</NumP>
                         </RegistDiv>
+                        {(!identificationNumFront.value || !identificationNumBack.value) && (
+                            <RequiredP>필수 입력값입니다.</RequiredP>
+                        )}
                     </InputDistanceDiv>
-                    <ConfirmBtn onClick={myInfoEdit}>수정 완료</ConfirmBtn>
+                    <ConfirmBtn onClick={myInfoEdit} disabled={!isFormValid}>
+                        수정 완료
+                    </ConfirmBtn>
                 </InputDiv>
             </EntireDiv>
+            {isModalOpen && (
+                <s.ModalOverlay>
+                    <s.ModalContainer>
+                        <s.ModalText>회원 정보가 수정되었습니다.</s.ModalText>
+                        <s.ModalButton onClick={closeModal}>확인</s.ModalButton>
+                    </s.ModalContainer>
+                </s.ModalOverlay>
+            )}
         </>
     );
 };
