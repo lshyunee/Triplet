@@ -100,6 +100,18 @@ const StyledLink = styled(Link)`
 `;
 
 
+const Country = styled.span`
+  font-size: 14px;
+  font-weight: 500;
+  margin-left: 12px;
+`;
+
+const CountryArea = styled.div`
+display: flex;
+align-items: center;
+`;
+
+
 interface TravelPayProps {
   travelId : number,
 }
@@ -110,17 +122,31 @@ const TravelDetailPay : React.FC<TravelPayProps> =
     const [ isButtonClicked, setIsButtonClicked ] = useState(false);
 
     const navigate = useNavigate();
+
+    const { data : travelData, error : travelError, refetch : travelRefetch }
+    = useAxios (`travels/${travelId}`, "GET");
     
     const { data : payData, error : payError, refetch : payRefetch }
     = useAxios(`travel-wallet/${travelId}`,"GET");
 
     useEffect(()=> {
       payRefetch();
+      travelRefetch();
     },[])
 
     useEffect(()=>{
 
     },[payData, payError])
+
+    const [ nation, setNation ] = useState('');
+
+    useEffect(() => {
+
+      if(travelData){
+        setNation(travelData?.data.country);
+      }
+
+    }, [travelData, travelError])
 
     const rechargePay = () => {
       navigate(`/travels/wallet/recharge/${travelId}/${payData?.data.currency}`);
@@ -138,7 +164,26 @@ const TravelDetailPay : React.FC<TravelPayProps> =
               <StyledLink to={`/travels/wallet/${travelId}`}>
                 <Header>
                   <Label>
-                    <JPFlag />
+                  {(() => {
+                    switch (nation) {
+                      case "한국":
+                        return <CountryArea><KRFlag/></CountryArea>
+                      case "미국":
+                        return <CountryArea><USFlag/></CountryArea>
+                      case "유럽":
+                        return <CountryArea><EUFlag/></CountryArea>
+                      case "일본":
+                        return <CountryArea><JPFlag/></CountryArea>
+                      case "중국":
+                        return <CountryArea><CHFlag/></CountryArea>
+                      case "영국":
+                        return <CountryArea><UKFlag/></CountryArea>
+                      case "스위스":
+                        return <CountryArea><SWFlag/></CountryArea>
+                      case "캐나다":
+                        return <CountryArea><CAFlag/></CountryArea>
+                    }
+                  }) ()}
                     여행지갑
                   </Label>
                   <RightArrow />
