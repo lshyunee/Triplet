@@ -308,6 +308,12 @@ public class TravelService {
         travelWalletRepository.deleteByTravelId(travelId);
     }
 
+    public boolean matchCreator(Long userId, Long travelId) {
+        Travel travel = travelRepository.findById(travelId).orElseThrow(() -> new CustomException(CustomErrorCode.TRAVEL_NOT_FOUND));
+        Long creatorId = travel.getCreatorId();
+        return creatorId.equals(userId);
+    }
+
     private void handleSingleMemberTravel(double balance, Travel travel) {
         AccountRechargeResponse response = accountRepository.findAccountNumberByMemberIdAndCurrency(
                 travel.getCreatorId(), travel.getCountry().getCurrency());
