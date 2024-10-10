@@ -107,7 +107,6 @@ const RemoveModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, creatorI
         }
 
         if(removeError) {
-            console.log(removeError);
             setErrorMsg(removeError.response.data.message);
             setErrorOpen(true);
         }
@@ -115,9 +114,9 @@ const RemoveModal: React.FC<ModalProps> = ({ isOpen, onClose, travelId, creatorI
     }, [removeData, removeError]);
 
     const hanldleRemoveComplete = () => {
+        onClose();
         setCompletOpen(false);
         navigate('/travels');
-        onClose();
     }
 
     if (!isOpen) {

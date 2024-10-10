@@ -129,13 +129,25 @@ const TravelDetailPay : React.FC<TravelPayProps> =
     const { data : payData, error : payError, refetch : payRefetch }
     = useAxios(`travel-wallet/${travelId}`,"GET");
 
+    const { data: exchangeData, 
+      error: exchangeError, 
+      loading: exchangeLoading, 
+      status: exchangeStatus, 
+      refetch: exchangeRefetch } = useAxios(`/exchange-cal`, 'POST', undefined,{
+        sourceCurrency: payData?.data?.currency,
+        targetCurrency: "KRW",
+        sourceAmount: payData?.data?.balance
+    });
+
     useEffect(()=> {
       payRefetch();
       travelRefetch();
     },[])
-
+    
     useEffect(()=>{
-
+      if(payData){
+        exchangeRefetch();
+      }
     },[payData, payError])
 
     const [ nation, setNation ] = useState('');
@@ -189,7 +201,7 @@ const TravelDetailPay : React.FC<TravelPayProps> =
                   <RightArrow />
                 </Header>
                 <Amount>{payData?.data.balance||0} {payData?.data?.currency}</Amount>
-                <SubAmount>9,548원</SubAmount>
+                <SubAmount>{payData?.data.balance === 0 ? `0` : `${exchangeData?.data?.targetAmount}`} 원</SubAmount>
               </StyledLink>
             ) : (
               <div>
