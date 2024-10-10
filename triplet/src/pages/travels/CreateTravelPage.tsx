@@ -430,6 +430,7 @@ const CreateTravelPage = () => {
       };
     }
   };
+
   useEffect(() => {
     setTotal(flight + meal + transport + shopping + tour + accommodation + etc)
     setForeignTotal(foreignFlight + foreignMeal + foreignTransport + foreignShopping + foreignTour + foreignAccommodation + foreignEtc)
@@ -456,12 +457,12 @@ const CreateTravelPage = () => {
     }
 
     const budgets = [
-      { categoryId: 1, budget: meal, budgetWon: meal },
-      { categoryId: 2, budget: shopping, budgetWon: shopping },
-      { categoryId: 3, budget: transport, budgetWon: transport },
-      { categoryId: 4, budget: tour, budgetWon: tour },
-      { categoryId: 5, budget: accommodation, budgetWon: accommodation },
-      { categoryId: 6, budget: etc, budgetWon: etc },
+      { categoryId: 1, budget: foreignMeal, budgetWon: meal },
+      { categoryId: 2, budget: foreignShopping, budgetWon: shopping },
+      { categoryId: 3, budget: foreignTransport, budgetWon: transport },
+      { categoryId: 4, budget: foreignTour, budgetWon: tour },
+      { categoryId: 5, budget: foreignAccommodation, budgetWon: accommodation },
+      { categoryId: 6, budget: foreignEtc, budgetWon: etc },
     ];
 
     // FormData 생성

@@ -255,6 +255,7 @@ const [ travel, setTravel ] = useState<Travel | null>(null);
 
 useEffect(()=>{
     if(travelData){
+        console.log(travelData);
         setTravel(travelData.data);
         budgetRefetch();
     }
@@ -280,7 +281,10 @@ interface Budget {
 const [ usedBudget, setUsedBudget ] = useState(0);
 
 useEffect(() => {
+
+    
     if (budgetData) {
+        console.log(budgetData);
          const { isComplete, budgetList } = budgetData.data;
   
           setBudgetDetails({
