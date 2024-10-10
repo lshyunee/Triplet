@@ -82,7 +82,7 @@ const s = {
 }
 
 
-const TransferPage = () => {
+const InvitePage = () => {
 	const dispatch = useDispatch();
 
   const [userAccountNumber, setUserAccountNumber] = useState<string>('');
@@ -127,14 +127,6 @@ const TransferPage = () => {
     }
   }
 
-  const amountOnChange = (e: React.FormEvent<HTMLInputElement>) => {
-    const {
-      currentTarget: {value}
-    } = e;
-    if (Number.isInteger(Number(value))) {
-      setTransferAmount(Number(value))
-    }
-  }
 
   const { data: transferData,
     error: transferError,
@@ -163,41 +155,21 @@ const TransferPage = () => {
 
 	const navigate = useNavigate();
 
-  useEffect(() => {
-    if (transferError) {
-      console.log(transferError)
-      window.alert(transferError)
-    }
-  }, [transferError])
-
-  useEffect(() => {
-    if (transferData) {
-      window.alert('송금이 완료되었습니다.')
-      navigate(-1)
-    }
-  }, [transferData])
-
 	return (
 		<>
-			<BackHeader title='송금하기'/>
+			<BackHeader title='초대코드 입력'/>
 			<s.Container>
-        <s.Title>계좌 잔액</s.Title>
-        <s.Account>{userAccountBalance}원</s.Account>
-        <s.InputText>계좌번호</s.InputText>
+        <s.Account>공유받은 초대코드를 입력해주세요.</s.Account>
+        <s.InputText>초대코드</s.InputText>
         <s.InputBoxArea>
           <s.InputBox onChange={accountOnChange} value={transferAccountNumber}/>
         </s.InputBoxArea>
-        <s.InputText>송금 금액</s.InputText>
-        <s.InputBoxArea>
-          <s.InputBox onChange={amountOnChange} value={transferAmount}/>
-          <s.Unit>원</s.Unit>
-        </s.InputBoxArea>
         <s.ButtonArea>
-          <s.NextButton onClick={transferOnClick}>송금하기</s.NextButton>
+          <s.NextButton onClick={transferOnClick}>입력완료</s.NextButton>
         </s.ButtonArea>
 			</s.Container>
 		</>
 	);
 };
 
-export default TransferPage;
+export default InvitePage;

@@ -37,6 +37,7 @@ import TravelWalletRechargePage from "../pages/travels/TravelWalletRechargePage"
 import TravelWalletRefundPage from "../pages/travels/TravelWalletRefundPage";
 import TransferPage from '../pages/pay/TransferPage';
 import TravelTransactionListPage from "../pages/travels/TravelTransactionListPage";
+import InvitePage from '../pages/travels/InvitePage';
 
 const AppRoutes: React.FC = () => (
         <Routes>
@@ -63,6 +64,7 @@ const AppRoutes: React.FC = () => (
             <Route path="/pay/refund/:accountId" element={<RefundPage/>}/>
             <Route path="/travels" element={<Travels/>}/>
             <Route path="/travels/create" element={<CreateTravelPage/>}/>
+            <Route path="/travels/invite" element={<InvitePage/>}/>
             <Route path="/travels/ongoing/detail" element={<OngoingTravelDetailPage/>}/>
             <Route path="/travels/upcoming/:id/detail" element={<UpcomingTravelDetailPage/>}/>
             <Route path="/travels/completed/:id/detail" element={<CompletedTravelDetailPage/>}/>
