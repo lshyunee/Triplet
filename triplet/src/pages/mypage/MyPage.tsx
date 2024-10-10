@@ -13,6 +13,8 @@ import WithdrawalModal from '../user/withdrawal/WithdrawalModal';
 import ErrorModal from '../../components/modal/ErrorModal';
 
 import { useSelector } from 'react-redux';
+import useAxios from '../../hooks/useAxios';
+import { setUserInfo } from '../../features/user/userInfoSlice';
 
 const PageDiv = styled.div`
     background-color : #F3F4F6;
@@ -112,11 +114,33 @@ const MyPage = () => {
     const [ isNotifictaionOpen, setIsNotifictaionOpen ] = useState(false);
     const userData = useSelector((state:any) => state.userInfo);
 
+    const { data : userInfoData, error: userInfoError, status: userInfoStatus, refetch: userInfoRefetch } 
+    = useAxios("/user/my","GET");
+
     const { memberId, name, birth, phoneNumber } = userData;
 
     useEffect(() => {
         dispatch(pageMove("mypage"));
     }, [])
+
+    useEffect(()=>{
+        if (!userData.memberId) {
+            userInfoRefetch();
+        }
+    }, [userData])
+
+    useEffect(() => {    
+        // userInfoData가 존재하고, userInfoStatus가 200일 때 Redux에 데이터를 저장
+        if (userInfoData && userInfoStatus === 200 && userInfoData.data) {
+            dispatch(setUserInfo({
+                memberId: userInfoData.data.memberId,
+                name: userInfoData.data.name,
+                birth: userInfoData.data.birth,
+                gender: userInfoData.data.gender,
+                phoneNumber: userInfoData.data.phoneNumber,
+            }));
+        }
+    }, [userInfoData, userInfoError]);
 
     const openNotifictaion = () => {
         setIsNotifictaionOpen(true);

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { logout } from '../features/auth/authSlice';
+import { loginSuccess, logout } from '../features/auth/authSlice';
 import store from '../store';
 
 const axiosInstance = axios.create({
@@ -35,15 +35,16 @@ axiosInstance.interceptors.response.use(
                 const response = await axiosInstance.post('/reissue');
 
                 if (response.status === 401) {
-                    store.dispatch(logout());
                     throw new Error('Token reissue failed');
                 }
 
+                store.dispatch(loginSuccess());
                 // 원래의 요청을 재시도
                 return axiosInstance(originalRequest);
             } catch (reissueError) {
                 // reissue 요청이 실패하면 로그인 페이지로 리다이렉트하거나 에러 처리
                 console.error('Token reissue failed', reissueError);
+                store.dispatch(logout());
                 window.location.href = '/login';
                 return Promise.reject(reissueError);  // 재시도하지 않고 에러 반환
             }
