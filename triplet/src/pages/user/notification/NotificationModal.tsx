@@ -46,11 +46,11 @@ const ConfirmDiv = styled.div`
   align-items: stretch;
 `;
 
-const Button = styled.button<{ isCancel?: boolean }>`
+const Button = styled.button<{ cancel?: boolean }>`
   width: 50%;
   height: 50px;
-  background-color: ${(props) => (props.isCancel ? '#E0E0E0' : '#008DE7')};
-  color: ${(props) => (props.isCancel ? '#000000' : '#FFFFFF')};
+  background-color: ${(props) => (props.cancel ? '#E0E0E0' : '#008DE7')};
+  color: ${(props) => (props.cancel ? '#000000' : '#FFFFFF')};
   font-weight: 400;
   font-size: 16px;
   border: none;
@@ -89,7 +89,7 @@ const NotificationModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
         <Title>Push 알림 동의</Title>
         <Description>Push 알림에 동의하시겠습니까?</Description>
         <ConfirmDiv>
-          <Button isCancel onClick={handleDenined}>미동의</Button>
+          <Button cancel={true} onClick={handleDenined}>미동의</Button>
           <Button onClick={handleAgree}>동의</Button>
         </ConfirmDiv>
       </ModalContentDiv>
