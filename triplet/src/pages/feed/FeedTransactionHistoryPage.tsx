@@ -360,11 +360,7 @@ return (
             <React.Fragment >
                 <s.PaymentArea key={transaction.transactionId}>
                 <s.PaymentTitleArea>
-                    <s.PaymentTime>{(() => {
-                    const transactionDate = new Date(transaction.transactionDate);
-                    transactionDate.setHours(transactionDate.getHours() - 9);
-                    return transactionDate.toLocaleTimeString();
-                    })()}</s.PaymentTime>
+                    <s.PaymentTime>{new Date(transaction.transactionDate).toLocaleTimeString()}</s.PaymentTime>
                     <s.PaymentTitle>{transaction.merchantName}</s.PaymentTitle>
                 </s.PaymentTitleArea>
 
