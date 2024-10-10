@@ -314,6 +314,7 @@ const groupTransactionsByDate = (transactions: Transaction[]) => {
         .filter((transaction: Transaction) => transaction.categoryId >= 1 && transaction.categoryId <= 6)
         .map((transaction: Transaction) => ({
         ...transaction,
+        transactionDate: subHours(new Date(transaction.transactionDate), 9).toISOString(),
         }));
 
     const groupedTransactions = groupTransactionsByDate(filteredTransactions);
@@ -360,7 +361,11 @@ return (
             <React.Fragment >
                 <s.PaymentArea key={transaction.transactionId}>
                 <s.PaymentTitleArea>
-                    <s.PaymentTime>{new Date(transaction.transactionDate).toLocaleTimeString()}</s.PaymentTime>
+                    <s.PaymentTime>{(() => {
+                    const transactionDate = new Date(transaction.transactionDate);
+                    transactionDate.setHours(transactionDate.getHours() - 9);
+                    return transactionDate.toLocaleTimeString();
+                    })()}</s.PaymentTime>
                     <s.PaymentTitle>{transaction.merchantName}</s.PaymentTitle>
                 </s.PaymentTitleArea>
 
