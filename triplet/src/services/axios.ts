@@ -10,7 +10,6 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
     (config) => {
-        console.log(config);
         return config;
     },
     (error) => Promise.reject(error)
@@ -20,8 +19,6 @@ axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
-
-        
 
         // 401 에러 처리: 토큰이 만료되었을 가능성
         if (error.response && error.response.status === 401 && !originalRequest._retry) {
