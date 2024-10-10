@@ -5,7 +5,6 @@ import { Link } from 'react-router-dom';
 
 import BackHeader from '../../components/header/BackHeader';
 import { pageMove } from '../../features/navigation/naviSlice';
-import useAxios from '../../hooks/useAxios';
 import { ReactComponent as RightArrow} from '../../assets/common/rightArrow.svg';
 
 import Logout from '../user/logout/LogoutModal';
@@ -14,9 +13,6 @@ import WithdrawalModal from '../user/withdrawal/WithdrawalModal';
 import ErrorModal from '../../components/modal/ErrorModal';
 
 import { useSelector } from 'react-redux';
-import { userInfo } from 'os';
-
-
 
 const PageDiv = styled.div`
     background-color : #F3F4F6;

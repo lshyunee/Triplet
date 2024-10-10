@@ -4,9 +4,6 @@ import styled from 'styled-components';
 
 import { useNavigate } from 'react-router-dom';
 
-import ErrorModal from '../../components/modal/ErrorModal';
-import CompleteModal from '../../components/modal/CompleteModal';
-
 import useAxios from '../../hooks/useAxios';
 import useInput from '../../hooks/useInput';
 import { useDispatch } from 'react-redux';
