@@ -396,21 +396,21 @@ const HomePage = () => {
 							foreignCurrency={foreignAccountData?.data[6]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[6]?.accountId}
-                            rate={exchangeRateData?.data[4]?.exchangeRate}
+                            rate={exchangeRateData?.data[6]?.exchangeRate}
 						/>
                         <GlobalAccount
 							nation='유럽'
 							foreignCurrency={foreignAccountData?.data[3]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[3]?.accountId}
-                            rate={exchangeRateData?.data[0]?.exchangeRate}
+                            rate={exchangeRateData?.data[3]?.exchangeRate}
 						/>
 						<GlobalAccount
 							nation='일본'
 							foreignCurrency={foreignAccountData?.data[5]?.accountBalance}
 							isExchange={false}
 							accountId={foreignAccountData?.data[5]?.accountId}
-                            rate={exchangeRateData?.data[3]?.exchangeRate}
+                            rate={exchangeRateData?.data[5]?.exchangeRate}
 						/>
                     </AccountDiv>
                 </Link>
