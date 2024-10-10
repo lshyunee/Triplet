@@ -254,13 +254,7 @@ const ForeignDetailPage = () => {
                           <s.PaymentArea>
                             <s.PaymentTitleArea>
                               <s.PaymentTime>
-                                {new Date(transaction.transactionDate).toLocaleTimeString('ko-KR', {
-                                  timeZone: 'UTC',
-                                  hour: '2-digit',
-                                  minute: '2-digit',
-                                  second: '2-digit',
-                                  hour12: false,
-                                })}
+                                {new Date(transaction.transactionDate).toLocaleTimeString()}
                               </s.PaymentTime>
                               <s.PaymentTitle>{transaction.merchantName || 'N/A'}</s.PaymentTitle>
                               <s.PaymentTitle>{transaction.categoryName || 'N/A'}</s.PaymentTitle>
