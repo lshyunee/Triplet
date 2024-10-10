@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 public class MemberUpdateRequest {
 
-    @NotNull
     private String name;
     @Pattern(regexp = "^[0-9]{10,11}$", message = "휴대폰 번호는 10~11자의 숫자입니다.")
     private String phoneNumber;
