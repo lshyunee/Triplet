@@ -49,12 +49,12 @@ const PasswordDots = styled.div`
     justify-content : center;
 `;
 
-const Dot = styled.div<{ isActive: boolean }>`
+const Dot = styled.div<{ active: boolean }>`
     width: 15px;
     height: 15px;
     margin: 0 8px;
     border-radius: 50%;
-    background-color: ${({ isActive }) => (isActive ? '#007BFF' : '#D3D3D3')};
+    background-color: ${({ active: active }) => (active ? '#007BFF' : '#D3D3D3')};
 `;
 
 const NumberPad = styled.div`
@@ -145,7 +145,7 @@ const SimplePasswordSetPage: React.FC = () => {
                     {Array(6)
                         .fill(null)
                         .map((_, idx) => (
-                            <Dot key={idx} isActive={password[idx] !== undefined} />
+                            <Dot key={idx} active={password[idx] !== undefined} />
                         ))}
                 </PasswordDots>
 
