@@ -126,7 +126,7 @@ const MoneyChartConsumpBar = styled.div<MoneyCategoryProps>`
     border-radius: 50px;
     overflow: hidden;
     height: 12px;
-`;
+`
 
 const MoneyChartBar = styled.div<MonyeProgressProps>`
     height : 100%;
@@ -170,8 +170,8 @@ const MoneyBudgetP = styled.p<MoneyCategoryProps>`
     margin : 0px;
     font-size : 14px;
     font-weight : 500;
-    color : ${props => props.color || "#666666"}
-`;
+    color : ${props => props.color || "#666666"};
+`
 
 const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
     margin : 0px;

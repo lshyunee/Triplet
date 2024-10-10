@@ -152,7 +152,6 @@ const OngoingTravelCard = () => {
         if (!travelData.travelId) {
             infoRefetch();
         }
-        console.log("여행아이디",travelData.travelId);
     }, [travelData.travelId]);
 
     useEffect(() => {
@@ -176,7 +175,6 @@ const OngoingTravelCard = () => {
 
         if (infoError !== null) {
             if(infoError.response.data.message){
-                console.log(infoError.response.data.message);
             }
         }
     }, [infoData, infoError]);

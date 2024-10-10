@@ -135,7 +135,7 @@ const MoneyBudgetP = styled.p<MoneyCategoryProps>`
     margin : 0px;
     font-size : 14px;
     font-weight : 500;
-    color : ${props => props.color || "#666666"}
+    color : ${props => props.color || "#666666"};
 `;
 
 const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
@@ -143,7 +143,7 @@ const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
     font-size : 14px;
     font-weight : 600;
     margin-right : 4px;
-    color : ${props => props.color || "#666666"}
+    color : ${props => props.color || "#666666"};
 `;
 
 interface MonyeProgressProps {
@@ -231,7 +231,6 @@ const CompletedTravelDetailPage = () => {
     useEffect(() => {
         if (travelData) {
             setTravel(travelData.data);
-            console.log(travelData.data);
         }
     }, [travelData, travelError]);
 
@@ -260,7 +259,6 @@ const CompletedTravelDetailPage = () => {
         if (budgetData) {
             const { isComplete, budgetList } = budgetData.data;
 
-            console.log(budgetData);
         
             setBudgetDetails({
                 isComplete,

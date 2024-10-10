@@ -170,23 +170,23 @@ const MoneyBudgetP = styled.p<MoneyCategoryProps>`
     margin : 0px;
     font-size : 14px;
     font-weight : 500;
-    color : ${props => props.color || "#666666"}
-`;
+    color : ${props => props.color || "#666666"};
+`
 
 const MoneyBudgetComsumpP = styled.p<MoneyCategoryProps>`
     margin : 0px;
     font-size : 14px;
     font-weight : 600;
     margin-right : 4px;
-    color : ${props => props.color || "#666666"}
-`;
+    color : ${props => props.color || "#666666"};
+`
 
 const StyledLink = styled(Link)`
     display: block;
     width: 100%;
     text-decoration: none !important;  /* 밑줄 강제로 제거 */
     color: inherit !important;         /* 링크 색상 기본값 제거 */
-`;
+`
 
 const OngoingTravelDetailPage = () => {
   
@@ -220,7 +220,6 @@ useEffect(() => {
         travelId : travelData.data.travelId,
         creatorId : travelData.data.creatorId,
       }));
-      console.log(travelData);
     }
     budgetRefetch();
 }, [travelData, travelError]);
@@ -264,7 +263,6 @@ useEffect(() => {
           setUsedBudget(budgetList.reduce(
             (total:Number, usedBudget: any) => total + usedBudget, 0));
 
-        console.log(budgetDetails?.budgetList);
 
       }
   

@@ -109,7 +109,6 @@ const WithdrawalModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
 
 
     if(accountData && foreignAccountData){
-      console.log(accountData.data.accountBalance);
       if(accountData.data.accountBalance === 0){
         const foreignAccountBalance : number = 
           foreignAccountData.data.reduce((total : number, account : any) => total + account.accountBalance, 0);

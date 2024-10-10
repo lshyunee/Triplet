@@ -140,17 +140,20 @@ const TransferPage = () => {
     error: transferError,
     loading: transferLoading,
     status: transferStatus,
-    refetch: transferRefetcch } = useAxios('/transaction/create', 'POST',
+    refetch: transferRefetcch } = useAxios('/transaction/create', 'POST', undefined,
     {
-      "depositAccountNumber": userAccountNumber,
-      "transactionsBalance": transferAmount,
-      "withdrawalAccountNumber": transferAccountNumber,
+      "depositAccountNumber": transferAccountNumber,
+      "transactionBalance": transferAmount,
+      "withdrawalAccountNumber": userAccountNumber,
     }
     )
 
   const transferOnClick = () => {
     const fetchData = async () => {
-			try {
+			console.log(userAccountNumber)
+      console.log(transferAccountNumber)
+      console.log(transferAmount)
+      try {
 			await Promise.all([
 				transferRefetcch(),     // 원화계좌 API 요청
 			]);

@@ -147,7 +147,6 @@ const TravelDetailCard: React.FC<TravelDetailCardProps> =
     useEffect(()=>{
 
         if(creatorData && creatorStatus===200){
-            console.log("creator", creatorData);
             setCreator(creatorData.data);
         }
 
