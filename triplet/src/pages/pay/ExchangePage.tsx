@@ -188,7 +188,10 @@ const s = {
     if (inputTimeout) clearTimeout(inputTimeout);
   
     // 입력된 원화 금액을 외화로 환산
-    const newToAmount = Math.floor(Number(value) / exchangeRate);
+    let newToAmount = Math.floor(Number(value) / exchangeRate);
+    if (foreignDetailData?.data?.currency === "JPY") {
+      newToAmount = newToAmount * 100
+    }
   
     // 일본 엔화(JPY)의 경우 100 단위로 나누어지지 않으면 유효성 검사 실패
     if (foreignDetailData?.data?.currency === "JPY" && newToAmount % 100 !== 0) {
@@ -199,20 +202,14 @@ const s = {
   
     // 2초 후 실행될 타이머 설정
     const timeout = setTimeout(() => {
-      if (foreignDetailData?.data?.currency === "JPY") {
-        // 엔화에 맞춘 원화 금액을 100엔 단위로 다시 계산
-        const correctToAmount = newToAmount * 100; // 100엔 단위로 조정
-        const correctFromAmount = Math.ceil(correctToAmount * exchangeRate); // 맞춰진 엔화에 맞춘 원화 금액 계산
-        setFromAmount(Math.ceil(correctFromAmount)); // 올바른 원화 금액으로 수정
-        setToAmount(correctToAmount); // 100엔 단위로 맞춘 엔화 설정
-      } else {
-        // 엔화가 아닌 경우 기존 로직 적용
-        const correctFromAmount = Math.ceil(newToAmount * exchangeRate); // 소수점 반올림 후 원화로 다시 계산
+        let correctFromAmount = Math.ceil(newToAmount * exchangeRate); // 소수점 반올림 후 원화로 다시 계산
+        if (foreignDetailData?.data?.currency === "JPY") {
+          correctFromAmount = Math.ceil(correctFromAmount / 100)
+        }
         if (Number(value) > correctFromAmount) {
           setFromAmount(correctFromAmount);  // 올바른 원화 금액으로 수정
         }
         setToAmount(newToAmount);
-      }
     }, 2000);
   
     // 타이머 저장
@@ -235,17 +232,13 @@ const s = {
   
     // 엔화(JPY) 입력 시 소수점 제거 및 100엔 단위로 설정
     let newFromAmount = Number(value) * exchangeRate;
-  
     if (foreignDetailData?.data?.currency === "JPY") {
-      // 소수점이 있을 경우 소수점 제거 후 1을 더함 (100엔 단위 맞추기)
-      if (newFromAmount % 100 !== 0) {
-        newFromAmount = Math.floor(newFromAmount / 100) + 1; // 100엔 단위로 맞춤
-      }
-    } else {
-      // 엔화가 아닌 경우 소수점 제거 후 반영
-      if (newFromAmount % 1 !== 0) {
-        newFromAmount = Math.floor(newFromAmount) + 1;
-      }
+      newFromAmount = newFromAmount / 100
+    }
+  
+    // 소수점 제거 후 반영
+    if (newFromAmount % 1 !== 0) {
+      newFromAmount = Math.floor(newFromAmount) + 1;
     }
   
     // 원화 칸에 즉시 반영
