@@ -2,11 +2,14 @@ package com.ssafy.triplet.travel.service;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
 import co.elastic.clients.elasticsearch._types.FieldValue;
+import co.elastic.clients.elasticsearch._types.SortOrder;
 import co.elastic.clients.elasticsearch._types.query_dsl.BoolQuery;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.RangeQuery;
 import co.elastic.clients.elasticsearch.core.DeleteRequest;
+import co.elastic.clients.elasticsearch.core.SearchResponse;
 import co.elastic.clients.elasticsearch.core.UpdateRequest;
+import co.elastic.clients.elasticsearch.core.search.Hit;
 import co.elastic.clients.json.JsonData;
 import com.ssafy.triplet.exception.CustomErrorCode;
 import com.ssafy.triplet.exception.CustomException;
@@ -24,6 +27,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,9 +50,8 @@ public class ElasticsearchService {
 
     public Page<TravelFeedListResponse> getTravelSNSList(Long userId, String countryName, Integer memberCount, Double minBudget, Double maxBudget,
                                                          Integer minDays, Integer maxDays, int page, int kind, int pageSize) {
-//        try {
-        BoolQuery.Builder boolQueryBuilder = buildCommonQuery(userId);
-        System.out.println("들어오나요? kind : " + kind);
+        try {
+            BoolQuery.Builder boolQueryBuilder = buildCommonQuery(userId);
 
             if (kind == 0) {
                 recommendedTravel(boolQueryBuilder, userId);
@@ -62,9 +65,9 @@ public class ElasticsearchService {
                 throw new CustomException(CustomErrorCode.INVALID_KIND_ERROR);
             }
 
-//        } catch (Exception e) {
-//            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
-//        }
+        } catch (Exception e) {
+            throw new CustomException(CustomErrorCode.ELASTICSEARCH_ERROR);
+        }
     }
 
     // 빌드 메서드
@@ -103,21 +106,50 @@ public class ElasticsearchService {
     }
 
     // kind = 0 (추천)
-    private void recommendedTravel(BoolQuery.Builder boolQueryBuilder, Long userId) {
+    private void recommendedTravel(BoolQuery.Builder boolQueryBuilder, Long userId) throws IOException {
         // 모든 여행
-        SearchHits<TravelFeedListResponse> allTravels = elasticsearchOperations.search(
-                NativeQuery.builder().withQuery(Query.of(q -> q.matchAll(m -> m)))
-                        .withPageable(PageRequest.of(0, 100))
-                        .build(),
-                TravelFeedListResponse.class
-        );
+//        SearchHits<TravelFeedListResponse> allTravels = elasticsearchOperations.search(
+//                NativeQuery.builder().withQuery(Query.of(q -> q.matchAll(m -> m)))
+//                        .withPageable(PageRequest.of(0, 100))
+//                        .build(),
+//                TravelFeedListResponse.class
+//        );
+
+        final List<FieldValue>[] searchAfterSortValues = new List[]{null};  // Use an array to make it effectively final
+
+        List<Hit<TravelFeedListResponse>> allTravels = new ArrayList<>();
+
+        while (true) {
+            SearchResponse<TravelFeedListResponse> response = elasticsearchClient.search(s -> s
+                            .index("travel-index")
+                            .query(q -> q.matchAll(m -> m))  // Match all query to fetch all documents
+                            .sort(so -> so
+                                    .field(f -> f
+                                            .field("_id")  // Sort by document ID
+                                            .order(SortOrder.Asc)  // Ascending order
+                                    )
+                            )
+                            .size(100)  // Fetch 100 documents per page
+                            .searchAfter(searchAfterSortValues[0]),  // Use the search_after values from previous page
+                    TravelFeedListResponse.class);
+
+            if (response.hits().hits().isEmpty()) {
+                break;
+            }
+
+            allTravels.addAll(response.hits().hits());
+
+            searchAfterSortValues[0] = response.hits().hits().get(response.hits().hits().size() - 1).sort();
+        }
+
 
         // 모든 여행에 초기점수 0점
-        Map<Long, Double> travelScores = allTravels.getSearchHits().stream()
+        Map<Long, Double> travelScores = allTravels.stream()
                 .collect(Collectors.toMap(
-                        hit -> hit.getContent().getId(),
-                        hit -> 0.0
+                        hit -> hit.source().getId(),
+                        hit -> 0.0  // 초기 점수 0.0
                 ));
+
 
         // 유저 정보 조회
         Query userQuery = Query.of(q -> q.term(t -> t.field("id").value(userId)));
