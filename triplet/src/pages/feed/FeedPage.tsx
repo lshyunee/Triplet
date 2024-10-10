@@ -235,11 +235,12 @@ const FeedPage = () => {
             setSelectedSortOption('정확도순');
             setPage(1);
             dispatch(setPages(1));
+            searchRefetch();
         }
     };
 
     useEffect(()=>{
-        if(!searchLoading){
+        if(!searchLoading && kind !== 2){
             dispatch(initFeedTravels());
             searchRefetch();
         }
@@ -297,8 +298,8 @@ const FeedPage = () => {
       }, [searchData, searchError]);
 
     const loadMore = () => {
-        if (!searchLoading && hasMore) {
-            setPage((prevPage) => prevPage + 1);
+        if (!searchLoading && hasMore && travels.travelData.length > 0) {
+            setPage((prevPage) => prevPage + 1); 
         }
     };
 
@@ -370,7 +371,9 @@ const FeedPage = () => {
                             image={travel.image}
                         />
                     ))}
-                    <TargetDiv ref={targetRef} />
+                    {hasMore && travels.travelData.length > 0 && (
+                        <TargetDiv ref={targetRef} />
+                    )}
                 </TravelDiv>
                 <DetailSearchBottomSheet isOpen={isBottomSheetOpen} 
             onClose={detailSearchClose}></DetailSearchBottomSheet>
