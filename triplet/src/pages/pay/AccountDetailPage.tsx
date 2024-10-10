@@ -8,7 +8,7 @@ import { ReactComponent as Calendar } from '../../assets/pay/calendar.svg';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
 import { isDate } from 'util/types';
-import { addDays } from 'react-datepicker/dist/date_utils';
+import { addDays, newDate } from 'react-datepicker/dist/date_utils';
 import useAxios from '../../hooks/useAxios';
 import { useNavigate } from 'react-router-dom';
 interface Transaction {
@@ -228,6 +228,10 @@ const AccountDetailPage = () => {
   const [dateRange, setDateRange] = useState<any | null>([week, today]);
   const [start, end] = dateRange;
 
+  useEffect(() => {
+    console.log(dateRange)
+  }, [dateRange])
+
   const dateInputRef = useRef<DatePicker>(null);
   
   const [isDateOpen, setIsDateOpen] = useState<boolean>(false);
@@ -239,8 +243,8 @@ const AccountDetailPage = () => {
     status: transactionStatus, 
     refetch: transactionRefetch } = useAxios(`/transaction`, 'POST', undefined,{
       accountId: accountDetailData?.data?.accountId,
-      startDate: start,
-      endDate: end
+      startDate: new Date(+start + 3240 * 10000),
+      endDate: new Date(+end + 3240 * 10000)
     });
 
   useEffect(() => {

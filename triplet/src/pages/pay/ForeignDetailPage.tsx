@@ -244,8 +244,8 @@ const ForeignDetailPage = () => {
     status: transactionStatus, 
     refetch: transactionRefetch } = useAxios(`/transaction`, 'POST', undefined,{
       accountId: accountId,
-      startDate: start,
-      endDate: end
+      startDate: new Date(+start + 3240 * 10000),
+      endDate: new Date(+end + 3240 * 10000)
     });
   
   useEffect(() => {
