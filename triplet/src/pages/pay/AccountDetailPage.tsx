@@ -332,11 +332,7 @@ const AccountDetailPage = () => {
                 <s.PaymentArea>
                   <s.PaymentTitleArea>
                     <s.PaymentTime>
-                    {(() => {
-                    const transactionDate = new Date(transaction.transactionDate);
-                    transactionDate.setHours(transactionDate.getHours() - 9);
-                    return transactionDate.toLocaleTimeString();
-                    })()}
+                    {new Date(transaction.transactionDate).toLocaleTimeString()}
 </s.PaymentTime>
                     <s.PaymentTitle>{transaction.transactionName}</s.PaymentTitle>
                   </s.PaymentTitleArea>
