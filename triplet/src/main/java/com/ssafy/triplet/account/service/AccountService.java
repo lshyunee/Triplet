@@ -259,7 +259,8 @@ public class AccountService {
         // 조회 결과 날짜별로 그룹화
         List<TransactionList> transactions = transactionListRepository.findByTransactionDateBetween(accountId, start, end);
         Map<LocalDate, List<TransactionList>> groupedBy = transactions.stream()
-                .collect(Collectors.groupingBy(transaction -> transaction.getTransactionDate().toLocalDate()));
+                .collect(Collectors.groupingBy(transaction -> transaction.getTransactionDate().toLocalDate(),
+                        () -> new TreeMap<>(Comparator.reverseOrder()), Collectors.toList()));
 
         return convertTransactionsToDTO(groupedBy);
     }
