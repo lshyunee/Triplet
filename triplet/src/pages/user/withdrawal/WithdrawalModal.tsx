@@ -50,11 +50,11 @@ const ConfirmDiv = styled.div`
   align-items: stretch;
 `;
 
-const Button = styled.button<{ isCancel?: boolean }>`
+const Button = styled.button<{ cancel?: boolean }>`
   width: 50%;
   height: 50px;
-  background-color: ${(props) => (props.isCancel ? '#E0E0E0' : '#008DE7')};
-  color: ${(props) => (props.isCancel ? '#000000' : '#FFFFFF')};
+  background-color: ${(props) => (props.cancel ? '#E0E0E0' : '#008DE7')};
+  color: ${(props) => (props.cancel ? '#000000' : '#FFFFFF')};
   font-weight: 400;
   font-size: 16px;
   border: none;
@@ -146,7 +146,7 @@ const WithdrawalModal: React.FC<ModalProps> = ({ isOpen, onClose }) => {
       <Title>회원 탈퇴</Title>
       <Description>정말 회원탈퇴 하시겠습니까?</Description>
       <ConfirmDiv>
-        <Button isCancel onClick={onClose}>취소</Button>
+        <Button cancel={true} onClick={onClose}>취소</Button>
         <Button onClick={handleWithdrawal}>확인</Button>
       </ConfirmDiv>
     </ModalContentDiv>
