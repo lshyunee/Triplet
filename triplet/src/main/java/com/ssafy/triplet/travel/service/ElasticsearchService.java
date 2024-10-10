@@ -106,48 +106,20 @@ public class ElasticsearchService {
     }
 
     // kind = 0 (추천)
-    private void recommendedTravel(BoolQuery.Builder boolQueryBuilder, Long userId) throws IOException {
+    private void recommendedTravel(BoolQuery.Builder boolQueryBuilder, Long userId) {
         // 모든 여행
-//        SearchHits<TravelFeedListResponse> allTravels = elasticsearchOperations.search(
-//                NativeQuery.builder().withQuery(Query.of(q -> q.matchAll(m -> m)))
-//                        .withPageable(PageRequest.of(0, 100))
-//                        .build(),
-//                TravelFeedListResponse.class
-//        );
-
-        final List<FieldValue>[] searchAfterSortValues = new List[]{null};  // Use an array to make it effectively final
-
-        List<Hit<TravelFeedListResponse>> allTravels = new ArrayList<>();
-
-        while (true) {
-            SearchResponse<TravelFeedListResponse> response = elasticsearchClient.search(s -> s
-                            .index("travel-index")
-                            .query(q -> q.matchAll(m -> m))  // Match all query to fetch all documents
-                            .sort(so -> so
-                                    .field(f -> f
-                                            .field("_id")  // Sort by document ID
-                                            .order(SortOrder.Asc)  // Ascending order
-                                    )
-                            )
-                            .size(100)  // Fetch 100 documents per page
-                            .searchAfter(searchAfterSortValues[0]),  // Use the search_after values from previous page
-                    TravelFeedListResponse.class);
-
-            if (response.hits().hits().isEmpty()) {
-                break;
-            }
-
-            allTravels.addAll(response.hits().hits());
-
-            searchAfterSortValues[0] = response.hits().hits().get(response.hits().hits().size() - 1).sort();
-        }
-
+        SearchHits<TravelFeedListResponse> allTravels = elasticsearchOperations.search(
+                NativeQuery.builder().withQuery(Query.of(q -> q.matchAll(m -> m)))
+                        .withPageable(PageRequest.of(0, 10000))
+                        .build(),
+                TravelFeedListResponse.class
+        );
 
         // 모든 여행에 초기점수 0점
-        Map<Long, Double> travelScores = allTravels.stream()
+        Map<Long, Double> travelScores = allTravels.getSearchHits().stream()
                 .collect(Collectors.toMap(
-                        hit -> hit.source().getId(),
-                        hit -> 0.0  // 초기 점수 0.0
+                        hit -> hit.getContent().getId(),
+                        hit -> 0.0
                 ));
 
 
