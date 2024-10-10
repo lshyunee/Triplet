@@ -179,7 +179,7 @@ const TravelDetailCard: React.FC<TravelDetailCardProps> =
                     <PriceUsedP>
                         {usedBudget} 
                     </PriceUsedP>
-                        <PriceInfoP>/ {totalBudget } {currency}</PriceInfoP>
+                        <PriceInfoP>/ {totalBudget } 원</PriceInfoP>
                 </PriceInfo>
             </CardDiv>
             <RemoveModal isOpen={removeOpen} onClose={() => {setRemoveOpen(false)}} travelId={travelId} creatorId={creatorId}/>

@@ -155,6 +155,8 @@ const OngoingTravelCard = () => {
     }, [travelData.travelId]);
 
     useEffect(() => {
+
+        
         if (infoData?.data) {
             dispatch(ongoingTravelDataInsert({
               travelId: infoData.data.travelId,
@@ -198,7 +200,7 @@ const OngoingTravelCard = () => {
                 <ProgressContainer>
                     <ProgressBar paid={(travelData.usedBudget/travelData.totalBudget*100)} />
                 </ProgressContainer>
-                <PriceInfo>{travelData.usedBudget} <PriceInfoP>/ {travelData.totalBudget}원</PriceInfoP></PriceInfo>
+                <PriceInfo>{travelData.usedBudget} <PriceInfoP>/ {travelData.totalBudget} 원</PriceInfoP></PriceInfo>
             </CardDiv>
         </PositionDiv>
         </StyledLink>
