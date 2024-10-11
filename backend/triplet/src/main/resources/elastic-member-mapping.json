@@ -1,0 +1,27 @@
+{
+  "mappings": {
+    "properties": {
+      "age": {
+        "type": "integer"
+      },
+      "gender": {
+        "type": "integer"
+      },
+      "id": {
+        "type": "long"
+      },
+      "is_notification_enabled": {
+        "type": "boolean"
+      },
+      "travels": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      }
+    }
+  }
+}
