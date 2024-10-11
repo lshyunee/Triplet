@@ -1,0 +1,45 @@
+{
+  "mappings": {
+    "properties": {
+      "country_id": {
+        "type": "integer"
+      },
+      "country_name": {
+        "type": "text"
+      },
+      "creator_id": {
+        "type": "long"
+      },
+      "days": {
+        "type": "integer"
+      },
+      "id": {
+        "type": "long"
+      },
+      "image": {
+        "type": "text"
+      },
+      "is_shared": {
+        "type": "boolean"
+      },
+      "member_count": {
+        "type": "integer"
+      },
+      "share_status": {
+        "type": "boolean"
+      },
+      "status": {
+        "type": "boolean"
+      },
+      "title": {
+        "type": "text"
+      },
+      "total_budget": {
+        "type": "double"
+      },
+      "total_budget_won": {
+        "type": "double"
+      }
+    }
+  }
+}
