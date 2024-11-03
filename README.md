@@ -37,25 +37,6 @@ Triplet은 여행 예산 계획과 여행 결제 내역을 카테고리 별로 �
 - 9/6 ~ 10/10(개발)
 
 
-### 현 상황
-
-- - 통계 참고자료
-    
-    https://www.unicornfactory.co.kr/article/2023110913240376635
-    
-    [opensurvey_trend_travel_2023.pdf](https://prod-files-secure.s3.us-west-2.amazonaws.com/2dc1d950-1989-4669-95f3-9ef532b45a49/e636dc4c-c868-4572-8f88-f834d9416c55/opensurvey_trend_travel_2023.pdf)
-    
-    예산 관리에 어려움을 겪음과 동시에 예산을 절약하거나 투자하고 싶은 영역도 세분화되고 있음
-    
-    → 다른 사람들의 여행 예산과 경비 내역을 비교/참고 가능
-    
-    → 예산을 투자하거나 절약하기 위한 방법을 다양하게 찾아볼 수 있음
-    
-    ![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/2dc1d950-1989-4669-95f3-9ef532b45a49/d1fe2f6f-80b9-4241-bb5e-eb7d0d87a389/image.png)
-
-    ![image.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/2dc1d950-1989-4669-95f3-9ef532b45a49/d7226bee-af7e-4163-8743-ea53833630c9/image.png)
----
-
 ## : sparkles: 주요 기능
 
 ### 주요 기능
